@@ -17,8 +17,9 @@ import {
 } from "@material-ui/icons";
 import { Switch, Route } from "react-router-dom";
 import appBarStyles from "./styles/appbar";
-import Auth from "./pages/auth/index";
 import withStyles from "@material-ui/core/styles/withStyles";
+// import Auth from "./pages/auth/index";
+import SimpleTabs from "./pages/auth/index"
 
 interface Props extends WithStyles<typeof appBarStyles> {
   children?: React.ReactElement;
@@ -68,7 +69,7 @@ class App extends React.Component<Props> {
           </Toolbar>
         </AppBar>
         <Switch>
-          <Route path="/auth" component={Auth} />
+          <Route path="/auth" component={SimpleTabs} />
         </Switch>
       </div>
     );
