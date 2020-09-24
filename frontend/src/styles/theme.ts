@@ -1,10 +1,12 @@
-import { createMuiTheme } from "@material-ui/core/styles"
+import { createMuiTheme } from "@material-ui/core/styles";
 
-export default {}
-/*
-createMuiTheme({
-    palette: {
-        main: ""
-    }
-})
-*/
+export default createMuiTheme({
+//  palette: {
+//    primary: {},
+//  },
+  typography: {
+    button: {
+      fontFamily: "Ubuntu",
+    },
+  }
+});
