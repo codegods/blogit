@@ -1,17 +1,21 @@
-import React from 'react';
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import SignUp from './signup'
-import SignIn from './signin'
+import React from "react";
+import {
+  Tabs,
+  Tab,
+  Typography,
+  Box,
+  Grow,
+  Card,
+  CardContent,
+} from "@material-ui/core";
+import SignUp from "./signup";
+import SignIn from "./signin";
+import { root as useStyles } from "../../styles/auth";
 
 interface TabPanelProps {
   children?: React.ReactNode;
-  index: any;
-  value: any;
+  index: number;
+  value: number;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -21,55 +25,60 @@ function TabPanel(props: TabPanelProps) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`auth-tabpanel-${index}`}
+      aria-labelledby={`auth-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
+      <Grow in={value === index}>
+        <Box>
+          <Typography component="div">{children}</Typography>
         </Box>
-      )}
+      </Grow>
     </div>
   );
 }
 
-function a11yProps(index: any) {
+function a11yProps(index: number) {
   return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    id: `auth-tab-${index}`,
+    "aria-controls": `auth-tabpanel-${index}`,
   };
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
-
-export default function SimpleTabs() {
+export default function Auth() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_e: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Sign-In" {...a11yProps(0)} />
-          <Tab label="Sign-Up" {...a11yProps(1)} />
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
-        <SignIn />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <SignUp />
-      </TabPanel>
+    <div>
+      <div className={classes.backdrop} />
+      <div className={classes.showText}>
+        <Typography variant="h1">blogit</Typography>
+        <Typography variant="subtitle1">The new era of blogging</Typography>
+      </div>
+      <Card className={classes.root}>
+        <CardContent>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="simple tabs example"
+            className={classes.tabPanel}
+          >
+            <Tab className={classes.tab} label="Sign-In" {...a11yProps(0)} />
+            <Tab className={classes.tab} label="Sign-Up" {...a11yProps(1)} />
+          </Tabs>
+          <TabPanel value={value} index={0}>
+            <SignIn />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <SignUp />
+          </TabPanel>
+        </CardContent>
+      </Card>
     </div>
   );
 }
