@@ -31,3 +31,5 @@ venv/
 
 # Python cache
 **/__pycache__
+
+.idea
