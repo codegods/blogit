@@ -15,7 +15,7 @@ def read_and_parse_json(file_name: str) -> dict:
         return json.loads(f.read())
 
 
-class Config:
+class Config(object):
     # Flask server config
     FLASK_HOST = "0.0.0.0"
     FLASK_PORT = "2811"
@@ -35,8 +35,11 @@ class Config:
     SHOULD_USE_SOURCEMAP = "false"
 
     # Development mode
-    NODE_ENV = "development"
     MODE = "development"
+
+    # Start react dev server along with the flask server
+    RUN_REACT_WITH_FLASK = "true"
+    RUN_FLASK_ON_DEVELOPMENT = "true"
 
     # Configuring the MYSQL server
     MYSQL_HOST = "localhost"
@@ -47,5 +50,10 @@ class Config:
     # MYSQL_PASSWORD = "password"
 
 
+# The .env file is gitignored, so we use it to
+# store application secrets such as MYSQL_PASSWORD
+# and APP_SECRET_KEY
+secrets = read_and_parse_json("./.env")
+
 config = Config()
-config.MYSQL_PASSWORD = read_and_parse_json("./.env")["MYSQL_PASSWORD"]
+config.MYSQL_PASSWORD = secrets["MYSQL_PASSWORD"]
