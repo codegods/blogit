@@ -1,0 +1,8 @@
+*/node_modules
+venv
+build
+.vscode
+.github
+__pycache__
+*/__pycache__
+*/*/__pycache__
