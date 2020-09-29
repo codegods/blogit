@@ -3,6 +3,7 @@ venv
 build
 .vscode
 .github
+.git
 __pycache__
 */__pycache__
 */*/__pycache__
