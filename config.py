@@ -12,7 +12,7 @@ import json
 def read_and_parse_json(file_name: str) -> dict:
 
     with open(file_name) as f:
-        return json.loads(f.read())
+        return json.load(f)
 
 
 class Config(object):
@@ -38,7 +38,7 @@ class Config(object):
     MODE = "development"
 
     # Start react dev server along with the flask server
-    RUN_REACT_WITH_FLASK = "true"
+    RUN_REACT_ON_DEVELOPMENT = "true"
     RUN_FLASK_ON_DEVELOPMENT = "true"
 
     # Configuring the MYSQL server
@@ -53,7 +53,8 @@ class Config(object):
 # The .env file is gitignored, so we use it to
 # store application secrets such as MYSQL_PASSWORD
 # and APP_SECRET_KEY
-secrets = read_and_parse_json("./.env")
+secrets = read_and_parse_json("./secrets.json")
 
 config = Config()
 config.MYSQL_PASSWORD = secrets["MYSQL_PASSWORD"]
+config.FLASK_SECRET_KEY = secrets["SECRET_KEY"]
