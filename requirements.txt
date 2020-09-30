@@ -1,3 +1,4 @@
 flask
 selenium
 mysql.connector
+prompt_toolkit
