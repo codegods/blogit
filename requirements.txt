@@ -1,4 +1,5 @@
 flask
 selenium
 mysql.connector
-prompt_toolkit
+colorama
+blessings
