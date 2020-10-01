@@ -1,6 +1,7 @@
 import flask
 import os
-from prompt_toolkit import print_formatted_text, HTML
+from helpers import screen
+from api import some_view
 
 
 def load_from_env(key, default=None):
@@ -12,14 +13,17 @@ def load_from_env(key, default=None):
 
 def create_app():
     app = flask.Flask(__name__)
+    app.register_blueprint(some_view.app)
+
+    screen.Screen(app)
+
     try:
         app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
     except KeyError:
-        print_formatted_text(
-            HTML(
-                "<ansiyellow><b>WARNING</b> Secret key not specified in config file. Using default security key."
-                + " <b>This is very dangerous in production mode.</b></ansiyellow>"
-            )
+        text = ("{}: Secret key not specified in config file. Using default security key.".format(app.console.bold('WARNING'))
+                + " This is very dangerous in production mode")
+        print(
+            f"\n{app.console.yellow(text)}\n"
         )
 
     @app.route("/")
@@ -34,8 +38,9 @@ def run_development_server():
     app.config["DEBUG"] = True
     app.run(
         load_from_env("FLASK_HOST", ""),
-        load_from_env("FLASK_PORT", "2811"),
+        int(load_from_env("FLASK_PORT", "2811")),
         load_dotenv=False,
+        use_reloader=False,
     )
 
 
@@ -44,12 +49,19 @@ def run_production_server():
 
     app = create_app()
     server = WSGIServer(
-        (load_from_env("FLASK_HOST", ""), load_from_env("FLASK_PORT", "2811")), app
+        (load_from_env("FLASK_HOST", ""), int(load_from_env("FLASK_PORT", "2811"))), app
     )
     server.serve_forever()
 
 
 if __name__ == "__main__":
+
+    # If the functions were called as modules, then screen is already initialised
+    # but if the code reaches here, it means that it is not initialised.
+
+    from colorama import init
+    init()
+
     if load_from_env("FLASK_ENV") == "production":
         run_production_server()
     else:
