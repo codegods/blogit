@@ -1,20 +1,19 @@
 import importlib.util
 import os
 import re
-from prompt_toolkit import HTML, print_formatted_text
+from blessings import Terminal
 
 
-def load(file="config.py", root=None):
+def load(file="config.py", root=None, term=None):
+
+    if not isinstance(term, Terminal):
+        term = Terminal()
 
     PROJECT_ROOT = root or os.path.abspath(
         ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
     )
 
-    print_formatted_text(
-        HTML(
-            f"Loading config from <ansigreen>{os.path.join(PROJECT_ROOT, file)}</ansigreen>"
-        )
-    )
+    print(f"Loading config from {term.green(os.path.join(PROJECT_ROOT, file))}")
 
     # Load the config file
     spec = importlib.util.spec_from_file_location("", os.path.join(PROJECT_ROOT, file))
@@ -27,11 +26,7 @@ def load(file="config.py", root=None):
     configuration = {}
     for x in dir(config.config):
         if not re.match("__[a-zA-Z0-9_]*__", x):
-            print_formatted_text(
-                HTML(
-                    f"<ansiwhite>Setting value for </ansiwhite><ansicyan>{x}</ansicyan>"
-                )
-            )
+            print(term.white("Setting value for ") + term.cyan(x))
             configuration.update([(x, config.config.__getattribute__(x))])
 
     # Set environment variables
@@ -45,10 +40,14 @@ def load(file="config.py", root=None):
 
 
 if __name__ == "__main__":
-    print_formatted_text(
-        HTML(
-            "<b><ansiblue>lib/config_loader.py</ansiblue><ansired> is a module and is not"
-            + " supposed to be run as a module.</ansired></b>"
+    from colorama import init
+
+    init()
+    t = Terminal()
+    print(
+        t.bold(
+            t.blue("lib/config_loader.py")
+            + t.red("is a module and is not supposed to be run as a script.")
         )
     )
     exit(1)

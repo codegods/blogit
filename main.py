@@ -20,11 +20,13 @@ def create_app():
     try:
         app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
     except KeyError:
-        text = ("{}: Secret key not specified in config file. Using default security key.".format(app.console.bold('WARNING'))
-                + " This is very dangerous in production mode")
-        print(
-            f"\n{app.console.yellow(text)}\n"
+        text = (
+            "{}: Secret key not specified in config file. Using default security key.".format(
+                app.console.t.bold("WARNING") + app.console.t.yellow
+            )
+            + " This is very dangerous in production mode"
         )
+        print(f"\n{app.console.t.yellow + text + app.console.t.normal}\n")
 
     @app.route("/")
     def index():
@@ -60,6 +62,7 @@ if __name__ == "__main__":
     # but if the code reaches here, it means that it is not initialised.
 
     from colorama import init
+
     init()
 
     if load_from_env("FLASK_ENV") == "production":
