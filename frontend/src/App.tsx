@@ -8,6 +8,7 @@ import {
   Badge,
   IconButton,
   Tooltip,
+  LinearProgress,
 } from "@material-ui/core";
 import {
   SearchOutlined as SearchIcon,
@@ -16,16 +17,61 @@ import {
   ExploreOutlined,
 } from "@material-ui/icons";
 import { Switch, Route } from "react-router-dom";
-import appBarStyles from "./styles/appbar";
+import { appBarStyles, progressBar } from "./styles/appbar";
 import withStyles from "@material-ui/core/styles/withStyles";
-// import Auth from "./pages/auth/index";
-import SimpleTabs from "./pages/auth/index"
+import Lazy from "./utils/Lazy";
 
-interface Props extends WithStyles<typeof appBarStyles> {
-  children?: React.ReactElement;
+// Application context interface
+interface Context {
+  load?: () => null;
+  loadOff?: () => null;
 }
 
-class App extends React.Component<Props> {
+interface ProgState {
+  isLoading: boolean;
+}
+
+let ApplicationContext = React.createContext<Context>({});
+
+const Auth = Lazy(() => import("./pages/auth/index"));
+
+let Loader = (context: any) => 
+  withStyles(progressBar)(
+    class extends React.Component<WithStyles<typeof progressBar>> {
+      static contextType = ApplicationContext;
+  
+      state: ProgState = {
+        isLoading: false,
+      };
+  
+      constructor(
+        props: WithStyles<typeof progressBar>
+      ) {
+        super(props);
+        this.context = context
+        this.context.load = (): void => {
+          this.setState({
+            isLoading: true,
+          });
+        };
+  
+        this.context.loadOff = (): void => {
+          this.setState({
+            isLoading: false,
+          });
+        };
+      }
+      render() {
+        const { classes } = this.props;
+        if (this.state.isLoading)
+          return <LinearProgress className={classes.root} />;
+  
+        return null;
+      }
+    }
+  );
+
+class App extends React.Component<WithStyles<typeof appBarStyles>> {
   render() {
     const { classes } = this.props;
 
@@ -68,9 +114,18 @@ class App extends React.Component<Props> {
             </Tooltip>
           </Toolbar>
         </AppBar>
-        <Switch>
-          <Route path="/auth" component={SimpleTabs} />
-        </Switch>
+        <ApplicationContext.Provider value={{}}>
+          <div>
+            <ApplicationContext.Consumer>
+              {
+                context => <Loader(context) />
+              }
+            </ApplicationContext.Consumer>
+            <Switch>
+              <Route path="/auth" component={Auth} />
+            </Switch>
+          </div>
+        </ApplicationContext.Provider>
       </div>
     );
   }

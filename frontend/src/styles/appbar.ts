@@ -1,6 +1,6 @@
 import { createStyles, Theme, fade } from "@material-ui/core/styles";
 
-export default (theme:Theme) => createStyles({
+export let appBarStyles = (theme:Theme) => createStyles({
   root: {
     flexGrow: 1,
   },
@@ -52,5 +52,13 @@ export default (theme:Theme) => createStyles({
     "& svg.MuiSvgIcon-root": {
       fill: theme.palette.grey[200]
     }
-  }
+  },
 });
+
+export let progressBar = (theme: Theme) => createStyles({
+  root: {
+    position: "fixed",
+    top: 0,
+    width: "100%"
+  }
+})
