@@ -4,9 +4,6 @@
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 
-// Makes the script crash on unhandled rejections instead of silently
-// ignoring them. In the future, promise rejections that are not handled will
-// terminate the Node.js process with a non-zero exit code.
 process.on('unhandledRejection', err => {
   throw err;
 });
@@ -41,7 +38,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 // Tools like Cloud9 rely on this.
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000; // TODO Change variable names
 const HOST = process.env.HOST || '0.0.0.0';
 
 if (process.env.HOST) {
@@ -101,7 +98,7 @@ checkBrowsers(paths.appPath, isInteractive)
     // During development, webpack and flask run on different ports
     // while they are on same address in production mode. So, we will
     // have to proxy all calls to the API
-    const proxySetting = `${protocol}://localhost:2811`
+    const proxySetting = `${protocol}://localhost:2811` // TODO change to configurable
     const proxyConfig = prepareProxy(
       proxySetting,
       paths.appPublic,
