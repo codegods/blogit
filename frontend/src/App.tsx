@@ -9,6 +9,7 @@ import {
   IconButton,
   Tooltip,
   LinearProgress,
+  Backdrop
 } from "@material-ui/core";
 import {
   SearchOutlined as SearchIcon,
@@ -17,59 +18,23 @@ import {
   ExploreOutlined,
 } from "@material-ui/icons";
 import { Switch, Route } from "react-router-dom";
-import { appBarStyles, progressBar } from "./styles/appbar";
+import { appBarStyles, LoaderStyles } from "./styles/appbar";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Lazy from "./utils/Lazy";
 
-// Application context interface
-interface Context {
-  load?: () => null;
-  loadOff?: () => null;
-}
 
-interface ProgState {
-  isLoading: boolean;
-}
+const Auth = React.lazy(() => import("./pages/auth/index"));
 
-let ApplicationContext = React.createContext<Context>({});
-
-const Auth = Lazy(() => import("./pages/auth/index"));
-
-let Loader = (context: any) => 
-  withStyles(progressBar)(
-    class extends React.Component<WithStyles<typeof progressBar>> {
-      static contextType = ApplicationContext;
-  
-      state: ProgState = {
-        isLoading: false,
-      };
-  
-      constructor(
-        props: WithStyles<typeof progressBar>
-      ) {
-        super(props);
-        this.context = context
-        this.context.load = (): void => {
-          this.setState({
-            isLoading: true,
-          });
-        };
-  
-        this.context.loadOff = (): void => {
-          this.setState({
-            isLoading: false,
-          });
-        };
-      }
-      render() {
-        const { classes } = this.props;
-        if (this.state.isLoading)
-          return <LinearProgress className={classes.root} />;
-  
-        return null;
-      }
-    }
-  );
+let Loader = withStyles(LoaderStyles)(
+  class extends React.Component<WithStyles<typeof LoaderStyles>>{
+  render(){
+    const { classes } = this.props;
+    return (
+      <Backdrop open={true}>
+        <LinearProgress className={classes.progress} />
+      </Backdrop>
+    )
+  }
+})
 
 class App extends React.Component<WithStyles<typeof appBarStyles>> {
   render() {
@@ -114,18 +79,13 @@ class App extends React.Component<WithStyles<typeof appBarStyles>> {
             </Tooltip>
           </Toolbar>
         </AppBar>
-        <ApplicationContext.Provider value={{}}>
-          <div>
-            <ApplicationContext.Consumer>
-              {
-                context => <Loader(context) />
-              }
-            </ApplicationContext.Consumer>
+        <React.Suspense fallback={
+          <Loader />
+        }>
             <Switch>
               <Route path="/auth" component={Auth} />
             </Switch>
-          </div>
-        </ApplicationContext.Provider>
+        </React.Suspense>
       </div>
     );
   }
