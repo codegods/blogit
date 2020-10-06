@@ -27,7 +27,7 @@ export let root = makeStyles((theme: Theme) => ({
     background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
     position: "absolute",
     width: "100vw",
-    height: "60vh",
+    height: "calc(100%/1.6198)",
   },
   showText: {
     position: "absolute",

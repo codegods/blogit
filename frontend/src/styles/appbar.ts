@@ -1,8 +1,8 @@
 import { createStyles, Theme, fade } from "@material-ui/core/styles";
 
-let appBarStyles = (theme:Theme) => createStyles({
+let AppBar = (theme:Theme) => createStyles({
   root: {
-    flexGrow: 1,
+    position: "fixed",
   },
   title: {
     flexGrow: 1,
@@ -56,10 +56,45 @@ let appBarStyles = (theme:Theme) => createStyles({
 });
 
 
-let LoaderStyles = (_theme:Theme) => createStyles({
+let Loader = (_theme:Theme) => createStyles({
   progress: {
     width: "40%"
   }
 })
 
-export { appBarStyles, LoaderStyles }
+let App = (theme: Theme) => createStyles({
+  root: {
+    flexGrow: 1
+  },
+  barProxy: theme.mixins.toolbar,
+  backdrop: {
+    background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
+    position: "absolute",
+    width: "100vw",
+    top: theme.mixins.toolbar.height,
+    height: "calc(100%/1.6198)",
+  },
+  logo: {
+    position: "absolute",
+    bottom: "25%",
+    left: theme.spacing(4),
+    "& *": {
+      color: "#fff",
+      fontFamily: '"Comfortaa"',
+    },
+    "& h5": {
+      opacity: 0.7
+    },
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+      textAlign: "center",
+      left: 0
+    },
+    main: {
+      position: "absolute",
+      top: "calc(100%/1.3)"
+    }
+  }
+})
+
+export default { AppBar, Loader, App }
