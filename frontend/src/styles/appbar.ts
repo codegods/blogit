@@ -1,6 +1,6 @@
 import { createStyles, Theme, fade } from "@material-ui/core/styles";
 
-export let appBarStyles = (theme:Theme) => createStyles({
+let appBarStyles = (theme:Theme) => createStyles({
   root: {
     flexGrow: 1,
   },
@@ -55,10 +55,11 @@ export let appBarStyles = (theme:Theme) => createStyles({
   },
 });
 
-export let progressBar = (theme: Theme) => createStyles({
-  root: {
-    position: "fixed",
-    top: 0,
-    width: "100%"
+
+let LoaderStyles = (_theme:Theme) => createStyles({
+  progress: {
+    width: "40%"
   }
 })
+
+export { appBarStyles, LoaderStyles }
