@@ -13,7 +13,7 @@ class Screen:
         ctime: str = datetime.datetime.now().isoformat()
         ctime = ctime[1: ctime.find(".")]
 
-        self.file = open(f"logs/{ctime}.log", "x")
+        self.file = open(f"logs/{ctime}.log", "x").close()
         self.fname = f"logs/{ctime}.log"
 
         self.app = app

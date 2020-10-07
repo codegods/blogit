@@ -1,6 +1,6 @@
 import flask
 import os
-from helpers import screen
+from extensions import screen
 from api import some_view
 
 
