@@ -1,24 +1,44 @@
-# This file holds configuration settings for our app
-# You can also keep dynamic structures.
-# Just make sure all configuration is kept in the namespace config
-# which is an instance of the Config class.
+"""
+This file holds configuration settings for our app.
+The `load` method of the class `Config` is called at app
+startup along with the parameters as specified in the definition.
 
-# Please note that these configuration properties will be overridden
-# by actual environment variables
+For help on configuring the app, please refer to
+docs/CONFIGURING.md
+
+Please note that some configuration properties can be overridden
+by actual environment variables
+"""
+
+# TODO Start server from an arbitrary free port.
 
 import json
+import os
 
 
-def read_and_parse_json(file_name: str) -> dict:
+class MySQL:
+    HOST = "localhost"
+    USER = "root"
+    AUTH_PLUGIN = "mysql_native_password"
 
-    with open(file_name) as f:
-        return json.load(f)
+    def __init__(self, secrets: dict):
+        """
+        This class defines the configuration for connecting to
+        the MySQL server. It must specify the host, user, root
+        and optionally an auth plugin.
+
+        :param dict secrets: A dictionary containing the secrets
+        """
+        self.PASSWORD = secrets.get("MYSQL_PASSWORD", None)
 
 
-class Config(object):
-    # Flask server config
-    FLASK_HOST = "0.0.0.0"
-    FLASK_PORT = "2811"
+class React:
+    """
+    This class holds the configuration for react
+    ( during build as well as dev mode ). The options here
+    are passed as environment variables to the webpack
+    dev server as well as react build process.
+    """
 
     # Should we use HTTPS on development server?
     HTTPS = "false"
@@ -27,34 +47,62 @@ class Config(object):
     # SSL_CERT_PATH = "/home/.certs/ssl_cert.crt"
     # SSL_KEY_PATH = "/home/.certs/ssl_key.key"
 
-    # React dev server configuration.
-    # Not required in most cases
-    REACT_HOST = "0.0.0.0"
+    HOST = "0.0.0.0"
 
     # Do not use sourcemaps
+    # As they drastically increase the build time.
     SHOULD_USE_SOURCEMAP = "false"
 
-    # Development mode
-    MODE = "development"
 
-    # Start react dev server along with the flask server
+class Flask:
+    HOST = "0.0.0.0"
+    PORT = "2811"
+
+    def __init__(self, key: str = "", mode: int = 0):
+        """
+        Holds the configuration for the flask server.
+        The config property must be a dictionary which
+        is passed used to update flask.app's default config
+
+        :param str secret: The secret key to be used to sign session cookies
+        :param int mode: The current mode.
+        -1 = development, 0 = testing, 1 = production
+        """
+        self.mode = mode
+        self.key = key
+
+    @property
+    def config(self):
+        conf = {"SECRET_KEY": self.key}
+
+        if self.mode == -1:
+            conf.update({"DEBUG": True})
+
+        return conf
+
+
+class Config(object):
+
+    # Whether to start webpack dev server along with the flask server
     RUN_REACT_ON_DEVELOPMENT = "true"
     RUN_FLASK_ON_DEVELOPMENT = "true"
 
-    # Configuring the MYSQL server
-    MYSQL_HOST = "localhost"
-    MYSQL_USER = "root"
-    MYSQL_AUTH_PLUGIN = "mysql_native_password"
+    def load(self, project_directory: str, mode: int) -> None:
+        """
+        This function is called when the start/build/test script
+        is loading the configuration.
 
-    # We will load this later
-    # MYSQL_PASSWORD = "password"
+        :param str project_directory: The absolute path to the project's root directory.
 
+        :param int mode: The mode in which the app is being run.
+        -1 = development, 0 = testing and 1 = production
 
-# The .env file is gitignored, so we use it to
-# store application secrets such as MYSQL_PASSWORD
-# and APP_SECRET_KEY
-secrets = read_and_parse_json("./secrets.json")
+        :returns: None
+        """
+        secrets: str
+        with open(os.path.join(project_directory, "secrets.json")) as f:
+            secrets = json.load(f)
 
-config = Config()
-config.MYSQL_PASSWORD = secrets["MYSQL_PASSWORD"]
-config.FLASK_SECRET_KEY = secrets["SECRET_KEY"]
+        self.flask = Flask(secrets.get("FLASK_SECRET_KEY"), mode)
+        self.mysql = MySQL(secrets)
+        self.react = React()
