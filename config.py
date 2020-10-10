@@ -10,10 +10,10 @@ Please note that some configuration properties can be overridden
 by actual environment variables
 """
 
-# TODO Start server from an arbitrary free port.
 
 import json
 import os
+import socket
 
 
 class MySQL:
@@ -48,6 +48,7 @@ class React:
     # SSL_KEY_PATH = "/home/.certs/ssl_key.key"
 
     HOST = "0.0.0.0"
+    PORT = "3000"
 
     # Do not use sourcemaps
     # As they drastically increase the build time.
@@ -100,9 +101,20 @@ class Config(object):
         :returns: None
         """
         secrets: str
+
+        def get_free_port() -> int:
+            s = socket.socket()
+            s.bind(('', 0))
+            p = s.getsockname()[1]
+            s.close()
+            return p
+
         with open(os.path.join(project_directory, "secrets.json")) as f:
             secrets = json.load(f)
 
         self.flask = Flask(secrets.get("FLASK_SECRET_KEY"), mode)
         self.mysql = MySQL(secrets)
         self.react = React()
+
+        self.flask.PORT = str(get_free_port())
+        self.react.PORT = str(get_free_port())
