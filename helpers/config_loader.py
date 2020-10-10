@@ -10,7 +10,7 @@ Although the config file can be changed by specifying the
 
 # TODO Add support for loading from classes.
 
-from json.decoder import JSONDecodeError
+from json import load
 import os
 import re
 import json
@@ -165,33 +165,19 @@ def validate(config: Any) -> None:
                 )
 
 
-def load_from_pyfile(file: str = "config.py", root: str = None) -> ConfigTemplate:
+def load_from_class(config, root: Optional[Union[str, None]]=None) -> ConfigTemplate:
     """
-    This loads the configuration from a `config.py` file located in the project root
-    :param file: ( str ) The name of the file
-    :param root: ( str ) The project's root
+    Loads the configuration from a given class by calling its `load`
+    method and then validates it.
     """
     PROJECT_ROOT = root or os.path.abspath(
         ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
     )
-    file = os.path.join(PROJECT_ROOT, file)
-
-    print(f"Loading config from {term.green(file)}")
-
-    # Load the config file
-    spec = importlib.util.spec_from_file_location("", file)
-    config = importlib.util.module_from_spec(spec)
-
-    # Execute the script
-    spec.loader.exec_module(config)
-
-    # Not needed anymore
-    del spec, file
 
     # Load the mode from environment variable and
     # if it is not specified use development mode
     MODE = int(os.environ.get("BLOGIT_MODE", -1))
-    conf: Any
+    conf: ConfigTemplate
 
     try:
         conf = config.Config()
@@ -211,6 +197,27 @@ def load_from_pyfile(file: str = "config.py", root: str = None) -> ConfigTemplat
         1: "production"
     }[MODE]
     return conf
+
+def load_from_pyfile(file: str = "config.py", root: Optional[Union[str, None]] = None) -> ConfigTemplate:
+    """
+    This loads the configuration from a `config.py` file located in the project root
+    :param file: ( str ) The name of the file
+    :param root: ( str ) The project's root
+    """
+    PROJECT_ROOT = root or os.path.abspath(
+        ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
+    )
+    file = os.path.join(PROJECT_ROOT, file)
+
+    print(f"Loading config from {term.green(file)}")
+
+    # Load the config file
+    spec = importlib.util.spec_from_file_location("", file)
+    config = importlib.util.module_from_spec(spec)
+
+    # Execute the script
+    spec.loader.exec_module(config)
+    return load_from_class(config, PROJECT_ROOT)    
 
 
 def load_from_json(file="config.json", root: str = None) -> ConfigTemplate:
@@ -306,7 +313,7 @@ def main(config_file: Optional[Union[str, None]] = None) -> Union[ConfigTemplate
                 return load_from_dict(
                     json.loads(f.read())
                 )
-            except JSONDecodeError:
+            except json.decoder.JSONDecodeError:
 
                 # Maybe its a python file then
                 return load_from_pyfile(config_file)
