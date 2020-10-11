@@ -85,8 +85,9 @@ class Flask:
 class Config(object):
 
     # Whether to start webpack dev server along with the flask server
-    RUN_REACT_ON_DEVELOPMENT = "true"
-    RUN_FLASK_ON_DEVELOPMENT = "true"
+    RUN_REACT_IN_DEVELOPMENT = "true"
+    RUN_FLASK_IN_DEVELOPMENT = "true"
+    MODE = "development"
 
     def load(self, project_directory: str, mode: int) -> None:
         """
