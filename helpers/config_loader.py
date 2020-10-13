@@ -8,18 +8,28 @@ Although the config file can be changed by specifying the
 `config_file` parameter in the main function.
 """
 
-# TODO Add support for loading from classes.
-
-from json import load
 import os
+import sys
+
+PROJECT_ROOT = os.path.abspath(
+    ".."
+    if os.path.abspath(".").split("/")[-1]
+    in ["lib", "api", "helpers", "scripts", "tests", "extensions"]
+    else "."
+)
+
+sys.path.append(PROJECT_ROOT)
+del sys
+
 import re
 import json
 import traceback
 import importlib.util
 from typing import Any, NoReturn, Optional, Union
-from blessings import Terminal
+from helpers import formatter
 
-term = Terminal()
+global logger
+logger: formatter.logging.Logger
 
 
 class UnknownOption(Exception):
@@ -43,6 +53,7 @@ class ConfigTemplate:
     This class represents a template for the configration files.
     It is used mainly for typechecking.
     """
+
     flask: object
     react: object
     mysql: object
@@ -113,6 +124,10 @@ def validate(config: Any) -> None:
         prop = config if kind == "root" else getattr(config, kind)
         for val in kind:
             if not hasattr(prop, val):
+                logger.error(
+                    "Error while parsing config: "
+                    + f"`{prop}.{val}` is a required config "
+                )
                 raise MissingOption(
                     "Error while parsing config: "
                     + f"`{prop}.{val}` is a required config "
@@ -120,10 +135,11 @@ def validate(config: Any) -> None:
                 )
 
     def unknown_option(option: str) -> NoReturn:
-        print(term.red("INVALID"))
+        logger.error("Error while parsing config: Found an unknown option: " + option)
         raise UnknownOption(
             "Error while parsing config: Found an unknown option: " + option
         )
+
     # Check for unknown options
     for val in vars(config):
 
@@ -147,6 +163,9 @@ def validate(config: Any) -> None:
         if not hasattr(config.react, "SSL_KEY_FILE") or not hasattr(
             config.react, "SSL_CRT_FILE"
         ):
+            logger.error(
+                "config.react.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
+            )
             raise MissingOption(
                 "config.react.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
             )
@@ -165,7 +184,7 @@ def validate(config: Any) -> None:
                 )
 
 
-def load_from_class(config, root: Optional[Union[str, None]]=None) -> ConfigTemplate:
+def load_from_class(config, root: Optional[Union[str, None]] = None) -> ConfigTemplate:
     """
     Loads the configuration from a given class by calling its `load`
     method and then validates it.
@@ -183,22 +202,25 @@ def load_from_class(config, root: Optional[Union[str, None]]=None) -> ConfigTemp
         conf = config.Config()
         conf.load(PROJECT_ROOT, MODE)
     except Exception:
-        print(term.red("Fatal: There was an error while parsing the config.py file:"))
+        logger.critical("Fatal: There was an error while parsing the config.py file:")
         traceback.print_exc()
         print("This error is non-recoverable. Aborting...")
         exit(1)
 
-    print("Validating configuration...", end=" ")
+    logger.info("Validating configuration...")
     validate(conf)
-    print(term.green("VALID"))
+    logger.info("Configuration OK")
     os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
         -1: "development",
         0: "testing",
-        1: "production"
+        1: "production",
     }[MODE]
     return conf
 
-def load_from_pyfile(file: str = "config.py", root: Optional[Union[str, None]] = None) -> ConfigTemplate:
+
+def load_from_pyfile(
+    file: str = "config.py", root: Optional[Union[str, None]] = None
+) -> ConfigTemplate:
     """
     This loads the configuration from a `config.py` file located in the project root
     :param file: ( str ) The name of the file
@@ -209,7 +231,7 @@ def load_from_pyfile(file: str = "config.py", root: Optional[Union[str, None]] =
     )
     file = os.path.join(PROJECT_ROOT, file)
 
-    print(f"Loading config from {term.green(file)}")
+    logger.info(f"Loading config from \x1b[32m{file}")
 
     # Load the config file
     spec = importlib.util.spec_from_file_location("", file)
@@ -217,7 +239,7 @@ def load_from_pyfile(file: str = "config.py", root: Optional[Union[str, None]] =
 
     # Execute the script
     spec.loader.exec_module(config)
-    return load_from_class(config, PROJECT_ROOT)    
+    return load_from_class(config, PROJECT_ROOT)
 
 
 def load_from_json(file="config.json", root: str = None) -> ConfigTemplate:
@@ -230,18 +252,18 @@ def load_from_json(file="config.json", root: str = None) -> ConfigTemplate:
         ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
     )
     config_file = os.path.join(PROJECT_ROOT, file)
-    print(f"Loading config from {term.green(config_file)}")
+    logger.info(f"Loading config from \x1b[32m{config_file}")
     with open(config_file) as f:
         conf = json.loads(f.read())
         config = ConfigFromJson()
         config.load(conf)
-        print("Validating config...", end=" ")
+        logger.info("Validating config...")
         validate(config)
-        print(term.green("VALID"))
+        logger.info("Configuration Ok")
         os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
             -1: "development",
             0: "testing",
-            1: "production"
+            1: "production",
         }[int(os.environ.get("BLOGIT_MODE", -1))]
         return config
 
@@ -263,13 +285,13 @@ def load_from_dict(config: dict) -> ConfigTemplate:
     """
     conf = ConfigFromJson()
     conf.load(config)
-    print("Validating config...", end=" ")
+    logger.info("Validating config...")
     validate(conf)
-    print(term.green("VALID"))
+    logger.info("Configuration Ok")
     os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
         -1: "development",
         0: "testing",
-        1: "production"
+        1: "production",
     }[int(os.environ.get("BLOGIT_MODE", -1))]
     return conf
 
@@ -282,24 +304,29 @@ def load_from_json_string(config: str) -> ConfigTemplate:
     config = json.loads(config)
     conf = ConfigFromJson()
     conf.load(config)
-    print("Validating config...", end=" ")
+    logger.info("Validating config...")
     validate(conf)
-    print(term.green("VALID"))
+    logger.info("Configuration Ok")
     os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
         -1: "development",
         0: "testing",
-        1: "production"
+        1: "production",
     }[int(os.environ.get("BLOGIT_MODE", -1))]
     return conf
 
 
-def main(config_file: Optional[Union[str, None]] = None) -> Union[ConfigTemplate, NoReturn]:
+def main(
+    log_file: str, config_file: Optional[Union[str, None]] = None
+) -> Union[ConfigTemplate, NoReturn]:
     """
     If the parameter config_file was specified, then this function will
     attempt to parse the configuration in that file, otherwise it
     searches for a config file in the project's root directory and then
     attempts to parse it.
     """
+    global logger
+    logger = formatter.getLogger(log_file, "configLoader")
+    del log_file
     PROJECT_ROOT = os.path.abspath(
         ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
     )
@@ -310,9 +337,7 @@ def main(config_file: Optional[Union[str, None]] = None) -> Union[ConfigTemplate
             try:
 
                 # First we assume it to be a JSON file
-                return load_from_dict(
-                    json.loads(f.read())
-                )
+                return load_from_dict(json.loads(f.read()))
             except json.decoder.JSONDecodeError:
 
                 # Maybe its a python file then
@@ -345,7 +370,7 @@ if __name__ == "__main__":
 
     init()
     print(
-        term.blue("helpers/config_loader.py")
-        + term.red("is a module and is not supposed to be run as a script.")
+        "\x1b[35mhelpers/config_loader.py"
+        + "\x1b[31mis a module and is not supposed to be run as a script."
     )
     exit(1)

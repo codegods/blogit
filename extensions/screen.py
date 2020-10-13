@@ -11,7 +11,7 @@ class Screen:
         self.t = Terminal()
 
         ctime: str = datetime.datetime.now().isoformat()
-        ctime = ctime[1: ctime.find(".")]
+        ctime = ctime[1 : ctime.find(".")]
 
         self.file = open(f"logs/{ctime}.log", "x").close()
         self.fname = f"logs/{ctime}.log"
@@ -48,6 +48,5 @@ class Screen:
         with open(self.fname, "r+") as f:
             f.write(f.read() + f" [{datetime.datetime.now()}] [ ERROR ] {msg}")
         print(
-            f" [{datetime.datetime.now()}] [ {self.t.red_bold('ERROR')} ] {msg}",
-            end=""
+            f" [{datetime.datetime.now()}] [ {self.t.red_bold('ERROR')} ] {msg}", end=""
         )
