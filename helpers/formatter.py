@@ -30,7 +30,7 @@ class StreamFormatter(logging.Formatter):
             + "\x1b[m"
         )
         record.name = "\x1b[2m" + record.name + "\x1b[0m"
-        res = "[{asctime}] [{levelname}] [{name}] {msg}".format(**vars(record))
+        res = "[{asctime}] [{levelname}] {name}: {msg}".format(**vars(record))
         return res
 
 
@@ -44,7 +44,7 @@ class FileFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         record.asctime = datetime.datetime.fromtimestamp(record.created).isoformat()
         record.msg = re.sub("\\033\[[0-9;m]+", "", record.msg)  # noqa: W605
-        res = "[{asctime}] [{levelname}] [{name}] {msg}".format(**vars(record))
+        res = "[{asctime}] [{levelname}] {name}: {msg}".format(**vars(record))
         return res
 
 
@@ -72,13 +72,21 @@ def init(root: str, logFile: str = None) -> None:
     Initiates logging in any app. Creates a log file in the `logs`
     directory of the project root. Creates that directory if it doesn't
     exist already. The name of the file is in the format
-    `YYYY-MM-DDTHH:MM:SS.log`.
+    `YYYY_MM_DDTHHMMSS.log`.
 
     :param root: The root directory of the project.
     :param logFile: (Optional) The name of the log file to use.
     """
     # Set up logging
-    logFile = logFile or datetime.datetime.now().isoformat().split(".")[0] + ".log"
+    logFile = (
+        logFile
+        or datetime.datetime.now()
+        .isoformat()
+        .split(".")[0]
+        .replace(":", "")
+        .replace("-", "_")
+        + ".log"
+    )
     log_dir = os.path.join(root, "logs")
     logFile = os.path.join(log_dir, logFile)
     # Create the logFile if it doesn't exist already
