@@ -309,7 +309,7 @@ def load_from_json_string(config: str) -> ConfigTemplate:
 
 
 def main(
-    log_file: str, config_file: Optional[Union[str, None]] = None
+    config_file: Optional[Union[str, None]] = None
 ) -> Union[ConfigTemplate, NoReturn]:
     """
     If the parameter config_file was specified, then this function will
@@ -318,8 +318,7 @@ def main(
     attempts to parse it.
     """
     global logger
-    logger = formatter.getLogger(log_file, "configLoader")
-    del log_file
+    logger = formatter.getLogger("configLoader")
 
     # If the config file was specified through the cli
     if config_file:
@@ -359,7 +358,6 @@ if __name__ == "__main__":
     from colorama import init
 
     init()
-    main(formatter.init(PROJECT_ROOT))
     print(
         "\x1b[35mhelpers/config_loader.py "
         + "\x1b[31mis a module and is not supposed to be run as a script."
