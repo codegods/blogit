@@ -72,7 +72,7 @@ def init(root: str, logFile: str = None) -> None:
     Initiates logging in any app. Creates a log file in the `logs`
     directory of the project root. Creates that directory if it doesn't
     exist already. The name of the file is in the format
-    `YYYY-MM-DDTHH:MM:SS.log`.
+    `YYYY_MM_DDTHHMMSS.log`.
 
     :param root: The root directory of the project.
     :param logFile: (Optional) The name of the log file to use.
@@ -80,7 +80,12 @@ def init(root: str, logFile: str = None) -> None:
     # Set up logging
     logFile = (
         logFile
-        or datetime.datetime.now().isoformat().split(".")[0].replace(":", "_") + ".log"
+        or datetime.datetime.now()
+        .isoformat()
+        .split(".")[0]
+        .replace(":", "")
+        .replace("-", "_")
+        + ".log"
     )
     log_dir = os.path.join(root, "logs")
     logFile = os.path.join(log_dir, logFile)
