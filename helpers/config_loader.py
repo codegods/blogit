@@ -122,7 +122,7 @@ def validate(config: Any) -> None:
     # Check for missing required options
     for kind in checklist["required"]:
         prop = config if kind == "root" else getattr(config, kind)
-        for val in kind:
+        for val in checklist["required"][kind]:
             if not hasattr(prop, val):
                 logger.error(
                     "Error while parsing config: "
@@ -144,8 +144,12 @@ def validate(config: Any) -> None:
     for val in vars(config):
 
         # Ignore built-in properties and methods like __init__, __dict__, __str__, etc
-        # And also ignore callables
-        if not re.match("__[a-zA-Z0-9_]*__", val) and not callable(val):
+        # Also ignore callables and "required" options
+        if (
+            not re.match("__[a-zA-Z0-9_]*__", val)
+            and not callable(val)
+            and val not in checklist["required"]
+        ):
             if val in checklist["optional"]:
                 for ch_val in vars(val):
                     if not re.match("__[a-zA-Z0-9_]*__", ch_val) and not callable(
@@ -184,14 +188,11 @@ def validate(config: Any) -> None:
                 )
 
 
-def load_from_class(config, root: Optional[Union[str, None]] = None) -> ConfigTemplate:
+def load_from_class(config: object) -> ConfigTemplate:
     """
     Loads the configuration from a given class by calling its `load`
     method and then validates it.
     """
-    PROJECT_ROOT = root or os.path.abspath(
-        ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
-    )
 
     # Load the mode from environment variable and
     # if it is not specified use development mode
@@ -218,20 +219,15 @@ def load_from_class(config, root: Optional[Union[str, None]] = None) -> ConfigTe
     return conf
 
 
-def load_from_pyfile(
-    file: str = "config.py", root: Optional[Union[str, None]] = None
-) -> ConfigTemplate:
+def load_from_pyfile(file: str = "config.py") -> ConfigTemplate:
     """
     This loads the configuration from a `config.py` file located in the project root
     :param file: ( str ) The name of the file
     :param root: ( str ) The project's root
     """
-    PROJECT_ROOT = root or os.path.abspath(
-        ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
-    )
     file = os.path.join(PROJECT_ROOT, file)
 
-    logger.info(f"Loading config from \x1b[32m{file}")
+    logger.info(f"Loading config from \x1b[32m{file}\x1b[m")
 
     # Load the config file
     spec = importlib.util.spec_from_file_location("", file)
@@ -239,20 +235,17 @@ def load_from_pyfile(
 
     # Execute the script
     spec.loader.exec_module(config)
-    return load_from_class(config, PROJECT_ROOT)
+    return load_from_class(config)
 
 
-def load_from_json(file="config.json", root: str = None) -> ConfigTemplate:
+def load_from_json(file="config.json") -> ConfigTemplate:
     """
     This loads the configuration from a `config.json` file located in the project root
     :param file: ( str ) The name of the file
     :param root: ( str ) The root directory of the project
     """
-    PROJECT_ROOT = root or os.path.abspath(
-        ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
-    )
     config_file = os.path.join(PROJECT_ROOT, file)
-    logger.info(f"Loading config from \x1b[32m{config_file}")
+    logger.info(f"Loading config from \x1b[32m{config_file}\x1b[m")
     with open(config_file) as f:
         conf = json.loads(f.read())
         config = ConfigFromJson()
@@ -327,9 +320,6 @@ def main(
     global logger
     logger = formatter.getLogger(log_file, "configLoader")
     del log_file
-    PROJECT_ROOT = os.path.abspath(
-        ".." if os.path.abspath(".").split("/")[-1] == "lib" else "."
-    )
 
     # If the config file was specified through the cli
     if config_file:
@@ -369,8 +359,9 @@ if __name__ == "__main__":
     from colorama import init
 
     init()
+    main(formatter.init(PROJECT_ROOT))
     print(
-        "\x1b[35mhelpers/config_loader.py"
+        "\x1b[35mhelpers/config_loader.py "
         + "\x1b[31mis a module and is not supposed to be run as a script."
     )
     exit(1)
