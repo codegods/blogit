@@ -12,12 +12,12 @@ class StreamFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        record.asctime = (
+        asctime = (
             "\x1b[2m"
             + datetime.datetime.fromtimestamp(record.created).isoformat()
             + "\x1b[m"
         )
-        record.levelname = (
+        levelname = (
             {
                 "INFO": "\x1b[36m",  # Cyan
                 "DEBUG": "\x1b[32m",  # Green
@@ -29,8 +29,8 @@ class StreamFormatter(logging.Formatter):
             + record.levelname
             + "\x1b[m"
         )
-        record.name = "\x1b[2m" + record.name + "\x1b[0m"
-        res = "[{asctime}] [{levelname}] {name}: {msg}".format(**vars(record))
+        name = "\x1b[36m\x1b[2m" + record.name + "\x1b[0m"
+        res = f"[{asctime}] [{levelname}] {name}: {record.msg}"
         return res
 
 
@@ -43,6 +43,9 @@ class FileFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         record.asctime = datetime.datetime.fromtimestamp(record.created).isoformat()
+
+        # This will prevent an ANSI code from making their way to
+        # the log files
         record.msg = re.sub("\\033\[[0-9;m]+", "", record.msg)  # noqa: W605
         res = "[{asctime}] [{levelname}] {name}: {msg}".format(**vars(record))
         return res
@@ -62,8 +65,8 @@ def getLogger(filename: str, name: str = "") -> logging.Logger:
     sh = logging.StreamHandler(stdout)
     sh.setFormatter(StreamFormatter("%(message)s"))
     logger.propagate = False
-    logger.addHandler(fh)
     logger.addHandler(sh)
+    logger.addHandler(fh)
     return logger
 
 
