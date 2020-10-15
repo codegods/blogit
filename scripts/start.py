@@ -36,15 +36,15 @@ def find_package_manager() -> str:
         return "npm"
 
 
-def finalize_react_config(config: config_loader.ConfigTemplate) -> Dict[str, str]:
+def finalize_wds_config(config: config_loader.ConfigTemplate) -> Dict[str, str]:
     """
     Converts the WDS configuration object to a dictionary that can be
     passed as environment variables to WDS process.
     """
     final = {}
-    for i in dir(config.react):
-        if not i.startswith("__") and not callable(getattr(config.react, i)):
-            final[i] = str(getattr(config.react, i))
+    for i in dir(config.wds):
+        if not i.startswith("__") and not callable(getattr(config.wds, i)):
+            final[i] = str(getattr(config.wds, i))
 
     # The WDS will need these in order to proxy API calls
     final["FLASK_HOST"] = str(config.flask.HOST)
@@ -64,14 +64,14 @@ def serialize(obj: object) -> str:
     return json.dumps(_d)
 
 
-def open_react_in_linux(config: config_loader.ConfigTemplate, pkg_manager: str) -> None:
+def open_wds_in_linux(config: config_loader.ConfigTemplate, pkg_manager: str) -> None:
     """
     This attempts to start the WDS server in a new terminal process.
     If it fails to do so, it will show a warning to the user.
     """
     logger.info("Attempting to find default terminal...")
     # Attempt to find the default terminal
-    env = finalize_react_config(config)
+    env = finalize_wds_config(config)
     env.update(os.environ)
     default_terminal = (
         subprocess.Popen(
@@ -164,22 +164,22 @@ def main() -> None:
     else:
         config = config_loader.main()
 
-    if config.MODE == "development" and config.RUN_REACT_IN_DEVELOPMENT:
+    if config.MODE == "development" and config.RUN_WDS_IN_DEVELOPMENT:
         pkg_manager = find_package_manager()
 
         logger.info(f"Using \x1b[32m{ pkg_manager }\x1b[m package manager...")
         if platform.system().lower() == "linux":
-            open_react_in_linux(config, pkg_manager)
+            open_wds_in_linux(config, pkg_manager)
 
         elif platform.system().lower() == "windows":
-            logger.info("Attempting to start react dev server...")
+            logger.info("Attempting to start webpack dev server...")
             subprocess.Popen(
                 ["start", pkg_manager, "start"],
                 cwd=os.path.join(PROJECT_ROOT, "frontend"),
-                env=finalize_react_config(config),
+                env=finalize_wds_config(config),
             )
         else:
-            logger.warn("Unable to start react dev server. Please start it manually.")
+            logger.warn("Unable to start webpack dev server. Please start it manually.")
 
         start_flask(config)
 
