@@ -31,9 +31,9 @@ class MySQL:
         self.AUTH_PLUGIN = "mysql_native_password"
 
 
-class React:
+class WDS:
     """
-    This class holds the configuration for react
+    This class holds the configuration for webpack
     ( during build as well as dev mode ). The options here
     are passed as environment variables to the webpack
     dev server as well as react build process.
@@ -87,7 +87,7 @@ class Flask:
 class Config(object):
     def __init__(self) -> None:
         # Whether to start webpack dev server along with the flask server
-        self.RUN_REACT_IN_DEVELOPMENT = True
+        self.RUN_WDS_IN_DEVELOPMENT = True
         self.RUN_FLASK_IN_DEVELOPMENT = True
         self.MODE = "development"
 
@@ -117,7 +117,7 @@ class Config(object):
 
         self.flask = Flask(secrets.get("FLASK_SECRET_KEY"), mode)
         self.mysql = MySQL(secrets)
-        self.react = React()
+        self.wds = WDS()
 
         self.flask.PORT = get_free_port()
-        self.react.PORT = str(get_free_port())
+        self.wds.PORT = str(get_free_port())

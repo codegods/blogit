@@ -55,11 +55,11 @@ class ConfigTemplate:
     """
 
     flask: object
-    react: object
+    wds: object
     mysql: object
     MODE: str
     PKG_MANAGER: str
-    RUN_REACT_IN_DEVELOPMENT: bool
+    RUN_WDS_IN_DEVELOPMENT: bool
     RUN_FLASK_IN_DEVELOPEMNT: bool
 
 
@@ -92,18 +92,18 @@ def validate(config: Any) -> None:
         "required": {
             "root": [
                 "flask",
-                "react",
+                "wds",
                 "mysql",
                 "MODE",
-                "RUN_REACT_IN_DEVELOPMENT",
+                "RUN_WDS_IN_DEVELOPMENT",
                 "RUN_FLASK_IN_DEVELOPMENT",
             ],
             "flask": ["HOST", "PORT", "config"],
-            "react": ["HOST"],
+            "wds": ["HOST"],
             "mysql": ["HOST", "USER", "PASSWORD"],
         },
         "optional": {
-            "react": [
+            "wds": [
                 "HTTPS",
                 "SHOULD_USE_SOURCE_MAP",
                 "IMAGE_INLINE_SIZE_LIMIT",
@@ -162,29 +162,29 @@ def validate(config: Any) -> None:
                 unknown_option(f"Config.{val}")
 
     # Check for illegal options
-    if config.react.HTTPS == "true":
+    if config.wds.HTTPS == "true":
 
         # HTTPS was set to true but no cert file was specified
-        if not hasattr(config.react, "SSL_KEY_FILE") or not hasattr(
-            config.react, "SSL_CRT_FILE"
+        if not hasattr(config.wds, "SSL_KEY_FILE") or not hasattr(
+            config.wds, "SSL_CRT_FILE"
         ):
             logger.error(
-                "config.react.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
+                "config.wds.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
             )
             raise MissingOption(
-                "config.react.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
+                "config.wds.HTTPS was set to True without specifying a key file and a crt file, which is illegal"
             )
         else:
 
             # Files were specified but are non-existent
-            if not os.path.exists(config.react.SSL_KEY_FILE):
+            if not os.path.exists(config.wds.SSL_KEY_FILE):
                 raise FileNotFoundError(
-                    f"The file at { config.react.SSL_KEY_FILE } was set as the key file"
+                    f"The file at { config.wds.SSL_KEY_FILE } was set as the key file"
                     + "in configuration but was not found."
                 )
-            if not os.path.exists(config.react.SSL_CRT_FILE):
+            if not os.path.exists(config.wds.SSL_CRT_FILE):
                 raise FileNotFoundError(
-                    f"The file at { config.react.SSL_CRT_FILE } was set as the certificate file"
+                    f"The file at { config.wds.SSL_CRT_FILE } was set as the certificate file"
                     + "in configuration but was not found."
                 )
 
