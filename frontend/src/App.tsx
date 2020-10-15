@@ -105,7 +105,7 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
             </Typography>
           </div>
         </div>
-        <main className={classes.main}>
+        <main>
           <Typography variant="h3">
             A better place to write
           </Typography>
