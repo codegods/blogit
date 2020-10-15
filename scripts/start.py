@@ -77,7 +77,7 @@ def open_wds_in_linux(config: config_loader.ConfigTemplate, pkg_manager: str) ->
         subprocess.Popen(
             [
                 "/bin/bash",
-                os.path.join(PROJECT_ROOT, "lib", "find_default_terminal.sh"),
+                os.path.join(PROJECT_ROOT, "scripts", "find_default_terminal.sh"),
                 f"{pkg_manager} start",
             ],
             stdout=subprocess.PIPE,
