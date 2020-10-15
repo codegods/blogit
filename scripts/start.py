@@ -1,24 +1,78 @@
-import importlib.util
 import os
-import subprocess
-import platform
 import sys
-from colorama import init
-from blessings import Terminal
-
-init()
-term = Terminal()
-
 
 PROJECT_ROOT = os.path.abspath(
-    ".." if os.path.abspath(".").split("/")[-1] == "utils" else "."
+    ".."
+    if os.path.abspath(".").split("/")[-1]
+    in ["lib", "api", "helpers", "scripts", "tests", "extensions"]
+    else "."
 )
 
+sys.path.append(PROJECT_ROOT)
 
-def open_react_in_linux(pkg_manager: str) -> None:
+import json
+import signal
+import platform
+import subprocess
+from typing import Union, Dict
+from colorama import init
+from helpers import formatter, config_loader
 
-    print("Attempting to find default terminal...")
+init()
+logfile = formatter.init(PROJECT_ROOT)
+logger = formatter.getLogger("startScript")
+
+
+def find_package_manager() -> str:
+    """
+    Returns the node package manager installed in the system.
+    It tries to search for `yarn` and if it was found then it returns
+    `yarn` otherwise returns `npm`
+    """
+    exit_code = subprocess.Popen(["yarn", "--version"], stdout=subprocess.PIPE).wait()
+    if exit_code == 0:
+        return "yarn"
+    else:
+        return "npm"
+
+
+def finalize_react_config(config: config_loader.ConfigTemplate) -> Dict[str, str]:
+    """
+    Converts the WDS configuration object to a dictionary that can be
+    passed as environment variables to WDS process.
+    """
+    final = {}
+    for i in dir(config.react):
+        if not i.startswith("__") and not callable(getattr(config.react, i)):
+            final[i] = str(getattr(config.react, i))
+
+    # The WDS will need these in order to proxy API calls
+    final["FLASK_HOST"] = str(config.flask.HOST)
+    final["FLASK_PORT"] = str(config.flask.PORT)
+    return final
+
+
+def serialize(obj: object) -> str:
+    """
+    Serializes a given object. It will find all the attributes of the
+    class that don't start with '__' and returns a json string.
+    """
+    _d = {}
+    for attr in dir(obj):
+        if not attr.startswith("__") and not callable(getattr(obj, attr)):
+            _d[attr] = getattr(obj, attr)
+    return json.dumps(_d)
+
+
+def open_react_in_linux(config: config_loader.ConfigTemplate, pkg_manager: str) -> None:
+    """
+    This attempts to start the WDS server in a new terminal process.
+    If it fails to do so, it will show a warning to the user.
+    """
+    logger.info("Attempting to find default terminal...")
     # Attempt to find the default terminal
+    env = finalize_react_config(config)
+    env.update(os.environ)
     default_terminal = (
         subprocess.Popen(
             [
@@ -28,7 +82,7 @@ def open_react_in_linux(pkg_manager: str) -> None:
             ],
             stdout=subprocess.PIPE,
             cwd=os.path.join(PROJECT_ROOT, "frontend"),
-            env=os.environ,
+            env=env,
         )
         .communicate()[0]
         .decode("utf-8")
@@ -36,67 +90,99 @@ def open_react_in_linux(pkg_manager: str) -> None:
     )
 
     if default_terminal:
-        print(
-            f"Using terminal {term.yellow(default_terminal) }\n"
-            + "Attempting to open terminal...\n"
-        )
+        logger.info(f"Using terminal \x1b[93m{ default_terminal }\x1b[m")
     else:
+        logger.warn("Failed to detect terminal")
         print(
-            term.red(
-                'Failed to detect your terminal, please open a new terminal (or a new tab) and run "'
-                + f"{ term.bold('cd frontend && ' + pkg_manager + ' start') } in it"
-            )
+            'Please open a new terminal (or a new tab) and run "'
+            + f"\x1b[96m{ 'cd frontend && ' + pkg_manager + ' start' }\x1b[m in it"
         )
 
 
-# Get the config loader
-spec = importlib.util.spec_from_file_location(
-    "", os.path.join(PROJECT_ROOT, "helpers/config_loader.py")
-)
-loader = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(loader)
-
-# Allow setting config file from cli
-if "--config-file" in sys.argv:
-    loader.load(sys.argv[sys.argv.index("--config-file") + 1])
-else:
-    loader.load("config.py")
-
-if os.environ["FLASK_ENV"] == "development" and os.environ["RUN_REACT_ON_DEVELOPMENT"]:
-    pkg_manager = "npm"
-    if os.path.isfile(os.path.join(PROJECT_ROOT, "frontend", "yarn.lock")):
-        pkg_manager = "yarn"
-
-    print(f"Using {term.green(pkg_manager)} package manager...")
-    if "linux" == platform.system().lower():
-        open_react_in_linux(pkg_manager)
-
-    elif "windows" == platform.system.lower():
-        print("Attempting to start react dev server...")
-        subprocess.Popen(
-            ["start", f"{pkg_manager}", "start"],
-            cwd=os.path.join(PROJECT_ROOT, "frontend"),
-            env=os.environ,
+def start_flask(config: config_loader.ConfigTemplate) -> None:
+    """
+    Attempts to start flask server in a subprocess and waits for it to end
+    """
+    logger.info("Attempting to start flask server...")
+    proc: Union[subprocess.Popen, None] = None
+    if config.MODE == "production":
+        proc = subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "main",
+                "--mode",
+                "production",
+                "--log-file",
+                logfile,
+                "--flask-config",
+                serialize(config.flask),
+                "--mysql-config",
+                serialize(config.mysql),
+            ]
         )
+    elif config.RUN_FLASK_IN_DEVELOPMENT:
+        proc = subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "main",
+                "--mode",
+                "development",
+                "--log-file",
+                logfile,
+                "--flask-config",
+                serialize(config.flask),
+                "--mysql-config",
+                serialize(config.mysql),
+            ]
+        )
+    if proc is not None:
+        try:
+            proc.wait()
+        except KeyboardInterrupt:
+            logger.info("Waiting for server to shutdown...")
+            if platform.system().lower() == "windows":
+                proc.send_signal(signal.CTRL_C_EVENT)
+            else:
+                proc.send_signal(signal.SIGTERM)
+
+            proc.wait()
+            logger.info("Shutted down.")
+
+
+def main() -> None:
+    """
+    Loads the configration files and then attempts to start the
+    WDS and flask processes accordingly.
+    """
+    config: Union[config_loader.ConfigTemplate, None] = None
+
+    # Allow setting config file from cli
+    if "--config-file" in sys.argv:
+        config = config_loader.main(sys.argv[sys.argv.index("--config-file") + 1])
     else:
-        print(
-            term.yellow_bold(
-                "WARNING: Unable to start react dev server. Please start it manually."
+        config = config_loader.main()
+
+    if config.MODE == "development" and config.RUN_REACT_IN_DEVELOPMENT:
+        pkg_manager = find_package_manager()
+
+        logger.info(f"Using \x1b[32m{ pkg_manager }\x1b[m package manager...")
+        if platform.system().lower() == "linux":
+            open_react_in_linux(config, pkg_manager)
+
+        elif platform.system().lower() == "windows":
+            logger.info("Attempting to start react dev server...")
+            subprocess.Popen(
+                ["start", pkg_manager, "start"],
+                cwd=os.path.join(PROJECT_ROOT, "frontend"),
+                env=finalize_react_config(config),
             )
-        )
+        else:
+            logger.warn("Unable to start react dev server. Please start it manually.")
 
-if os.environ["FLASK_ENV"] == "production":
-    spec = importlib.util.spec_from_file_location(
-        "", os.path.join(PROJECT_ROOT, "main.py")
-    )
-    main = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(main)
-    main.run_production_server()
+        start_flask(config)
 
-elif os.environ["RUN_FLASK_ON_DEVELOPMENT"]:
-    spec = importlib.util.spec_from_file_location(
-        "", os.path.join(PROJECT_ROOT, "main.py")
-    )
-    main = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(main)
-    main.run_development_server()
+
+if __name__ == "__main__":
+    main()

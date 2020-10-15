@@ -7,6 +7,7 @@ from sys import stdout
 global filename
 filename: str
 
+
 class StreamFormatter(logging.Formatter):
     """
     Custom formatter for stream handler. It just adds colors to the output so that
