@@ -57,9 +57,10 @@ class ConfigTemplate:
     flask: object
     react: object
     mysql: object
-    MODE: int
-    RUN_REACT_IN_DEVELOPMENT: str
-    RUN_FLASK_IN_DEVELOPEMNT: str
+    MODE: str
+    PKG_MANAGER: str
+    RUN_REACT_IN_DEVELOPMENT: bool
+    RUN_FLASK_IN_DEVELOPEMNT: bool
 
 
 class ConfigFromJson(ConfigTemplate):
@@ -141,14 +142,14 @@ def validate(config: Any) -> None:
         )
 
     # Check for unknown options
-    for val in vars(config):
+    for val in dir(config):
 
         # Ignore built-in properties and methods like __init__, __dict__, __str__, etc
         # Also ignore callables and "required" options
         if (
             not re.match("__[a-zA-Z0-9_]*__", val)
-            and not callable(val)
-            and val not in checklist["required"]
+            and not callable(getattr(config, val))
+            and val not in checklist["required"]["root"]
         ):
             if val in checklist["optional"]:
                 for ch_val in vars(val):
@@ -350,9 +351,6 @@ def main(
             + "Or specify a file using the '--config-file' cli option"
         )
 
-
-# Allow this module to be called directly
-__call__ = main
 
 if __name__ == "__main__":
     from colorama import init
