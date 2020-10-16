@@ -4,23 +4,25 @@ import sys
 PROJECT_ROOT = os.path.abspath(
     ".."
     if os.path.abspath(".").split("/")[-1]
-    in ["lib", "api", "helpers", "scripts", "tests", "extensions"]
+    in ["lib", "api", "helpers", "scripts", "tests", "extensions", "docs", "frontend"]
     else "."
 )
 
 sys.path.append(PROJECT_ROOT)
 
 import json
+import base64
 import signal
+import logging
 import platform
 import subprocess
-from typing import Union, Dict
 from colorama import init
+from typing import Union, Dict
 from helpers import formatter, config_loader
 
 init()
 logfile = formatter.init(PROJECT_ROOT)
-logger = formatter.getLogger("startScript")
+logger = logging.getLogger("startScript")
 
 
 def find_package_manager() -> str:
@@ -55,13 +57,14 @@ def finalize_wds_config(config: config_loader.ConfigTemplate) -> Dict[str, str]:
 def serialize(obj: object) -> str:
     """
     Serializes a given object. It will find all the attributes of the
-    class that don't start with '__' and returns a json string.
+    class that don't start with '__' and returns a base64 encoded json
+    string.
     """
-    _d = {}
+    final_dict = {}
     for attr in dir(obj):
         if not attr.startswith("__") and not callable(getattr(obj, attr)):
-            _d[attr] = getattr(obj, attr)
-    return json.dumps(_d)
+            final_dict[attr] = getattr(obj, attr)
+    return base64.b64encode(json.dumps(final_dict).encode()).decode("utf-8")
 
 
 def open_wds_in_linux(config: config_loader.ConfigTemplate, pkg_manager: str) -> None:

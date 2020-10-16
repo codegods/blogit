@@ -1,32 +1,39 @@
-import flask
 import os
-from extensions import screen
+import sys
+
+PROJECT_ROOT = os.path.abspath(
+    ".."
+    if os.path.abspath(".").split("/")[-1]
+    in ["lib", "api", "helpers", "scripts", "tests", "extensions", "docs", "frontend"]
+    else "."
+)
+
+sys.path.append(PROJECT_ROOT)
+
+import json
+import flask
+import base64
+import logging
 from api import some_view
+from helpers import formatter
+from typing import NoReturn, Union
+
+logger: Union[logging.Logger, None] = None
 
 
-def load_from_env(key, default=None):
-    try:
-        return os.environ[key]
-    except KeyError:
-        return default
-
-
-def create_app():
+def create_app(config: dict, mysql_config: object) -> flask.app:
     app = flask.Flask(__name__)
     app.register_blueprint(some_view.app)
 
-    screen.Screen(app)
+    app.logger = logger
 
-    try:
-        app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
-    except KeyError:
-        text = (
-            "{}: Secret key not specified in config file. Using default security key.".format(
-                app.console.t.bold("WARNING") + app.console.t.yellow
-            )
+    app.config.update(config)
+    if "SECRET_KEY" not in config:
+        app.config["SECRET_KEY"] = "bg6/X`k!`-|iyh,?fbms,z0034VSjH5g"
+        logger.warn(
+            "Secret key not specified in config file. Using default security key."
             + " This is very dangerous in production mode"
         )
-        print(f"\n{app.console.t.yellow + text + app.console.t.normal}\n")
 
     @app.route("/")
     def index():
@@ -35,25 +42,52 @@ def create_app():
     return app
 
 
-def run_development_server():
-    app = create_app()
-    app.config["DEBUG"] = True
+def run_development_server(config: object, mysql: object) -> NoReturn:
+    app = create_app(config.config, mysql)
     app.run(
-        load_from_env("FLASK_HOST", ""),
-        int(load_from_env("FLASK_PORT", "2811")),
-        load_dotenv=False,
-        use_reloader=False,
+        config.HOST,
+        int(config.PORT),
     )
 
 
-def run_production_server():
+def run_production_server(config: object, mysql: object) -> NoReturn:
+    app = create_app(config.config, mysql)
     from gevent.pywsgi import WSGIServer
 
-    app = create_app()
     server = WSGIServer(
-        (load_from_env("FLASK_HOST", ""), int(load_from_env("FLASK_PORT", "2811"))), app
+        (config.HOST, int(config.PORT)),
+        app,
     )
     server.serve_forever()
+
+
+def deserialize(encoded: str) -> object:
+    class EmtpyClass:
+        pass
+
+    cls = EmtpyClass()
+    decoded = json.loads(base64.b64decode(encoded.encode()).decode("utf-8"))
+    for i in decoded:
+        setattr(cls, i, decoded[i])
+    return cls
+
+
+def main() -> NoReturn:
+    global logger
+    if "--log-file" in sys.argv:
+        formatter.init(PROJECT_ROOT, sys.argv[sys.argv.index("--log-file") + 1])
+    logger = logging.getLogger("server")
+
+    if "--flask-config" not in sys.argv or "--mysql-config" not in sys.argv:
+        logger.error("Flask and mysql config are not specified in commandline.")
+
+    flask_config = deserialize(sys.argv[sys.argv.index("--flask-config") + 1])
+    mysql_config = deserialize(sys.argv[sys.argv.index("--mysql-config") + 1])
+
+    if sys.argv[sys.argv.index("--mode") + 1] == "development":
+        run_development_server(flask_config, mysql_config)
+    else:
+        run_production_server(flask_config, mysql_config)
 
 
 if __name__ == "__main__":
@@ -65,7 +99,4 @@ if __name__ == "__main__":
 
     init()
 
-    if load_from_env("FLASK_ENV") == "production":
-        run_production_server()
-    else:
-        run_development_server()
+    main()
