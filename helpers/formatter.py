@@ -18,7 +18,9 @@ class StreamFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         asctime = (
             "\x1b[2m"
-            + datetime.datetime.fromtimestamp(record.created).isoformat()
+            + datetime.datetime.fromtimestamp(record.created)
+            .isoformat()
+            .split("T")[1]  # Date is an overkill in streams, so remove it
             + "\x1b[m"
         )
         msg = record.getMessage()
@@ -111,8 +113,14 @@ def init(root: str, logFile: str = None) -> str:
             },
             "loggers": {
                 "werkzeug": {"handlers": ["file", "console"], "level": logging.DEBUG},
-                "configLoader": {"handlers": ["file", "console"], "level": logging.DEBUG},
-                "startScript": {"handlers": ["file", "console"], "level": logging.DEBUG},
+                "configLoader": {
+                    "handlers": ["file", "console"],
+                    "level": logging.DEBUG,
+                },
+                "startScript": {
+                    "handlers": ["file", "console"],
+                    "level": logging.DEBUG,
+                },
                 "server": {"handlers": ["file", "console"], "level": logging.DEBUG},
             },
         }
