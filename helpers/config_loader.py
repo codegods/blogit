@@ -14,7 +14,7 @@ import sys
 PROJECT_ROOT = os.path.abspath(
     ".."
     if os.path.abspath(".").split("/")[-1]
-    in ["lib", "api", "helpers", "scripts", "tests", "extensions"]
+    in ["lib", "api", "helpers", "scripts", "tests", "extensions", "docs", "frontend"]
     else "."
 )
 
@@ -23,10 +23,11 @@ del sys
 
 import re
 import json
+import logging
 import traceback
 import importlib.util
-from typing import Any, NoReturn, Optional, Union
 from helpers import formatter
+from typing import Any, NoReturn, Optional, Union
 
 global logger
 logger: formatter.logging.Logger
@@ -319,7 +320,7 @@ def main(
     attempts to parse it.
     """
     global logger
-    logger = formatter.getLogger("configLoader")
+    logger = logging.getLogger("configLoader")
 
     # If the config file was specified through the cli
     if config_file:

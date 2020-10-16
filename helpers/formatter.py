@@ -2,6 +2,7 @@ import os
 import re
 import logging
 import datetime
+import logging.config
 from sys import stdout
 
 global filename
@@ -20,6 +21,7 @@ class StreamFormatter(logging.Formatter):
             + datetime.datetime.fromtimestamp(record.created).isoformat()
             + "\x1b[m"
         )
+        msg = record.getMessage()
         levelname = (
             {
                 "INFO": "\x1b[36m",  # Cyan
@@ -28,7 +30,7 @@ class StreamFormatter(logging.Formatter):
                 "WARNING": "\x1b[33m",  # Yellow
                 "ERROR": "\x1b[31m",  # Red
                 "CRITICAL": "\x1b[31m\x1b[1m",  # Red + Bold
-            }.get(record.levelname, '')
+            }.get(record.levelname, "")
             + record.levelname
             + "\x1b[m"
         )
@@ -36,7 +38,7 @@ class StreamFormatter(logging.Formatter):
         #     Dim magenta
         #         |
         name = "\x1b[35m\x1b[2m" + record.name + "\x1b[0m"
-        res = f"[{asctime}] [{levelname}] {name}: {record.msg}"
+        res = f"[{asctime}] [{levelname}] {name}: {msg}"
         return res
 
 
@@ -52,33 +54,12 @@ class FileFormatter(logging.Formatter):
 
         # This will prevent any ANSI code from making their way to
         # the log files
-        record.msg = re.sub("\\033\[[0-9;m]+", "", record.msg)  # noqa: W605
-        res = "[{asctime}] [{levelname}] {name}: {msg}".format(**vars(record))
+        msg = re.sub("\\033\[[0-9;m]+", "", record.getMessage())  # noqa: W605
+        res = f"[{record.asctime}] [{record.levelname}] {record.name}: {msg}"
         return res
 
 
-def getLogger(name: str = "") -> logging.Logger:
-    """
-    Returns a logger with all required formatting in place.
-    Attaches a stream and a file handler to the logger and
-    returns the logger.
-    :param name: Name of the logger
-    :returns: loggging.Logger
-    """
-    global filename
-
-    logger = logging.getLogger(name)
-    fh = logging.FileHandler(filename)
-    fh.setFormatter(FileFormatter("%(message)s"))
-    sh = logging.StreamHandler(stdout)
-    sh.setFormatter(StreamFormatter("%(message)s"))
-    logger.propagate = False
-    logger.addHandler(sh)
-    logger.addHandler(fh)
-    return logger
-
-
-def init(root: str, logFile: str = None) -> None:
+def init(root: str, logFile: str = None) -> str:
     """
     Initiates logging in any app. Creates a log file in the `logs`
     directory of the project root. Creates that directory if it doesn't
@@ -111,6 +92,29 @@ def init(root: str, logFile: str = None) -> None:
 
     filename = logFile
 
-    # Log all messages
-    logging.basicConfig(level=logging.DEBUG)
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "level": logging.INFO,
+            "formatters": {"sf": {"()": StreamFormatter}, "ff": {"()": FileFormatter}},
+            "handlers": {
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "sf",
+                    "stream": stdout,
+                },
+                "file": {
+                    "class": "logging.FileHandler",
+                    "formatter": "ff",
+                    "filename": logFile,
+                },
+            },
+            "loggers": {
+                "werkzeug": {"handlers": ["file", "console"], "level": logging.DEBUG},
+                "configLoader": {"handlers": ["file", "console"], "level": logging.DEBUG},
+                "startScript": {"handlers": ["file", "console"], "level": logging.DEBUG},
+                "server": {"handlers": ["file", "console"], "level": logging.DEBUG},
+            },
+        }
+    )
     return logFile
