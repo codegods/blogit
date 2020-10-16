@@ -44,10 +44,13 @@ def create_app(config: dict, mysql_config: object) -> flask.app:
 
 def run_development_server(config: object, mysql: object) -> NoReturn:
     app = create_app(config.config, mysql)
-    app.run(
-        config.HOST,
-        int(config.PORT),
-    )
+    try:
+        app.run(
+            config.HOST,
+            int(config.PORT),
+        )
+    except KeyboardInterrupt:
+        logger.info("Server shutting down...")
 
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
@@ -58,7 +61,10 @@ def run_production_server(config: object, mysql: object) -> NoReturn:
         (config.HOST, int(config.PORT)),
         app,
     )
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        logger.info("Server shutting down...")
 
 
 def deserialize(encoded: str) -> object:

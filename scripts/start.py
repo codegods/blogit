@@ -144,12 +144,14 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
         try:
             proc.wait()
         except KeyboardInterrupt:
-            logger.info("Waiting for server to shutdown...")
+
+            # Send shutdown signal to server
             if platform.system().lower() == "windows":
                 proc.send_signal(signal.CTRL_C_EVENT)
             else:
                 proc.send_signal(signal.SIGTERM)
 
+            # Wait for a graceful shutdown
             proc.wait()
             logger.info("Shutted down.")
 
@@ -176,15 +178,17 @@ def main() -> None:
 
         elif platform.system().lower() == "windows":
             logger.info("Attempting to start webpack dev server...")
+            env = finalize_wds_config(config)
+            env.update(os.environ)
             subprocess.Popen(
                 ["start", pkg_manager, "start"],
                 cwd=os.path.join(PROJECT_ROOT, "frontend"),
-                env=finalize_wds_config(config),
+                env=env,
             )
         else:
             logger.warn("Unable to start webpack dev server. Please start it manually.")
 
-        start_flask(config)
+    start_flask(config)
 
 
 if __name__ == "__main__":
