@@ -101,7 +101,7 @@ def validate(config: Any) -> None:
             ],
             "flask": ["HOST", "PORT", "config"],
             "wds": ["HOST"],
-            "mysql": ["HOST", "USER", "PASSWORD"],
+            "mysql": ["USER", "PASSWORD"],
         },
         "optional": {
             "wds": [
@@ -117,7 +117,7 @@ def validate(config: Any) -> None:
                 "SSL_KEY_FILE",
                 "SSL_CRT_FILE",
             ],
-            "mysql": ["AUTH_PLUGIN"],
+            "mysql": ["AUTH_PLUGIN", "HOST"],
         },
     }
 

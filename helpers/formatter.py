@@ -122,6 +122,7 @@ def init(root: str, logFile: str = None) -> str:
                     "level": logging.DEBUG,
                 },
                 "server": {"handlers": ["file", "console"], "level": logging.DEBUG},
+                "mysqlInitiator": {"handlers": ["file", "console"], "level": logging.DEBUG}
             },
         }
     )
