@@ -147,9 +147,9 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
 
             # Send shutdown signal to server
             if platform.system().lower() == "windows":
-                proc.send_signal(signal.CTRL_C_EVENT)
+                proc.send_signal(signal.SIGBREAK)
             else:
-                proc.send_signal(signal.SIGTERM)
+                proc.send_signal(signal.SIGINT)
 
             # Wait for a graceful shutdown
             proc.wait()

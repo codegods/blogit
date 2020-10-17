@@ -26,7 +26,6 @@ class MySQL:
         :param dict secrets: A dictionary containing the secrets
         """
         self.PASSWORD = secrets.get("MYSQL_PASSWORD", None)
-        self.HOST = "localhost"
         self.USER = "root"
         self.AUTH_PLUGIN = "mysql_native_password"
 
