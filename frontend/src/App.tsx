@@ -10,6 +10,7 @@ import {
   Tooltip,
   LinearProgress,
   Backdrop,
+  Button,
 } from "@material-ui/core";
 import {
   SearchOutlined as SearchIcon,
@@ -17,12 +18,13 @@ import {
   PersonOutline,
   ExploreOutlined,
 } from "@material-ui/icons";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Link } from "react-router-dom";
 import Styles from "./styles/appbar";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 // Lazy load other app pages
 const Auth = React.lazy(() => import("./pages/auth/index"));
+const HomePage = React.lazy(() => import("./pages/Homepage"));
 
 // Fallback to show when any page is in loading state
 let Loader = withStyles(Styles.Loader)(
@@ -62,23 +64,39 @@ let MainAppBar = withStyles(Styles.AppBar)(
                 inputProps={{ "aria-label": "search" }}
               />
             </div>
-            <Tooltip title="Notifications" aria-label="notifications">
-              <IconButton className={classes.icon}>
-                <Badge max={9} badgeContent={7} color="secondary">
-                  <NotificationsOutlined />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Explore" aria-label="explore">
-              <IconButton className={classes.icon}>
-                <ExploreOutlined />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="My Account" aria-label="my account">
-              <IconButton className={classes.icon}>
-                <PersonOutline />
-              </IconButton>
-            </Tooltip>
+            {
+              /**@todo change this to if user is logged in or not */
+              false ? (
+                <div>
+                  <Tooltip title="Notifications" aria-label="notifications">
+                    <IconButton className={classes.icon}>
+                      <Badge max={9} badgeContent={7} color="secondary">
+                        <NotificationsOutlined />
+                      </Badge>
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Explore" aria-label="explore">
+                    <IconButton className={classes.icon}>
+                      <ExploreOutlined />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="My Account" aria-label="my account">
+                    <IconButton className={classes.icon}>
+                      <PersonOutline />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              ) : (
+                <div>
+                  <Link to="/auth/login" className={classes.loginButtons}>
+                    <Button color="secondary">Login</Button>
+                  </Link>
+                  <Link to="/auth/signup" className={classes.loginButtons}>
+                    <Button color="secondary" variant="contained">Signup</Button>
+                  </Link>
+                </div>
+              )
+            }
           </Toolbar>
         </AppBar>
       );
@@ -94,27 +112,9 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
     return (
       <div className={classes.root}>
         <MainAppBar />
-        <div className={classes.barProxy} />
-        <div className={classes.backdrop}>
-          <div className={classes.logo}>
-            <Typography variant="h1">
-              blogit
-            </Typography>
-            <Typography variant="h5">
-              The new era of blogging
-            </Typography>
-          </div>
-        </div>
-        <main>
-          <Typography variant="h3">
-            A better place to write
-          </Typography>
-          <Typography variant="body1">
-            With blogit you can write whatever
-          </Typography>
-        </main>
         <React.Suspense fallback={<Loader />}>
           <Switch>
+            <Route path="/" exact component={HomePage} />
             <Route path="/auth" component={Auth} />
           </Switch>
         </React.Suspense>
