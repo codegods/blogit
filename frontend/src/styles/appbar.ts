@@ -1,4 +1,5 @@
 import { createStyles, Theme, fade } from "@material-ui/core/styles";
+import LogoImage from "../assets/blogit.png";
 
 let AppBar = (theme:Theme) => createStyles({
   root: {
@@ -53,6 +54,10 @@ let AppBar = (theme:Theme) => createStyles({
       fill: theme.palette.grey[200]
     }
   },
+  loginButtons: {
+    marginRight: theme.spacing(2),
+    textDecoration: "none"
+  }
 });
 
 
@@ -71,30 +76,19 @@ let App = (theme: Theme) => createStyles({
     background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
     position: "absolute",
     width: "100vw",
-    top: theme.mixins.toolbar.height,
-    height: "calc(100%/1.6198)",
+    height: "100vh",
   },
-  logo: {
+  logoBackground: {
+    backgroundImage: `url(${LogoImage})`,
+    width: "100vw",
     position: "absolute",
-    bottom: "25%",
-    left: theme.spacing(4),
-    "& *": {
-      color: "#fff",
-      fontFamily: '"Comfortaa"',
-    },
-    "& h5": {
-      opacity: 0.7
-    },
-    [theme.breakpoints.down("xs")]: {
-      width: "100%",
-      textAlign: "center",
-      left: 0
-    },
-    main: {
-      position: "absolute",
-      top: "calc(100%/1.3)"
-    }
+    height: "100vh",
+    top: theme.mixins.toolbar.height,
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
   }
 })
 
 export default { AppBar, Loader, App }
+export { AppBar, Loader, App }
