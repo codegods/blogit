@@ -56,7 +56,8 @@ let AppBar = (theme:Theme) => createStyles({
   },
   loginButtons: {
     marginRight: theme.spacing(2),
-    textDecoration: "none"
+    textDecoration: "none",
+    color: "white"
   }
 });
 

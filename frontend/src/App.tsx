@@ -49,7 +49,9 @@ let MainAppBar = withStyles(Styles.AppBar)(
         <AppBar position="static" className={classes.root}>
           <Toolbar>
             <Typography className={classes.title} variant="h6" noWrap>
-              blogit
+              <Link to="/" className={classes.loginButtons}>
+                blogit
+              </Link>
             </Typography>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
@@ -88,12 +90,23 @@ let MainAppBar = withStyles(Styles.AppBar)(
                 </div>
               ) : (
                 <div>
-                  <Link to="/auth/login" className={classes.loginButtons}>
-                    <Button color="secondary">Login</Button>
-                  </Link>
-                  <Link to="/auth/signup" className={classes.loginButtons}>
-                    <Button color="secondary" variant="contained">Signup</Button>
-                  </Link>
+                  <Button
+                    component={Link}
+                    to="/auth/login"
+                    className={classes.loginButtons}
+                    color="secondary"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/auth/login"
+                    className={classes.loginButtons}
+                    color="secondary"
+                    variant="contained"
+                  >
+                    Signup
+                  </Button>
                 </div>
               )
             }
@@ -115,7 +128,7 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
         <React.Suspense fallback={<Loader />}>
           <Switch>
             <Route path="/" exact component={HomePage} />
-            <Route path="/auth" component={Auth} />
+            <Route path="/auth/:page" component={Auth} />
           </Switch>
         </React.Suspense>
       </div>

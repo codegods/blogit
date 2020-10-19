@@ -7,15 +7,37 @@ import {
   Grow,
   Card,
   CardContent,
+  withStyles,
+  WithStyles,
 } from "@material-ui/core";
 import SignUp from "./signup";
 import SignIn from "./signin";
-import { root as useStyles } from "../../styles/auth";
+import { RootStyles } from "../../styles/auth";
+import { Switch, Route, Link } from "react-router-dom";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+}
+
+interface AuthPage extends React.Component {
+  handleChange: (_e: React.ChangeEvent<{}>, newValue: number) => void;
+  state: {
+    value: number;
+  };
+}
+
+interface AppProps extends WithStyles<typeof RootStyles> {
+  history: {
+    [index: string]: any;
+  };
+  match: {
+    [index: string]: any;
+  };
+  location: {
+    [index: string]: any;
+  };
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -45,40 +67,81 @@ function a11yProps(index: number) {
   };
 }
 
-export default function Auth() {
-  const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+class Auth extends React.Component<AppProps> implements AuthPage {
+  state: AuthPage["state"];
+  constructor(props: AppProps) {
+    super(props);
+    this.state = {
+      value: props.match.params.page === "login" ? 0 : 1,
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
 
-  const handleChange = (_e: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
+  handleChange(_e: React.ChangeEvent<{}>, newValue: number) {
+    this.setState({
+      value: newValue,
+    });
+  }
 
-  return (
-    <div>
-      <div className={classes.backdrop} />
-      <div className={classes.showText}>
-        <Typography variant="h1">blogit</Typography>
-        <Typography variant="subtitle1">The new era of blogging</Typography>
+  render() {
+    const { classes } = this.props;
+    return (
+      <div>
+        <div className={classes.backdrop} />
+        <div className={classes.showText}>
+          <Typography variant="h1">blogit</Typography>
+          <Typography variant="subtitle1">The new era of blogging</Typography>
+        </div>
+        <Card className={classes.root}>
+          <CardContent>
+            <Tabs
+              value={this.state.value}
+              onChange={this.handleChange}
+              aria-label="Sign and Signup Tabs"
+              className={classes.tabPanel}
+            >
+                <Tab
+                  component={Link}
+                  to="/auth/login"
+                  className={classes.tab}
+                  label="Sign-In"
+                  {...a11yProps(0)}
+                />
+                <Tab
+                  component={Link}
+                  to="/auth/signup"
+                  className={classes.tab}
+                  label="Sign-Up"
+                  {...a11yProps(1)}
+                />
+            </Tabs>
+            <TabPanel value={this.state.value} index={0}>
+              <SignIn />
+            </TabPanel>
+            <TabPanel value={this.state.value} index={1}>
+              <SignUp />
+            </TabPanel>
+          </CardContent>
+        </Card>
+        <Switch>
+          <Route
+            path="/auth/login"
+            component={() => {
+              if (this.state.value !== 0) this.setState({ value: 0 });
+              return null;
+            }}
+          />
+          <Route
+            path="/auth/signup"
+            component={() => {
+              if (this.state.value !== 1) this.setState({ value: 1 });
+              return null;
+            }}
+          />
+        </Switch>
       </div>
-      <Card className={classes.root}>
-        <CardContent>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="simple tabs example"
-            className={classes.tabPanel}
-          >
-            <Tab className={classes.tab} label="Sign-In" {...a11yProps(0)} />
-            <Tab className={classes.tab} label="Sign-Up" {...a11yProps(1)} />
-          </Tabs>
-          <TabPanel value={value} index={0}>
-            <SignIn />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <SignUp />
-          </TabPanel>
-        </CardContent>
-      </Card>
-    </div>
-  );
+    );
+  }
 }
+
+export default withStyles(RootStyles)(Auth);
