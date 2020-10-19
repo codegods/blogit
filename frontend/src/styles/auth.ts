@@ -88,5 +88,8 @@ export let signup = (theme: Theme) => createStyles({
     left: 0,
     bottom: 0,
     width: "100%",
+  },
+  hidden: {
+    display: "none"
   }
 })
