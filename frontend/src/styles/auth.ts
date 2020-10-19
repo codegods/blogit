@@ -1,19 +1,27 @@
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 
-export let root = makeStyles((theme: Theme) => ({
+export let RootStyles = (theme: Theme) => createStyles({
   root: {
+    "& a": {
+      textDecoration: "none",
+      color: theme.palette.primary.main
+    },
     flexGrow: 1,
     width: "fit-content",
     margin: theme.spacing(8, 2, 2, 2),
     position: "absolute",
     left: "0",
+    top: "45%",
+    transform: "translateY(-50%)",
     [theme.breakpoints.up("md")]: {
+      top: "50%",
       left: "80% !important",
-      transform: "translateX(-80%) !important",
+      transform: "translateX(-80%) translateY(-50%) !important",
     },
     [theme.breakpoints.up("sm")]: {
       left: "50%",
-      transform: "translateX(-50%)",
+      top: "50%",
+      transform: "translateX(-50%) translateY(-50%)",
       margin: theme.spacing(8, 0, 0, 0),
     },
   },
@@ -27,7 +35,7 @@ export let root = makeStyles((theme: Theme) => ({
     background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
     position: "absolute",
     width: "100vw",
-    height: "calc(100%/1.6198)",
+    height: "75vh",
   },
   showText: {
     position: "absolute",
@@ -43,7 +51,7 @@ export let root = makeStyles((theme: Theme) => ({
       display: "none"
     }
   },
-}));
+});
 
 export let signin = makeStyles((theme: Theme) => ({
   paper: {
@@ -63,7 +71,6 @@ export let signin = makeStyles((theme: Theme) => ({
 
 export let signup = (theme: Theme) => createStyles({
   paper: {
-    marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -71,8 +78,15 @@ export let signup = (theme: Theme) => createStyles({
   form: {
     width: '100%',
     marginTop: theme.spacing(1),
+    padding: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  progress: {
+    position: "absolute",
+    left: 0,
+    bottom: 0,
+    width: "100%",
+  }
 })
