@@ -213,11 +213,12 @@ def load_from_class(config: object) -> ConfigTemplate:
     logger.info("Validating configuration...")
     validate(conf)
     logger.info("Configuration OK")
-    os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
+    MODE = {
         -1: "development",
         0: "testing",
         1: "production",
     }[MODE]
+    conf.MODE = os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = MODE
     return conf
 
 
@@ -255,11 +256,12 @@ def load_from_json(file="config.json") -> ConfigTemplate:
         logger.info("Validating config...")
         validate(config)
         logger.info("Configuration Ok")
-        os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
+        MODE = {
             -1: "development",
             0: "testing",
             1: "production",
         }[int(os.environ.get("BLOGIT_MODE", -1))]
+        conf.MODE = os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = MODE
         return config
 
 
@@ -283,11 +285,12 @@ def load_from_dict(config: dict) -> ConfigTemplate:
     logger.info("Validating config...")
     validate(conf)
     logger.info("Configuration Ok")
-    os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
+    MODE = {
         -1: "development",
         0: "testing",
         1: "production",
     }[int(os.environ.get("BLOGIT_MODE", -1))]
+    conf.MODE = os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = MODE
     return conf
 
 
@@ -302,11 +305,12 @@ def load_from_json_string(config: str) -> ConfigTemplate:
     logger.info("Validating config...")
     validate(conf)
     logger.info("Configuration Ok")
-    os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = {
+    MODE = {
         -1: "development",
         0: "testing",
         1: "production",
     }[int(os.environ.get("BLOGIT_MODE", -1))]
+    conf.MODE = os.environ["FLASK_ENV"] = os.environ["NODE_ENV"] = MODE
     return conf
 
 
