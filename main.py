@@ -55,14 +55,14 @@ def run_development_server(config: object, mysql: object) -> NoReturn:
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
     app = create_app(config.config, mysql)
-    from gevent.pywsgi import WSGIServer
+    from meinheld import server
 
-    server = WSGIServer(
+    server.listen(
         (config.HOST, int(config.PORT)),
-        app,
     )
     try:
-        server.serve_forever()
+        logger.info("Starting server on {}://{}:{}".format("http", config.HOST, config.PORT))
+        server.run(app)
     except KeyboardInterrupt:
         logger.info("Server shutting down...")
 

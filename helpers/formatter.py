@@ -117,17 +117,7 @@ def init(root: str, logFile: str = None) -> str:
                 },
             },
             "loggers": {
-                "werkzeug": {"handlers": ["file", "console"], "level": logging.DEBUG},
-                "configLoader": {
-                    "handlers": ["file", "console"],
-                    "level": logging.DEBUG,
-                },
-                "startScript": {
-                    "handlers": ["file", "console"],
-                    "level": logging.DEBUG,
-                },
-                "server": {"handlers": ["file", "console"], "level": logging.DEBUG},
-                "mysqlInitiator": {"handlers": ["file", "console"], "level": logging.DEBUG}
+                "": {"handlers": ["file", "console"], "level": logging.DEBUG},
             },
         }
     )
