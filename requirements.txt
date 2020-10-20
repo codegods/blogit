@@ -1,4 +1,4 @@
 flask
-selenium
+meinheld
 mysql.connector
 colorama
