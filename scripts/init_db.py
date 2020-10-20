@@ -159,10 +159,11 @@ def main():
 
     connection: Union[mysql.connector.connection.MySQLConnection, None] = None
     try:
+        logger.info("Connecting to mysql server...")
         connection = mysql.connector.connect(**con_options)
-    except mysql.connector.errors.Error as e:
-        logger.error("Failed to connect to mysql server. Got this exception:")
-        logger.exception(e.msg)
+        logger.info("Connected.")
+    except mysql.connector.errors.Error:
+        logger.exception("Error while connecting to mysql: ", exc_info=1)
 
     execution: Union[Execute, None] = None
     try:
