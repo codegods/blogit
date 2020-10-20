@@ -29,6 +29,7 @@ logger: Union[logging.Logger, None] = None
 
 class Execute:
     def __init__(self, connection: mysql.connector.connection.MySQLConnection) -> None:
+        """Initiates the database by creating required tables and their structures."""
         self._connection = connection
 
         # The main database
@@ -68,7 +69,9 @@ class Execute:
         }
 
     def start(self) -> None:
+        """Starts the task"""
         if not self.check_if_db_exists(self._db):
+            # Create the DB if it doesn't exist
             logger.info("Creating database \x1b[97m{}\x1b[m".format(self._db))
             cursor = self._connection.cursor()
             cursor.execute(
@@ -82,14 +85,19 @@ class Execute:
             "use {}".format(self._connection.converter.escape(self._db))
         )
 
+        # Create all required tables
         for table in self._structures:
             if not self.check_if_table_exists(table):
                 logger.info("Creating table \x1b[97m{}\x1b[m".format(table))
                 self.create_table(table)
 
+        # All tasks done. Cleanup.
         self.cleanUp()
 
     def create_table(self, table: str) -> None:
+        """
+        Creates a given table by taking its structure from `self._structures`
+        """
         command = (
             "create table " + table + " (" + ", ".join(self._structures[table]) + ")"
         )
@@ -98,6 +106,7 @@ class Execute:
         self._connection.commit()
 
     def check_if_db_exists(self, db: str) -> bool:
+        """Checks if a database exists or not"""
         logger.info("Checking for existence of database \x1b[97m{}\x1b[m".format(db))
         cursor = self._connection.cursor(dictionary=True)
         cursor.execute("show databases;")
@@ -108,6 +117,7 @@ class Execute:
         return False
 
     def check_if_table_exists(self, table: str) -> bool:
+        """Checks if a table exists or not"""
         logger.info("Checking for existence of table \x1b[97m{}\x1b[m".format(table))
         cursor = self._connection.cursor(dictionary=True)
         cursor.execute("show tables;")
@@ -118,6 +128,8 @@ class Execute:
         return False
 
     def cleanUp(self):
+
+        # Clean up jobs
         logger.info("Cleaning up...")
         self._connection.commit()
         self._connection.close()
@@ -138,6 +150,7 @@ def main():
         "password": mysql_config.PASSWORD,
     }
 
+    # Attaching optional attributes to arguments
     if hasattr(mysql_config, "AUTH_PLUGIN"):
         con_options["auth_plugin"] = mysql_config.AUTH_PLUGIN
 
@@ -159,6 +172,8 @@ def main():
     except mysql.connector.errors.Error as e:
         logger.error("There was an error while creating tables:")
         logger.exception(e.msg)
+        # Make sure that everything we did is commited
+        # and the connection is closed, even on a failure
         execution.cleanUp()
 
 
@@ -166,6 +181,7 @@ if __name__ == "__main__":
 
     init()
 
+    # Initiate the logger
     if "--log-file" in sys.argv:
         formatter.init(PROJECT_ROOT, sys.argv[sys.argv.index("--log-file") + 1])
     else:
