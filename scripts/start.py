@@ -181,11 +181,11 @@ def main() -> None:
             env = finalize_wds_config(config)
             env.update(os.environ)
             subprocess.Popen(
-                f"start {pkg_manager} start",
+                ["cmd.exe", "/C", f"start {pkg_manager} start"],
                 cwd=os.path.join(PROJECT_ROOT, "frontend"),
                 env=env,
-                shell=True
-            )
+            ).wait()
+
         else:
             logger.warn("Unable to start webpack dev server. Please start it manually.")
 
