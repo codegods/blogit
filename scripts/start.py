@@ -31,10 +31,10 @@ def find_package_manager() -> str:
     It tries to search for `yarn` and if it was found then it returns
     `yarn` otherwise returns `npm`
     """
-    exit_code = subprocess.Popen(["yarn", "--version"], stdout=subprocess.PIPE).wait()
-    if exit_code == 0:
+    try:
+        exit_code = subprocess.Popen(["yarn", "--version"], stdout=subprocess.PIPE).wait()
         return "yarn"
-    else:
+    except:
         return "npm"
 
 
