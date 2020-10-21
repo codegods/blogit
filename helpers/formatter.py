@@ -42,7 +42,7 @@ class StreamFormatter(logging.Formatter):
         #         |
         name = "\x1b[35m\x1b[2m" + record.name + "\x1b[0m"
         res = f"[{asctime}] [{levelname}] {name}: {msg}"
-        if record.levelno >= logging.ERROR:
+        if record.levelno >= logging.ERROR and record.exc_info is not None:
             res += "\n\x1b[31m" + "\n".join(format_exception(*record.exc_info)) + "\n\x1b[m"
         return res
 
@@ -61,7 +61,7 @@ class FileFormatter(logging.Formatter):
         # the log files
         msg = re.sub("\\033\[[0-9;m]+", "", record.getMessage())  # noqa: W605
         res = f"[{record.asctime}] [{record.levelname}] {record.name}: {msg}"
-        if record.levelno >= logging.ERROR:
+        if record.levelno >= logging.ERROR and record.exc_info is not None:
             res += "\n" + "\n".join(format_exception(*record.exc_info)) + "\n"
         return res
 

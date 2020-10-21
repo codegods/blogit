@@ -16,6 +16,7 @@ import base64
 import logging
 from api import some_view
 from helpers import formatter
+from extensions import database
 from typing import NoReturn, Union
 
 logger: Union[logging.Logger, None] = None
@@ -23,8 +24,14 @@ logger: Union[logging.Logger, None] = None
 
 def create_app(config: dict, mysql_config: object) -> flask.app:
     app = flask.Flask(__name__)
+
+    # The database extension
+    database.DataBase(mysql_config, app)
+
+    # Register blueprints
     app.register_blueprint(some_view.app)
 
+    # Initiate logging
     app.logger = logger
 
     app.config.update(config)
