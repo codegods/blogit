@@ -118,7 +118,7 @@ def validate(config: Any) -> None:
                 "SSL_CRT_FILE",
             ],
             "mysql": ["AUTH_PLUGIN", "HOST"],
-            "flask": ["ENABLE_CACHING_IN_DEVELOPMENT"]
+            "flask": ["ENABLE_CACHING_IN_DEVELOPMENT"],
         },
     }
 
@@ -151,12 +151,16 @@ def validate(config: Any) -> None:
         if (
             not re.match("__[a-zA-Z0-9_]*__", val)
             and not callable(getattr(config, val))
-            and val not in checklist["required"]["root"]
+            and (
+                val not in checklist["required"]["root"] or val in checklist["required"]
+            )
         ):
             if val in checklist["optional"]:
-                for ch_val in vars(val):
-                    if not re.match("__[a-zA-Z0-9_]*__", ch_val) and not callable(
-                        ch_val
+                for ch_val in vars(getattr(config, val)):
+                    if (
+                        not re.match("__[a-zA-Z0-9_]*__", ch_val)
+                        and not callable(ch_val)
+                        and ch_val not in checklist["required"][val]
                     ):
                         if ch_val not in checklist["optional"][val]:
                             unknown_option(f"Config.{val}.{ch_val}")
