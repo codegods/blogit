@@ -81,7 +81,9 @@ export let signup = (theme: Theme) => createStyles({
     padding: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    width: "80%",
+    textAlign: "center",
+    marginTop: theme.spacing(1)
   },
   progress: {
     position: "absolute",
