@@ -118,6 +118,7 @@ def validate(config: Any) -> None:
                 "SSL_CRT_FILE",
             ],
             "mysql": ["AUTH_PLUGIN", "HOST"],
+            "flask": ["ENABLE_CACHING_IN_DEVELOPMENT"]
         },
     }
 

@@ -32,9 +32,10 @@ def find_package_manager() -> str:
     `yarn` otherwise returns `npm`
     """
     try:
-        exit_code = subprocess.Popen(["yarn", "--version"], stdout=subprocess.PIPE).wait()
+        subprocess.Popen(["yarn", "--version"], stdout=subprocess.PIPE).wait()
         return "yarn"
-    except:
+    # It will raise a file not found error if yarn is not found
+    except FileNotFoundError:
         return "npm"
 
 
@@ -108,14 +109,15 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
     """
     logger.info("Attempting to start flask server...")
     proc: Union[subprocess.Popen, None] = None
+
+    # Got to set this property for flask to start in correct mode
+    config.flask.MODE = config.MODE
     if config.MODE == "production":
         proc = subprocess.Popen(
             [
                 sys.executable,
                 "-m",
                 "main",
-                "--mode",
-                "production",
                 "--log-file",
                 logfile,
                 "--flask-config",
@@ -130,8 +132,6 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
                 sys.executable,
                 "-m",
                 "main",
-                "--mode",
-                "development",
                 "--log-file",
                 logfile,
                 "--flask-config",

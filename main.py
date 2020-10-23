@@ -14,28 +14,31 @@ import json
 import flask
 import base64
 import logging
-from api import some_view
+from api import user
 from helpers import formatter
-from extensions import database
+from extensions import database, cache
 from typing import NoReturn, Union
 
 logger: Union[logging.Logger, None] = None
 
 
-def create_app(config: dict, mysql_config: object) -> flask.app:
+def create_app(config: object, mysql_config: object) -> flask.app:
     app = flask.Flask(__name__)
 
     # The database extension
     database.DataBase(mysql_config, app)
 
+    # Enables the cache extension
+    cache.Cache(config, app)
+
     # Register blueprints
-    app.register_blueprint(some_view.app)
+    app.register_blueprint(user.blueprint)
 
     # Initiate logging
     app.logger = logger
 
-    app.config.update(config)
-    if "SECRET_KEY" not in config:
+    app.config.update(config.config)
+    if "SECRET_KEY" not in config.config:
         app.config["SECRET_KEY"] = "bg6/X`k!`-|iyh,?fbms,z0034VSjH5g"
         logger.warn(
             "Secret key not specified in config file. Using default security key."
@@ -50,7 +53,7 @@ def create_app(config: dict, mysql_config: object) -> flask.app:
 
 
 def run_development_server(config: object, mysql: object) -> NoReturn:
-    app = create_app(config.config, mysql)
+    app = create_app(config, mysql)
     try:
         app.run(
             config.HOST,
@@ -97,7 +100,7 @@ def main() -> NoReturn:
     flask_config = deserialize(sys.argv[sys.argv.index("--flask-config") + 1])
     mysql_config = deserialize(sys.argv[sys.argv.index("--mysql-config") + 1])
 
-    if sys.argv[sys.argv.index("--mode") + 1] == "development":
+    if flask_config.MODE == "development":
         run_development_server(flask_config, mysql_config)
     else:
         run_production_server(flask_config, mysql_config)
