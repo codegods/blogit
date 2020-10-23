@@ -106,7 +106,7 @@ def validate(config: Any) -> None:
         "optional": {
             "wds": [
                 "HTTPS",
-                "SHOULD_USE_SOURCE_MAP",
+                "SHOULD_USE_SOURCEMAP",
                 "IMAGE_INLINE_SIZE_LIMIT",
                 "DANGEROUSLY_DISABLE_HOST_CHECK",
                 "NODE_PATH",
@@ -116,6 +116,7 @@ def validate(config: Any) -> None:
                 "WDS_SPCKET_PORT",
                 "SSL_KEY_FILE",
                 "SSL_CRT_FILE",
+                "PORT"
             ],
             "mysql": ["AUTH_PLUGIN", "HOST"],
             "flask": ["ENABLE_CACHING_IN_DEVELOPMENT"],

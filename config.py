@@ -87,8 +87,8 @@ class Flask:
 class Config(object):
     def __init__(self) -> None:
         # Whether to start webpack dev server along with the flask server
-        self.RUN_WDS_IN_DEVELOPMENT = False
-        self.RUN_FLASK_IN_DEVELOPMENT = False
+        self.RUN_WDS_IN_DEVELOPMENT = True
+        self.RUN_FLASK_IN_DEVELOPMENT = True
         self.MODE = "development"
 
     def load(self, project_directory: str, mode: int) -> None:

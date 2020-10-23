@@ -19,8 +19,10 @@ import {
   ExploreOutlined,
 } from "@material-ui/icons";
 import { Switch, Route, Link } from "react-router-dom";
-import Styles from "./styles/appbar";
 import withStyles from "@material-ui/core/styles/withStyles";
+
+import Styles from "./styles/appbar";
+import url_for from "./utils/url_for";
 
 // Lazy load other app pages
 const Auth = React.lazy(() => import("./pages/auth/index"));
@@ -92,7 +94,7 @@ let MainAppBar = withStyles(Styles.AppBar)(
                 <div>
                   <Button
                     component={Link}
-                    to="/auth/login"
+                    to={url_for("views.auth.login")}
                     className={classes.loginButtons}
                     color="secondary"
                   >
@@ -100,7 +102,7 @@ let MainAppBar = withStyles(Styles.AppBar)(
                   </Button>
                   <Button
                     component={Link}
-                    to="/auth/login"
+                    to={url_for("views.auth.signup")}
                     className={classes.loginButtons}
                     color="secondary"
                     variant="contained"
