@@ -117,6 +117,6 @@ class Config(object):
         self.flask = Flask(secrets.get("FLASK_SECRET_KEY"), mode)
         self.mysql = MySQL(secrets)
         self.wds = WDS()
-
-        self.flask.PORT = get_free_port()
-        self.wds.PORT = str(get_free_port())
+        if mode == -1:
+            self.flask.PORT = get_free_port()
+            self.wds.PORT = str(get_free_port())
