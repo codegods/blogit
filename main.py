@@ -111,7 +111,7 @@ if __name__ == "__main__":
     # If the functions were called as modules, then screen is already initialised
     # but if the code reaches here, it means that it is not initialised.
 
-    from colorama import init
+    from helpers.init_console import init
 
     init()
 

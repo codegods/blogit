@@ -19,7 +19,7 @@ del os
 import logging
 import mysql.connector
 from typing import Union
-from colorama import init
+from helpers.init_console import init
 from helpers import formatter, config_loader
 
 global logger

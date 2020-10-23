@@ -364,7 +364,7 @@ def main(
 
 
 if __name__ == "__main__":
-    from colorama import init
+    from helpers.init_console import init
 
     init()
     print(

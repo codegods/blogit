@@ -16,8 +16,8 @@ import signal
 import logging
 import platform
 import subprocess
-from colorama import init
 from typing import Union, Dict
+from helpers.init_console import init
 from helpers import formatter, config_loader
 
 init()
