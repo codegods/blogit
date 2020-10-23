@@ -1,4 +1,3 @@
 flask
 meinheld
 mysql.connector
-colorama

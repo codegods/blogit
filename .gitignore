@@ -26,8 +26,9 @@ yarn-error.log*
 chromedriver
 chromedriver_*.zip
 
-# Virtual environment
+# Virtual environments
 venv/
+.winvenv/
 
 # Python cache
 **/__pycache__
