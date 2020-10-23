@@ -67,17 +67,18 @@ class Flask:
         :param int mode: The current mode.
         -1 = development, 0 = testing, 1 = production
         """
-        self.mode = mode
-        self.key = key
+        self.__mode__ = mode
+        self.__key__ = key
 
         self.HOST = "0.0.0.0"
         self.PORT = 2811
+        self.ENABLE_CACHING_IN_DEVELOPMENT = True
 
     @property
     def config(self):
-        conf = {"SECRET_KEY": self.key}
+        conf = {"SECRET_KEY": self.__key__}
 
-        if self.mode == -1:
+        if self.__mode__ == -1:
             conf.update({"DEBUG": True})
 
         return conf
@@ -86,8 +87,8 @@ class Flask:
 class Config(object):
     def __init__(self) -> None:
         # Whether to start webpack dev server along with the flask server
-        self.RUN_WDS_IN_DEVELOPMENT = True
-        self.RUN_FLASK_IN_DEVELOPMENT = True
+        self.RUN_WDS_IN_DEVELOPMENT = False
+        self.RUN_FLASK_IN_DEVELOPMENT = False
         self.MODE = "development"
 
     def load(self, project_directory: str, mode: int) -> None:
