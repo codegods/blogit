@@ -30,6 +30,7 @@ def create_app(config: object, mysql_config: object) -> flask.app:
 
     # Enables the cache extension
     cache.Cache(config, app)
+    app.cache.create_store("signup")
 
     # Register blueprints
     app.register_blueprint(user.blueprint)

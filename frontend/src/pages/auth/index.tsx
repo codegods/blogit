@@ -10,10 +10,11 @@ import {
   withStyles,
   WithStyles,
 } from "@material-ui/core";
+import { Switch, Route, Link } from "react-router-dom";
 import SignUp from "./signup";
 import SignIn from "./signin";
 import { RootStyles } from "../../styles/auth";
-import { Switch, Route, Link } from "react-router-dom";
+import url_for from "../../utils/url_for";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -125,15 +126,17 @@ class Auth extends React.Component<AppProps> implements AuthPage {
         </Card>
         <Switch>
           <Route
-            path="/auth/login"
+            path={url_for("views.auth.login")}
             component={() => {
+              document.title = "Sign in | Blogit"
               if (this.state.value !== 0) this.setState({ value: 0 });
               return null;
             }}
           />
           <Route
-            path="/auth/signup"
+            path={url_for("views.auth.signup")}
             component={() => {
+              document.title = "Sign up | Blogit"
               if (this.state.value !== 1) this.setState({ value: 1 });
               return null;
             }}

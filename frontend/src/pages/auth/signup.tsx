@@ -10,24 +10,22 @@ import {
 import { withStyles } from "@material-ui/core/styles";
 import { CloudUpload } from "@material-ui/icons";
 import { signup as Styles } from "../../styles/auth";
+import Validator from "./Validator";
 
 // State of the signup page
 interface SignUpState {
   step: number;
   isLoading: boolean;
+  error_id: string | null;
+  errorText: string;
 }
 
 // The Signup Component
 interface SignUpPage extends React.Component {
-  steps: Array<React.ReactNode>;
   nextStep: (_e: React.ChangeEvent<{}>) => void;
   prevStep: (_e: React.ChangeEvent<{}>) => void;
   _ids: {
-    [index: string]: {
-      id: string;
-      onClick?: (evt: React.ChangeEvent<HTMLElement>) => void;
-      onChange?: (evt: React.ChangeEvent<HTMLElement>) => void;
-    };
+    [index: string]: string;
   };
 }
 
@@ -36,132 +34,62 @@ type PropTypes = WithStyles<typeof Styles>;
 
 class SignUp extends React.Component<PropTypes> implements SignUpPage {
   state: SignUpState;
-  steps: SignUpPage["steps"];
   _ids: SignUpPage["_ids"];
+
   constructor(props: PropTypes) {
     super(props);
     this.state = {
       step: 0,
       isLoading: false,
+      error_id: "",
+      errorText: "",
     };
     this.nextStep = this.nextStep.bind(this);
     this.prevStep = this.prevStep.bind(this);
 
+    // HTML IDs for the app
     this._ids = {
-      email: {
-        id: "auth-signup-email",
-      },
-      password: {
-        id: "auth-signup-password",
-      },
-      username: {
-        id: "auth-signup-username",
-      },
-      fname: {
-        id: "auth-signup-fname",
-      },
-      lname: {
-        id: "auth-signup-lname",
-      },
-      proxyPicker: {
-        id: "auth-signup-proxy-avatar",
-      },
-      avatar: {
-        id: "auth-signup-avatar",
-      },
-      bio: {
-        id: "auth-signup-bio",
-      },
+      email: "auth-signup-email",
+      password: "auth-signup-password",
+      username: "auth-signup-username",
+      fname: "auth-signup-fname",
+      lname: "auth-signup-lname",
+      proxyPicker: "auth-signup-proxy-avatar",
+      avatar: "auth-signup-avatar",
+      bio: "auth-signup-bio",
     };
-
-    // The steps user will go through
-    this.steps = [
-      // Step 0: Email and Password
-      <div>
-        <TextField
-          margin="normal"
-          variant="outlined"
-          required
-          fullWidth
-          id={this._ids.email.id}
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-        />
-        <TextField
-          margin="normal"
-          variant="outlined"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id={this._ids.password.id}
-          autoComplete="current-password"
-        />
-      </div>,
-      // Step 1: Pick a Username, First and Last name
-      <div>
-        <TextField
-          margin="normal"
-          autoComplete="fname"
-          name="firstName"
-          variant="outlined"
-          required
-          fullWidth
-          id={this._ids.fname.id}
-          label="First Name"
-          autoFocus
-        />
-        <TextField
-          margin="normal"
-          variant="outlined"
-          required
-          fullWidth
-          id={this._ids.lname.id}
-          label="Last Name"
-          name="lastName"
-          autoComplete="lname"
-        />
-        <TextField
-          margin="normal"
-          variant="outlined"
-          required
-          fullWidth
-          id={this._ids.username.id}
-          label="Pick a user name"
-          name="userName"
-          autoComplete="uname"
-        />
-      </div>,
-      // Step 2: Bio data and avatar
-      <div>
-        <input
-          type="file"
-          id={this._ids.proxyPicker.id}
-          className={this.props.classes.hidden}
-        />
-        <Button variant="contained" color="primary" startIcon={<CloudUpload />}>
-          Choose an Avatar
-        </Button>
-        <TextField
-          margin="normal"
-          variant="outlined"
-          fullWidth
-          id={this._ids.bio.id}
-          label="Add something about yourself"
-          name="bioData"
-          multiline
-        />
-      </div>,
-    ];
   }
 
   nextStep(_e: React.ChangeEvent<{}>) {
-    if (this.state.step < this.steps.length - 1) {
-      this.setState({
-        step: this.state.step + 1,
-      });
+    let go_to_next = () => {
+      // 3 steps are possible: 0, 1, 2
+      if (this.state.step < 2) {
+        this.setState({
+          step: this.state.step + 1,
+          isLoading: false,
+        });
+      }
+    };
+
+    this.setState({
+      isLoading: true,
+    });
+    switch (this.state.step) {
+      case 0:
+        Validator.validate_step_1(this._ids.email, this._ids.password).then(
+          (res) => {
+            if (res.error) {
+              this.setState({
+                error_id: res.error.id,
+                errorText: res.error.message,
+                isLoading: false,
+              });
+            } else {
+              go_to_next();
+            }
+          }
+        );
+        break;
     }
   }
 
@@ -180,13 +108,134 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
       <Container component="main" maxWidth="xs">
         <div className={classes.paper}>
           <form className={classes.form} noValidate>
-            {
-              // Display the current step
-              this.steps[this.state.step]
-            }
+            <div
+              style={{
+                display: this.state.step === 0 ? "block" : "none",
+              }}
+            >
+              <TextField
+                margin="normal"
+                variant="outlined"
+                required
+                fullWidth
+                error={this.state.error_id === this._ids.email}
+                helperText={
+                  this.state.error_id === this._ids.email
+                    ? this.state.errorText
+                    : ""
+                }
+                id={this._ids.email}
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                placeholder="Enter your email..."
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                variant="outlined"
+                placeholder="Enter your password..."
+                required
+                fullWidth
+                error={this.state.error_id === this._ids.password}
+                helperText={
+                  this.state.error_id === this._ids.password
+                    ? this.state.errorText
+                    : ""
+                }
+                name="password"
+                label="Password"
+                type="password"
+                id={this._ids.password}
+                autoComplete="current-password"
+              />
+            </div>
+            {/* Step 1: Pick a Username, First and Last name*/}
+            <div
+              style={{
+                display: this.state.step === 1 ? "block" : "none",
+              }}
+            >
+              <TextField
+                margin="normal"
+                autoComplete="fname"
+                name="firstName"
+                variant="outlined"
+                required
+                fullWidth
+                error={this.state.error_id === this._ids.fname}
+                helperText={
+                  this.state.error_id === this._ids.fname
+                    ? this.state.errorText
+                    : ""
+                }
+                id={this._ids.fname}
+                label="First Name"
+              />
+              <TextField
+                margin="normal"
+                variant="outlined"
+                required
+                fullWidth
+                error={this.state.error_id === this._ids.lname}
+                helperText={
+                  this.state.error_id === this._ids.lname
+                    ? this.state.errorText
+                    : ""
+                }
+                id={this._ids.lname}
+                label="Last Name"
+                name="lastName"
+                autoComplete="lname"
+              />
+              <TextField
+                margin="normal"
+                variant="outlined"
+                required
+                fullWidth
+                error={this.state.error_id === this._ids.username}
+                helperText={
+                  this.state.error_id === this._ids.username
+                    ? this.state.errorText
+                    : ""
+                }
+                id={this._ids.username}
+                label="Pick a user name"
+                name="userName"
+                autoComplete="uname"
+              />
+            </div>
+            {/* Step 2: Bio data and avatar*/}
+            <div
+              style={{
+                display: this.state.step === 2 ? "block" : "none",
+              }}
+            >
+              <input
+                type="file"
+                id={this._ids.proxyPicker}
+                className={this.props.classes.hidden}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<CloudUpload />}
+              >
+                Choose an Avatar
+              </Button>
+              <TextField
+                margin="normal"
+                variant="outlined"
+                fullWidth
+                id={this._ids.bio}
+                label="Add something about yourself"
+                name="bioData"
+                multiline
+              />
+            </div>
           </form>
-          <Grid container xs={12} sm={12}>
-            <Grid sm={6} xs={12} style={{textAlign: "center"}}>
+          <Grid container>
+            <Grid sm={6} xs={12} style={{ textAlign: "center" }} item>
               <Button
                 variant="contained"
                 color="secondary"
@@ -197,7 +246,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
                 Prev
               </Button>
             </Grid>
-            <Grid sm={6} xs={12} style={{textAlign: "center"}}>
+            <Grid sm={6} xs={12} style={{ textAlign: "center" }} item>
               <Button
                 variant="contained"
                 color="primary"
@@ -212,7 +261,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
         <LinearProgress
           className={classes.progress}
           variant={this.state.isLoading ? "indeterminate" : "determinate"}
-          value={(this.state.step / this.steps.length) * 100}
+          value={(this.state.step / 3) * 100}
         />
       </Container>
     );
