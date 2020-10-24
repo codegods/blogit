@@ -51,6 +51,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
     this._ids = {
       email: "auth-signup-email",
       password: "auth-signup-password",
+      password_confirm: "auth-signup-password-confirm",
       username: "auth-signup-username",
       fname: "auth-signup-fname",
       lname: "auth-signup-lname",
@@ -76,19 +77,21 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
     });
     switch (this.state.step) {
       case 0:
-        Validator.validate_step_1(this._ids.email, this._ids.password).then(
-          (res) => {
-            if (res.error) {
-              this.setState({
-                error_id: res.error.id,
-                errorText: res.error.message,
-                isLoading: false,
-              });
-            } else {
-              go_to_next();
-            }
+        Validator.validate_step_1(
+          this._ids.email,
+          this._ids.password,
+          this._ids.password_confirm
+        ).then((res) => {
+          if (res.error) {
+            this.setState({
+              error_id: res.error.id,
+              errorText: res.error.message,
+              isLoading: false,
+            });
+          } else {
+            go_to_next();
           }
-        );
+        });
         break;
     }
   }
@@ -147,7 +150,23 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
                 label="Password"
                 type="password"
                 id={this._ids.password}
-                autoComplete="current-password"
+              />
+
+              <TextField
+                margin="normal"
+                variant="outlined"
+                required
+                fullWidth
+                name="password-confirm"
+                label="Confirm Password"
+                type="password"
+                id={this._ids.password_confirm}
+                error={this.state.error_id === this._ids.password_confirm}
+                helperText={
+                  this.state.error_id === this._ids.password_confirm
+                    ? this.state.errorText
+                    : ""
+                }
               />
             </div>
             {/* Step 1: Pick a Username, First and Last name*/}

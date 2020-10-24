@@ -2,7 +2,8 @@ import url_for from "../../utils/url_for";
 
 let validate_step_1 = (
   email: string,
-  password: string
+  password: string,
+  cpassword: string
 ): Promise<{
   uuid?: string;
   error?: {
@@ -29,6 +30,16 @@ let validate_step_1 = (
         error: {
           message: "Password is a required field",
           id: password,
+        },
+      });
+      return;
+    }
+
+    if (passwordString !== (document.getElementById(cpassword) as HTMLInputElement).value) {
+      resolve({
+        error: {
+          message: "The two passwords don't match",
+          id: cpassword,
         },
       });
       return;
