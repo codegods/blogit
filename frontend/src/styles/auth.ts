@@ -35,7 +35,7 @@ export let RootStyles = (theme: Theme) => createStyles({
     background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
     position: "absolute",
     width: "100vw",
-    height: "75vh",
+    height: "100vh",
   },
   showText: {
     position: "absolute",
