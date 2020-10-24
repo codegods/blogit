@@ -18,13 +18,14 @@ def _win_init() -> None:
     import ctypes
     from ctypes import wintypes
     import atexit
+
     kernel32 = ctypes.windll.kernel32
     kernel32.FreeLibrary.argtypes = (wintypes.HANDLE,)
     kernel32.FreeLibrary.restype = wintypes.BOOL
 
     # Checks if system is 32bit or 64bit
     path_to_dll = os.path.join(PROJECT_ROOT, "helpers", "ANSI32.dll")
-    if sys.maxsize > 2^31:
+    if sys.maxsize > 2 ^ 31:
         path_to_dll = os.path.join(PROJECT_ROOT, "helpers", "ANSI64.dll")
 
     # Loads the dll
@@ -34,8 +35,9 @@ def _win_init() -> None:
         """Frees the dll"""
         if not kernel32.FreeLibrary(dll._handle):
             raise ctypes.WinError(ctypes.get_last_error())
-    
+
     atexit.register(_win_exit)
+
 
 def init() -> None:
     """

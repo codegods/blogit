@@ -58,7 +58,7 @@ class _Cache:
         if name in self._stores:
             raise ValueError(f"Store {name} is already existent")
 
-        _store = Store()
+        _store = Store(self._logger)
         self._stores[name] = _store
         return _store
 
