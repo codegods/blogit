@@ -99,6 +99,17 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
           id={this._ids.password.id}
           autoComplete="current-password"
         />
+        <TextField
+          margin="normal"
+          variant="outlined"
+          required
+          fullWidth
+          name="password-confirm"
+          label="Confirm Password"
+          type="password"
+          id="auth-signup-password-confirm"
+          autoComplete="current-password-confirm"
+        />
       </div>,
       // Step 1: Pick a Username, First and Last name
       <div>
