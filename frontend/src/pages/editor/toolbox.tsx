@@ -6,4 +6,4 @@ class Toolbox extends React.Component {
   }
 }
 
-export default Toolbox
+export default Toolbox;

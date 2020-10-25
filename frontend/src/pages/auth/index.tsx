@@ -101,20 +101,20 @@ class Auth extends React.Component<AppProps> implements AuthPage {
               aria-label="Sign and Signup Tabs"
               className={classes.tabPanel}
             >
-                <Tab
-                  component={Link}
-                  to="/auth/login"
-                  className={classes.tab}
-                  label="Sign-In"
-                  {...a11yProps(0)}
-                />
-                <Tab
-                  component={Link}
-                  to="/auth/signup"
-                  className={classes.tab}
-                  label="Sign-Up"
-                  {...a11yProps(1)}
-                />
+              <Tab
+                component={Link}
+                to="/auth/login"
+                className={classes.tab}
+                label="Sign-In"
+                {...a11yProps(0)}
+              />
+              <Tab
+                component={Link}
+                to="/auth/signup"
+                className={classes.tab}
+                label="Sign-Up"
+                {...a11yProps(1)}
+              />
             </Tabs>
             <TabPanel value={this.state.value} index={0}>
               <SignIn />
@@ -128,7 +128,7 @@ class Auth extends React.Component<AppProps> implements AuthPage {
           <Route
             path={url_for("views.auth.login")}
             component={() => {
-              document.title = "Sign in | Blogit"
+              document.title = "Sign in | Blogit";
               if (this.state.value !== 0) this.setState({ value: 0 });
               return null;
             }}
@@ -136,7 +136,7 @@ class Auth extends React.Component<AppProps> implements AuthPage {
           <Route
             path={url_for("views.auth.signup")}
             component={() => {
-              document.title = "Sign up | Blogit"
+              document.title = "Sign up | Blogit";
               if (this.state.value !== 1) this.setState({ value: 1 });
               return null;
             }}
