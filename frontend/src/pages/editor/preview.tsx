@@ -6,4 +6,4 @@ class Preview extends React.Component {
   }
 }
 
-export default Preview
+export default Preview;
