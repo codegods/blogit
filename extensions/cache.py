@@ -42,7 +42,7 @@ class Store:
             return self._cache[key]
         except KeyError:
             self._logger.exception(f"Key {key} not found in cache")
-            return None
+            raise
 
 
 class _Cache:

@@ -24,6 +24,7 @@ interface SignUpState {
 interface SignUpPage extends React.Component {
   nextStep: (_e: React.ChangeEvent<{}>) => void;
   prevStep: (_e: React.ChangeEvent<{}>) => void;
+  uuid: string;
   _ids: {
     [index: string]: string;
   };
@@ -35,6 +36,7 @@ type PropTypes = WithStyles<typeof Styles>;
 class SignUp extends React.Component<PropTypes> implements SignUpPage {
   state: SignUpState;
   _ids: SignUpPage["_ids"];
+  uuid: SignUpPage["uuid"];
 
   constructor(props: PropTypes) {
     super(props);
@@ -59,6 +61,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
       avatar: "auth-signup-avatar",
       bio: "auth-signup-bio",
     };
+    this.uuid = ""
   }
 
   nextStep(_e: React.ChangeEvent<{}>) {
@@ -68,6 +71,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
         this.setState({
           step: this.state.step + 1,
           isLoading: false,
+          error: null,
         });
       }
     };
@@ -89,9 +93,46 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
               isLoading: false,
             });
           } else {
+            this.uuid = res.uuid || "";
             go_to_next();
           }
         });
+        break;
+      case 1:
+        Validator.validate_step_2(
+          this.uuid,
+          this._ids.username,
+          this._ids.fname,
+          this._ids.lname
+        ).then((res) => {
+          if (res.error) {
+            this.setState({
+              error_id: res.error.id,
+              errorText: res.error.message,
+              isLoading: false,
+            });
+          } else {
+            go_to_next();
+          }
+        });
+        break;
+      case 2:
+        Validator.validate_step_2(
+          this.uuid,
+          this._ids.username,
+          this._ids.fname,
+          this._ids.lname
+        ).then((res) => {
+          if (res.error) {
+            this.setState({
+              error_id: res.error.id,
+              errorText: res.error.message,
+              isLoading: false,
+            });
+          } else {
+            // Submit
+            go_to_next()
+        }});
         break;
     }
   }
