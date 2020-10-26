@@ -88,9 +88,7 @@ let validate_step_1 = (
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
-                resolve({});
-
+                resolve(res);
                 return;
             })
             .catch((_) => {
@@ -107,4 +105,121 @@ let validate_step_1 = (
     });
 };
 
-export default { validate_step_1 };
+let validate_step_2 = (
+    uuid: string,
+    uname: string,
+    fname: string,
+    lname: string
+): Promise<{
+    error?: {
+        message: string;
+        id: string;
+    };
+}> => {
+    return new Promise((resolve, reject) => {
+        let uString = (document.getElementById(uname) as HTMLInputElement)
+            .value;
+        let fString = (document.getElementById(fname) as HTMLInputElement)
+            .value;
+        let lString = (document.getElementById(lname) as HTMLInputElement)
+            .value;
+        if (uString === "") {
+            resolve({
+                error: {
+                    message: "Username is a required field",
+                    id: uname,
+                },
+            });
+            return;
+        }
+        if (fString === "") {
+            resolve({
+                error: {
+                    message: "Firstname is a required field",
+                    id: fname,
+                },
+            });
+            return;
+        }
+
+        fetch(url_for("api.auth.signup.validate"), {
+            method: "POST",
+            body: JSON.stringify({ uuid, uString, fString, lString, step: 1 }),
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                resolve(res);
+                return;
+            })
+            .catch((_) => {
+                resolve({
+                    error: {
+                        message:
+                            "There was an errror while contacting our server",
+                        id: fname,
+                    },
+                });
+
+                return;
+            });
+    });
+};
+
+/*let validate_step_3 = (
+    uuid: string,
+    avatar: string,
+    bio: string
+): Promise<{
+    error?: {
+        message: string;
+        id: string;
+    };
+}> => {
+    return new Promise((resolve, reject) => {
+        let _elem = (document.getElementById(avatar) as HTMLInputElement)
+        let AvatarFile = _elem.files && _elem.files[0];
+        let bString = (document.getElementById(bio) as HTMLInputElement)
+            .value;
+/*        if (bString === "") {
+            resolve({
+                error: {
+                    message: "Username is a required field",
+                    id: uname,
+                },
+            });
+            return;
+        }
+        if (fString === "") {
+            resolve({
+                error: {
+                    message: "Firstname is a required field",
+                    id: fname,
+                },
+            });
+            return;
+        }
+
+        fetch(url_for("api.auth.signup.validate"), {
+            method: "POST",
+            body: JSON.stringify({ uuid, uString, fString, lString, step: 1 }),
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                resolve(res);
+                return;
+            })
+            .catch((_) => {
+                resolve({
+                    error: {
+                        message:
+                            "There was an errror while contacting our server",
+                        id: fname,
+                    },
+                });
+
+                return;
+            });
+    });
+};
+*/
+export default { validate_step_1, validate_step_2 /*, validate_step_3 */};
