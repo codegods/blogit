@@ -176,7 +176,7 @@ module.exports = function (webpackEnv) {
               ecma: 8,
             },
             compress: {
-              ecma: 5,
+              ecma: 6,
               warnings: false,
               comparisons: false,
               inline: 2,
@@ -188,7 +188,7 @@ module.exports = function (webpackEnv) {
             keep_classnames: isEnvProductionProfile,
             keep_fnames: isEnvProductionProfile,
             output: {
-              ecma: 5,
+              ecma: 6,
               comments: false,
               ascii_only: true,
             },
