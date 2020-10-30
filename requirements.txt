@@ -1,3 +1,4 @@
 Flask==1.1.2
 meinheld==1.0.2
 mysql-connector==2.2.9
+bcrypt==3.2.0

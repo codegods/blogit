@@ -14,7 +14,7 @@ import json
 import flask
 import base64
 import logging
-from api import user
+from api import user, uploader
 from helpers import formatter
 from extensions import database, cache
 from typing import NoReturn, Union
@@ -31,9 +31,11 @@ def create_app(config: object, mysql_config: object) -> flask.app:
     # Enables the cache extension
     cache.Cache(config, app)
     app.cache.create_store("signup")
+    app.cache.create_store("uploads")
 
     # Register blueprints
     app.register_blueprint(user.blueprint)
+    app.register_blueprint(uploader.blueprint)
 
     # Initiate logging
     app.logger = logger
