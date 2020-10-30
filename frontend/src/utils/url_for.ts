@@ -5,6 +5,7 @@ let _url_database: {
     "views.auth.signup": "/auth/signup",
     "api.auth.signup.validate": "/api/auth/signup/validate/",
     "api.auth.loginin": "/api/auth/login",
+    "api.uploader": "/api/uploader"
 };
 
 let url_for = (name: keyof typeof _url_database): string => {
