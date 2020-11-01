@@ -22,12 +22,6 @@ interface TabPanelProps {
   value: number;
 }
 
-interface AuthPage extends React.Component {
-  handleChange: (_e: React.ChangeEvent<{}>, newValue: number) => void;
-  state: {
-    value: number;
-  };
-}
 
 interface AppProps extends WithStyles<typeof RootStyles> {
   history: {
@@ -68,8 +62,10 @@ function a11yProps(index: number) {
   };
 }
 
-class Auth extends React.Component<AppProps> implements AuthPage {
-  state: AuthPage["state"];
+class Auth extends React.Component<AppProps> {
+  state: {
+    value: number;
+  };
   constructor(props: AppProps) {
     super(props);
     this.state = {

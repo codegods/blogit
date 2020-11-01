@@ -6,37 +6,27 @@ import {
   WithStyles,
   LinearProgress,
   Grid,
+  Avatar,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { CloudUpload } from "@material-ui/icons";
 import { signup as Styles } from "../../styles/auth";
 import Validator from "./Validator";
 
-// State of the signup page
-interface SignUpState {
-  step: number;
-  isLoading: boolean;
-  error_id: string | null;
-  errorText: string;
-}
+// Props it will accept
+type PropTypes = WithStyles<typeof Styles>;
 
-// The Signup Component
-interface SignUpPage extends React.Component {
-  nextStep: (_e: React.ChangeEvent<{}>) => void;
-  prevStep: (_e: React.ChangeEvent<{}>) => void;
+class SignUp extends React.Component<PropTypes> {
+  state: {
+    step: number;
+    isLoading: boolean;
+    error_id: string | null;
+    errorText: string;
+  };
   uuid: string;
   _ids: {
     [index: string]: string;
   };
-}
-
-// Props it will accept
-type PropTypes = WithStyles<typeof Styles>;
-
-class SignUp extends React.Component<PropTypes> implements SignUpPage {
-  state: SignUpState;
-  _ids: SignUpPage["_ids"];
-  uuid: SignUpPage["uuid"];
 
   constructor(props: PropTypes) {
     super(props);
@@ -61,7 +51,7 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
       avatar: "auth-signup-avatar",
       bio: "auth-signup-bio",
     };
-    this.uuid = ""
+    this.uuid = "";
   }
 
   nextStep(_e: React.ChangeEvent<{}>) {
@@ -117,11 +107,10 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
         });
         break;
       case 2:
-        Validator.validate_step_2(
+        Validator.validate_step_3(
           this.uuid,
-          this._ids.username,
-          this._ids.fname,
-          this._ids.lname
+          this._ids.proxyPicker,
+          this._ids.bio
         ).then((res) => {
           if (res.error) {
             this.setState({
@@ -130,9 +119,10 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
               isLoading: false,
             });
           } else {
-            // Submit
-            go_to_next()
-        }});
+            window.location.assign("/")
+            go_to_next();
+          }
+        });
         break;
     }
   }
@@ -235,7 +225,6 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
               <TextField
                 margin="normal"
                 variant="outlined"
-                required
                 fullWidth
                 error={this.state.error_id === this._ids.lname}
                 helperText={
@@ -274,11 +263,12 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
               <input
                 type="file"
                 id={this._ids.proxyPicker}
-                className={this.props.classes.hidden}
+                className={classes.hidden}
               />
               <Button
                 variant="contained"
                 color="primary"
+                onClick={() => document.getElementById(this._ids.proxyPicker)?.click()}
                 startIcon={<CloudUpload />}
               >
                 Choose an Avatar
@@ -291,6 +281,12 @@ class SignUp extends React.Component<PropTypes> implements SignUpPage {
                 label="Add something about yourself"
                 name="bioData"
                 multiline
+                error={this.state.error_id === this._ids.bio}
+                helperText={
+                  this.state.error_id === this._ids.bio
+                    ? this.state.errorText
+                    : ""
+                }
               />
             </div>
           </form>

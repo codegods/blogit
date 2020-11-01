@@ -1,4 +1,5 @@
 import url_for from "../../utils/url_for";
+import FileUploader from "../../utils/file_uploader";
 
 let validate_step_1 = (
     email: string,
@@ -86,7 +87,10 @@ let validate_step_1 = (
                 password: passwordString,
             }),
         })
-            .then((res) => res.json())
+            .then((res) => {
+                if (!res.ok) throw new Error("Response not ok");
+                return res.json();
+            })
             .then((res) => {
                 resolve(res);
                 return;
@@ -146,7 +150,10 @@ let validate_step_2 = (
             method: "POST",
             body: JSON.stringify({ uuid, uString, fString, lString, step: 1 }),
         })
-            .then((res) => res.json())
+            .then((res) => {
+                if (!res.ok) throw new Error("Response not ok");
+                return res.json();
+            })
             .then((res) => {
                 resolve(res);
                 return;
@@ -165,7 +172,7 @@ let validate_step_2 = (
     });
 };
 
-/*let validate_step_3 = (
+let validate_step_3 = (
     uuid: string,
     avatar: string,
     bio: string
@@ -176,44 +183,40 @@ let validate_step_2 = (
     };
 }> => {
     return new Promise((resolve, reject) => {
-        let _elem = (document.getElementById(avatar) as HTMLInputElement)
+        let _elem = document.getElementById(avatar) as HTMLInputElement;
         let AvatarFile = _elem.files && _elem.files[0];
-        let bString = (document.getElementById(bio) as HTMLInputElement)
-            .value;
-/*        if (bString === "") {
-            resolve({
-                error: {
-                    message: "Username is a required field",
-                    id: uname,
-                },
-            });
-            return;
-        }
-        if (fString === "") {
-            resolve({
-                error: {
-                    message: "Firstname is a required field",
-                    id: fname,
-                },
-            });
-            return;
-        }
+        let bString = (document.getElementById(bio) as HTMLInputElement).value;
 
         fetch(url_for("api.auth.signup.validate"), {
             method: "POST",
-            body: JSON.stringify({ uuid, uString, fString, lString, step: 1 }),
+            body: JSON.stringify({ uuid, bString, step: 2 }),
+            // credentials: "include",
         })
             .then((res) => res.json())
             .then((res) => {
-                resolve(res);
-                return;
+                // Uploads the file
+                if (AvatarFile) {
+                    let file = new FileReader();
+                    file.readAsDataURL(AvatarFile);
+                    file.onload = () => {
+                        new FileUploader(file.result as string)
+                            .upload()
+                            ?.then((res) => {
+                                resolve({});
+                                return;
+                            });
+                    };
+                } else {
+                    resolve({});
+                    return;
+                }
             })
             .catch((_) => {
                 resolve({
                     error: {
                         message:
                             "There was an errror while contacting our server",
-                        id: fname,
+                        id: bio,
                     },
                 });
 
@@ -221,5 +224,5 @@ let validate_step_2 = (
             });
     });
 };
-*/
-export default { validate_step_1, validate_step_2 /*, validate_step_3 */};
+
+export default { validate_step_1, validate_step_2 , validate_step_3 };
