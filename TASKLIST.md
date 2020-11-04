@@ -1,0 +1,31 @@
+# Tasklist
+
+- Configuration files                   ✓
+- Config loader and validator           ✓
+- Starter script                        ✓
+- Main flask setup                      ✓
+- Homepage                              ✓
+- Cache extension                       ✓
+- Storage API                           •
+- Mysql connection                      ✓
+- Signin and signup pages               ✓
+- Signup API                            •
+- Signin API                            ⨯
+- ORM models                            •
+- Markdown render API                   ✓
+- Markdown editor                       ⨯
+- Create new post API                   ⨯
+- Posts view                            ⨯
+- Profile view                          ⨯
+- Profile stats API                     ⨯
+- Following and followers API           ⨯
+- Comments view                         ⨯
+- Comments API                          ⨯
+- Logged in user's homepage             ⨯
+- [L] Service Worker                    ⨯
+- [L] Build script                      ⨯
+- [L] Pre-render script                 ⨯
+- [L] Tests                             ⨯
+- [L] Test script                       ⨯
+- [L] Deploy                            ⨯
+- [L] Docs                              ⨯
