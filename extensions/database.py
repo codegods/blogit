@@ -1,6 +1,7 @@
 import atexit
 import logging
 import mysql.connector
+from .models import user, storage, post, comment
 
 
 class DataBase:
@@ -26,8 +27,10 @@ class DataBase:
 
         try:
             self._connection = mysql.connector.connect(**options)
+            self.is_connected = True
             self._logger.info("Connected.")
         except mysql.connector.errors.Error as err:
+            self.is_connected = False
             self._logger.exception("Failed to connect to mysql server", exc_info=err)
             raise
 
@@ -40,13 +43,22 @@ class DataBase:
         registers a cleanup function to be called when the app is exiting.
         """
         setattr(app, "sql", self)
+        cursor = self.cursor()
+        cursor.execute("use blogit")
+        cursor.close()
+        self.commit()
+
+        self.users = user
+        self.comments = comment
+        self.posts = post
+        self.storage = storage
 
         # Make sure connection is committed and closed before exiting
         atexit.register(self.tearDown)
 
-    def cursor(self, *args) -> mysql.connector.connection.MySQLCursor:
+    def cursor(self, *args, **kwargs) -> mysql.connector.connection.MySQLCursor:
         """Returns a MySQLCursor on the current connection."""
-        return self._connection.cursor(*args)
+        return self._connection.cursor(*args, **kwargs)
 
     def commit(self) -> None:
         """Commits the current connection"""
@@ -56,4 +68,5 @@ class DataBase:
         """Commits and closes the current connection"""
         self._connection.commit()
         self._connection.close()
+        self.is_connected = False
         self._logger.warn("MySQL connection closed.")
