@@ -6,7 +6,6 @@ import {
   WithStyles,
   LinearProgress,
   Grid,
-  Avatar,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { CloudUpload } from "@material-ui/icons";
@@ -131,6 +130,7 @@ class SignUp extends React.Component<PropTypes> {
     if (this.state.step > 0) {
       this.setState({
         step: this.state.step - 1,
+        error: null
       });
     }
   }

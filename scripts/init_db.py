@@ -38,20 +38,21 @@ class Execute:
         # Tables we will need
         self._structures = {
             "users": [
-                "Id char(32) NOT NULL",
+                "Id char(64) NOT NULL",
                 "Username varchar(20) NOT NULL",
                 "FirstName varchar(20) NOT NULL",
                 "Email varchar(200) NOT NULL",
                 "Password char(60) NOT NULL",
                 "LastName varchar(20)",
                 "Bio varchar(500)",
+                "AvatarUrl varchar(200)",
                 "PRIMARY KEY(Id)",
                 "UNIQUE (Username)",
                 "UNIQUE (Email)",
             ],
             "posts": [
-                "Id char(32) NOT NULL",
-                "Author char(32) NOT NULL",
+                "Id char(64) NOT NULL",
+                "Author char(64) NOT NULL",
                 "Likes_Count int DEFAULT 0",
                 "Comments int DEFAULT 0",
                 "Content text(409600)",  # 409600chars = 1024char/kb * 400 characters = 400kB
@@ -60,8 +61,8 @@ class Execute:
             ],
             "comments": [
                 "Id char(64) NOT NULL",
-                "Author char(32) NOT NULL",
-                "Post char(32) NOT NULL",
+                "Author char(64) NOT NULL",
+                "Post char(64) NOT NULL",
                 "Content varchar(1024) NOT NULL",
                 "PRIMARY KEY (Id)",
                 "FOREIGN KEY (Author) REFERENCES users(Id)",
@@ -73,9 +74,9 @@ class Execute:
                 "Contents text(5242880) NOT NULL",  # 5242880chars = 1024 chars/kb * 1024kb/mb * 5 = 5MB,
                 "PRIMARY KEY (Id)"
             ],
-            "follower": [
-                "Following char(32) NOT NULL",
-                "Follower char(32) NOT NULL",
+            "followers": [
+                "Following char(64) NOT NULL",
+                "Follower char(64) NOT NULL",
                 "FOREIGN KEY (Following) REFERENCES users(Id)",
                 "FOREIGN KEY (Follower) REFERENCES users(Id)",
             ]

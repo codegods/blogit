@@ -92,7 +92,14 @@ let validate_step_1 = (
                 return res.json();
             })
             .then((res) => {
-                resolve(res);
+                if (res.success) resolve(res);
+                else
+                    resolve({
+                        error: {
+                            message: res.error,
+                            id: email,
+                        },
+                    });
                 return;
             })
             .catch((_) => {
@@ -148,14 +155,27 @@ let validate_step_2 = (
 
         fetch(url_for("api.auth.signup.validate"), {
             method: "POST",
-            body: JSON.stringify({ uuid, uString, fString, lString, step: 1 }),
+            body: JSON.stringify({
+                uuid,
+                username: uString,
+                fname: fString,
+                lname: lString,
+                step: 1,
+            }),
         })
             .then((res) => {
                 if (!res.ok) throw new Error("Response not ok");
                 return res.json();
             })
             .then((res) => {
-                resolve(res);
+                if (res.success) resolve(res);
+                else
+                    resolve({
+                        error: {
+                            message: res.error,
+                            id: uname,
+                        },
+                    });
                 return;
             })
             .catch((_) => {
@@ -225,4 +245,4 @@ let validate_step_3 = (
     });
 };
 
-export default { validate_step_1, validate_step_2 , validate_step_3 };
+export default { validate_step_1, validate_step_2, validate_step_3 };
