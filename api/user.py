@@ -37,16 +37,28 @@ class UserSignup(View):
     methods = ["POST"]
 
     def step_1_validator(self, body: dict) -> Dict[str, str]:
-        # TODO Implement a check for a valid email address
         requuid = body.get("uuid", uuid.uuid4().hex)
         if "password" not in body or "email" not in body:
             return flask.Response(status=403)
+        
+        if app.sql.users.get(email=body["email"]):
+            return {
+                "success": False,
+                "error": "This email is already being used by someone else."
+            }
         body["password"] = bcrypt.hashpw(body["password"].encode(), bcrypt.gensalt()).decode()
         app.cache.get_store("signup").add(requuid, body)
-        return {"uuid": requuid}
+        return {"uuid": requuid, "success": True}
 
     def step_2_validator(self, body: dict) -> Dict[str, str]:
-        # TODO Implement a check for a valid username
+        if "username" not in body or "fname" not in body:
+            return flask.Response(status=403)
+
+        if app.sql.users.get(username=body["username"]):
+            return {
+                "success": False,
+                "error": "This username is already taken. Please try something else."
+            }
         user, store = None, None
         try:
             store = app.cache.get_store("signup")
@@ -60,14 +72,13 @@ class UserSignup(View):
         return {"success": True}
 
     def step_3_validator(self, body: dict) -> Dict[str, str]:
-        # TODO Save the user in the database
         user, store = None, None
         try:
             store = app.cache.get_store("signup")
             user: dict = store.get(body["uuid"])
         except KeyError:
-            return flask.Response(status=403)
-
+            return {"success": False}, 403
+        
         reqid = body.pop("uuid")
         user.update(body)
         store.update(reqid, user)

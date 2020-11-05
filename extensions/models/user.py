@@ -133,7 +133,7 @@ def loadByUserName(username: str):
     cursor = app.sql.cursor(dictionary=True)
     cursor.execute("select * from users where Username=%s limit 1", (username,))
     result = cursor.fetchall()
-    return len(result) and Model.from_dict(result[0])
+    return len(result) and from_dict(result[0])
 
 
 def loadByEmail(email: str):
@@ -148,4 +148,4 @@ def loadByEmail(email: str):
     cursor = app.sql.cursor(dictionary=True)
     cursor.execute("select * from users where Email=%s limit 1", (email,))
     result = cursor.fetchall()
-    return len(result) and Model.from_dict(result[0])
+    return len(result) and from_dict(result[0])
