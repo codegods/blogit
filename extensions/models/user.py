@@ -1,41 +1,115 @@
+import hashlib
+import secrets
+import datetime
 from flask import current_app as app, has_request_context
 
 
 class Model:
-    @classmethod
-    def from_dict(cls, dictionary: dict):
-        for key in dictionary:
-            setattr(cls, key, dictionary[key])
-        return cls
+    def __init__(self):
+        class UData:
+            username: str
+            email: str
+            password: str
+            firstname: str
+            avatarURL: str
+            bio: str
+            lastname: str
+            id: str
 
-    @classmethod
-    def search(cls, searchstr: str):
-        pass
-
-    @classmethod
-    def create(
-        cls,
-        username: str,
-        email: str,
-        password: str,
-        fname: str,
-        lname: str = None,
-        bString: str = None,
-        avatarURL: str = None,
-    ):
-        pass
+        self.props = UData()
 
     def delete(self):
-        pass
+        return app.sql.autocommit("delete from users where Id = ", (self.props.id,))
 
-    def add_follower(self, follower):
-        pass
+    def add_follower(self, follower: str):
+        return app.sql.autocommit(
+            "insert into followers values (%s, %s)", (self.props.id, follower)
+        )
 
-    def follow(self, username):
-        pass
+    def follow(self, username: str):
+        return app.sql.autocommit(
+            "insert into followers values (%s, %s)", (username, self.props.id)
+        )
 
-    def get_posts(self):
-        pass
+    def get_posts(self, limit: int = 10, offset: int = 0):
+        csr = app.sql.cursor(dictionary=True)
+        csr.execute(
+            "select * from posts where Author=%s limit %d offset %d",
+            (self.props.id, limit, offset),
+        )
+        return csr.fetchall()
+
+    def get_followers(self, limit: int = 10, offset: int = 0):
+        csr = app.sql.cursor(dictionary=True)
+        csr.execute(
+            "select * from followers where Following=%s limit %d offset %d",
+            (self.props.id, limit, offset),
+        )
+        return csr.fetchall()
+
+    def get_following(self, limit: int = 10, offset: int = 0):
+        csr = app.sql.cursor(dictionary=True)
+        csr.execute(
+            "select * from followers where Follower=%s limit %d offset %d",
+            (self.props.id, limit, offset),
+        )
+        return csr.fetchall()
+
+    def get_follower_count(self):
+        csr = app.sql.cursor()
+        csr.execute(
+            "select count(*) from followers where Following=%s", (self.props.id,)
+        )
+        return csr.fetchall()
+
+    def get_following_count(self):
+        csr = app.sql.cursor()
+        csr.execute(
+            "select count(*) from followers where Follower=%s", (self.props.id,)
+        )
+        return csr.fetchall()
+
+
+def from_dict(dictionary: dict):
+    model = Model()
+    for key in dictionary:
+        setattr(model.props, key.lower(), dictionary[key])
+    return model
+
+
+def search(searchstr: str, limit: int = 10, offset: int = 0):
+    csr = app.sql.cursor(dictionary=True)
+    csr.execute(
+        "select username, firstname, bio from users where username like %s limit %s offset %s",
+        (f"%{searchstr}%", limit, offset),
+    )
+    return [from_dict(user) for user in csr.fetchall()]
+
+
+def create(
+    username: str,
+    email: str,
+    password: str,
+    fname: str,
+    lname: str = None,
+    bString: str = None,
+    avatarURL: str = None,
+):
+    return app.sql.autocommit(
+        "insert into users values (%s, %s, %s, %s, %s, %s, %s, %s)",
+        (
+            hashlib.sha256(
+                secrets.token_bytes() + datetime.datetime.now().isoformat().encode()
+            ).hexdigest(),  # This will give us a random uuid hash of 32 chars
+            username,
+            fname,
+            email,
+            password,
+            lname,
+            bString,
+            avatarURL,
+        ),
+    )
 
 
 def get(email: str = None, username: str = None):
