@@ -68,7 +68,10 @@ class DataBase:
         cursor = self.cursor()
         cursor.execute(command, parameters)
         self.commit()
-        return cursor.fetchall()
+        try:
+            return cursor.fetchall()
+        except mysql.connector.errors.InterfaceError:
+            return []
 
     def tearDown(self) -> None:
         """Commits and closes the current connection"""
