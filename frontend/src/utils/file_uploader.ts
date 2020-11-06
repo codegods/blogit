@@ -2,6 +2,7 @@ import url_for from "./url_for";
 
 class Uploader {
     _file: string;
+    _name: string;
     ready: boolean;
     #_uid: string;
     _promises: Array<Promise<Response>>;
@@ -9,10 +10,11 @@ class Uploader {
      *
      * @param file The base64 encoded file data to be uploaded
      */
-    constructor(file: string) {
+    constructor(file: string, name: string) {
         this.#_uid = "";
         this.ready = false;
         this._file = file;
+        this._name = name;
         this._promises = [];
     }
 
@@ -43,6 +45,7 @@ class Uploader {
                 method: "POST",
                 body: JSON.stringify({
                     init: true,
+                    name: this._name,
                     total: this._file.length,
                 }),
             })
@@ -63,7 +66,7 @@ class Uploader {
     /**
      * Upload the file
      */
-    upload() {
+    upload(): Promise<{url: string, error?: string}>  {
         return new Promise((resolve, reject) => {
             if (!this.ready) {
                 this.init().then(() =>
@@ -78,7 +81,7 @@ class Uploader {
      * Sends the file splitted into 100 chunks.
      * And then returns the permalink of the file
      */
-    send_chunks() {
+    send_chunks(): Promise<{url: string, error?: string}> {
         return new Promise((resolve, reject) => {
             let chunks = this.chunk(
                 this._file,
@@ -105,7 +108,7 @@ class Uploader {
      * Finishes the file upload. If not called, the uploaded file be deleted in 30 minutes.
      * @todo Give it a response type (probably a permalink)
      */
-    finish() {
+    finish(): Promise<{url: string, error?: string}> {
         return new Promise((resolve, reject) => {
             fetch(url_for("api.uploader"), {
                 method: "POST",
@@ -116,7 +119,7 @@ class Uploader {
             })
                 .then((res) => {
                     if (res.ok) return res.json();
-                    reject(Error(`Invalid response receives ${res.status}`));
+                    reject(`Invalid response received ${res.status}`);
                     return;
                 })
                 .then((res) => resolve(res));

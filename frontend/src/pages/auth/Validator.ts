@@ -207,41 +207,42 @@ let validate_step_3 = (
         let AvatarFile = _elem.files && _elem.files[0];
         let bString = (document.getElementById(bio) as HTMLInputElement).value;
 
-        fetch(url_for("api.auth.signup.validate"), {
-            method: "POST",
-            body: JSON.stringify({ uuid, bString, step: 2 }),
-            // credentials: "include",
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                // Uploads the file
-                if (AvatarFile) {
-                    let file = new FileReader();
-                    file.readAsDataURL(AvatarFile);
-                    file.onload = () => {
-                        new FileUploader(file.result as string)
-                            .upload()
-                            ?.then((res) => {
-                                resolve({});
-                                return;
-                            });
-                    };
-                } else {
-                    resolve({});
-                    return;
-                }
+        let upload_bio_and_save_user = (avatar?: string) => {
+            fetch(url_for("api.auth.signup.validate"), {
+                method: "POST",
+                body: JSON.stringify({ uuid, bio: bString, step: 2, avatarUrl: avatar }),
             })
-            .catch((_) => {
-                resolve({
-                    error: {
-                        message:
-                            "There was an errror while contacting our server",
-                        id: bio,
-                    },
+                .then((res) => res.json())
+                .then((res) => {
+                    resolve(res);
+                    return;
+                })
+                .catch((_) => {
+                    resolve({
+                        error: {
+                            message:
+                                "There was an errror while contacting our server",
+                            id: bio,
+                        },
+                    });
+    
+                    return;
                 });
-
-                return;
-            });
+        }
+        // Uploads the file
+        if (AvatarFile) {
+            let file = new FileReader();
+            file.readAsDataURL(AvatarFile);
+            file.onload = () => {
+                new FileUploader(file.result as string, AvatarFile?.name || "")
+                    .upload()
+                    ?.then((res: {url: string}) => {
+                        upload_bio_and_save_user(res.url)
+                    });
+            };
+        } else {
+            upload_bio_and_save_user()
+        }
     });
 };
 
