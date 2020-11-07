@@ -6,6 +6,7 @@ import {
   WithStyles,
   LinearProgress,
   Grid,
+  Typography,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { CloudUpload } from "@material-ui/icons";
@@ -21,6 +22,7 @@ class SignUp extends React.Component<PropTypes> {
     isLoading: boolean;
     error_id: string | null;
     errorText: string;
+    file: string;
   };
   uuid: string;
   _ids: {
@@ -34,9 +36,11 @@ class SignUp extends React.Component<PropTypes> {
       isLoading: false,
       error_id: "",
       errorText: "",
+      file: "",
     };
     this.nextStep = this.nextStep.bind(this);
     this.prevStep = this.prevStep.bind(this);
+    this.fileHandler = this.fileHandler.bind(this);
 
     // HTML IDs for the app
     this._ids = {
@@ -53,6 +57,35 @@ class SignUp extends React.Component<PropTypes> {
     this.uuid = "";
   }
 
+  fileHandler(): File | null{
+    let elem = document.getElementById(
+      this._ids.proxyPicker
+    ) as HTMLInputElement;
+    let file = elem.files && elem.files[0];
+
+    // Correct unit
+    if (file) {
+      let unit = "kB";
+      let size = file.size / 1024;
+      if (size > 1024) {
+        size = size / 1024;
+        unit = "MB";
+      }
+      this.setState({
+        file: `${file.name} (Size: ${Math.round(size) + unit})`,
+      });
+    }
+    // File sizze check
+    if (file && file.size > 1024 * 1024 * 5) {
+      this.setState({
+        isLoading: false,
+        file: "File size is too large (Max 5MB)",
+      });
+    }
+    return file;
+  }
+
+  /* This will take us to the next step */
   nextStep(_e: React.ChangeEvent<{}>) {
     let go_to_next = () => {
       // 3 steps are possible: 0, 1, 2
@@ -65,6 +98,7 @@ class SignUp extends React.Component<PropTypes> {
       }
     };
 
+    // Start the loading animation
     this.setState({
       isLoading: true,
     });
@@ -106,31 +140,37 @@ class SignUp extends React.Component<PropTypes> {
         });
         break;
       case 2:
-        Validator.validate_step_3(
-          this.uuid,
-          this._ids.proxyPicker,
-          this._ids.bio
-        ).then((res) => {
-          if (res.error) {
-            this.setState({
-              error_id: res.error.id,
-              errorText: res.error.message,
-              isLoading: false,
-            });
-          } else {
-            window.location.assign("/")
-            go_to_next();
-          }
-        });
+        let file = this.fileHandler();
+        if(file){
+          // Go for validation
+          Validator.validate_step_3(this.uuid, this._ids.bio, file).then(
+            (res) => {
+              if (res.error) {
+                this.setState({
+                  error_id: res.error.id,
+                  errorText: res.error.message,
+                  isLoading: false,
+                });
+              } else {
+                // Checks passed, lets go to home page
+                /**@todo Go to the referrer page */
+                window.location.assign("/");
+              }
+            }
+          );
+        }
         break;
     }
   }
 
+  /**
+   * This will allow the user to go the previous step
+   */
   prevStep(_e: React.ChangeEvent<{}>) {
     if (this.state.step > 0) {
       this.setState({
         step: this.state.step - 1,
-        error: null
+        error: null,
       });
     }
   }
@@ -163,6 +203,7 @@ class SignUp extends React.Component<PropTypes> {
                 name="email"
                 autoComplete="email"
                 placeholder="Enter your email..."
+                disabled={this.state.isLoading}
                 autoFocus
               />
               <TextField
@@ -181,6 +222,7 @@ class SignUp extends React.Component<PropTypes> {
                 label="Password"
                 type="password"
                 id={this._ids.password}
+                disabled={this.state.isLoading}
               />
 
               <TextField
@@ -198,6 +240,7 @@ class SignUp extends React.Component<PropTypes> {
                     ? this.state.errorText
                     : ""
                 }
+                disabled={this.state.isLoading}
               />
             </div>
             {/* Step 1: Pick a Username, First and Last name*/}
@@ -221,6 +264,7 @@ class SignUp extends React.Component<PropTypes> {
                 }
                 id={this._ids.fname}
                 label="First Name"
+                disabled={this.state.isLoading}
               />
               <TextField
                 margin="normal"
@@ -236,6 +280,7 @@ class SignUp extends React.Component<PropTypes> {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
+                disabled={this.state.isLoading}
               />
               <TextField
                 margin="normal"
@@ -252,6 +297,7 @@ class SignUp extends React.Component<PropTypes> {
                 label="Pick a user name"
                 name="userName"
                 autoComplete="uname"
+                disabled={this.state.isLoading}
               />
             </div>
             {/* Step 2: Bio data and avatar*/}
@@ -264,15 +310,29 @@ class SignUp extends React.Component<PropTypes> {
                 type="file"
                 id={this._ids.proxyPicker}
                 className={classes.hidden}
+                onChange={this.fileHandler}
+                accept="image/*"
               />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => document.getElementById(this._ids.proxyPicker)?.click()}
-                startIcon={<CloudUpload />}
-              >
-                Choose an Avatar
-              </Button>
+              <Grid container style={{textAlign: "center"}}>
+                <Grid item sm={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() =>
+                      document.getElementById(this._ids.proxyPicker)?.click()
+                    }
+                    startIcon={<CloudUpload />}
+                    disabled={this.state.isLoading}
+                  >
+                    Choose an Avatar
+                  </Button>
+                </Grid>
+                <Grid item sm={12}>
+                  <Typography variant="caption" component="span">
+                    {this.state.file || "No file chosen (Max Size 5MB)"}
+                  </Typography>
+                </Grid>
+              </Grid>
               <TextField
                 margin="normal"
                 variant="outlined"
@@ -287,6 +347,7 @@ class SignUp extends React.Component<PropTypes> {
                     ? this.state.errorText
                     : ""
                 }
+                disabled={this.state.isLoading}
               />
             </div>
           </form>
@@ -296,7 +357,7 @@ class SignUp extends React.Component<PropTypes> {
                 variant="contained"
                 color="secondary"
                 className={classes.submit}
-                disabled={this.state.step === 0}
+                disabled={this.state.step === 0 || this.state.isLoading}
                 onClick={this.prevStep}
               >
                 Prev
@@ -308,6 +369,7 @@ class SignUp extends React.Component<PropTypes> {
                 color="primary"
                 className={classes.submit}
                 onClick={this.nextStep}
+                disabled={this.state.isLoading}
               >
                 Next
               </Button>

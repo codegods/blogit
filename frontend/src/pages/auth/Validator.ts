@@ -62,7 +62,7 @@ let validate_step_1 = (
         ) {
             resolve({
                 error: {
-                    message: "Email is not valid",
+                    message: "Sorry, this doesn't look like an email",
                     id: email,
                 },
             });
@@ -143,6 +143,26 @@ let validate_step_2 = (
             });
             return;
         }
+        if (uString.length > 20) {
+            resolve({
+                error: {
+                    message: "Username can not be more then 20 characters",
+                    id: uname,
+                },
+            });
+            return;
+        }
+
+        if (/\W/g.test(uString)) {
+            resolve({
+                error: {
+                    message:
+                        "Usernames should not contain any characters other than letters, digits and underscore.",
+                    id: uname,
+                },
+            });
+            return;
+        }
         if (fString === "") {
             resolve({
                 error: {
@@ -194,8 +214,8 @@ let validate_step_2 = (
 
 let validate_step_3 = (
     uuid: string,
-    avatar: string,
-    bio: string
+    bio: string,
+    AvatarFile?: File | null
 ): Promise<{
     error?: {
         message: string;
@@ -203,14 +223,17 @@ let validate_step_3 = (
     };
 }> => {
     return new Promise((resolve, reject) => {
-        let _elem = document.getElementById(avatar) as HTMLInputElement;
-        let AvatarFile = _elem.files && _elem.files[0];
         let bString = (document.getElementById(bio) as HTMLInputElement).value;
 
         let upload_bio_and_save_user = (avatar?: string) => {
             fetch(url_for("api.auth.signup.validate"), {
                 method: "POST",
-                body: JSON.stringify({ uuid, bio: bString, step: 2, avatarUrl: avatar }),
+                body: JSON.stringify({
+                    uuid,
+                    bio: bString,
+                    step: 2,
+                    avatarUrl: avatar,
+                }),
             })
                 .then((res) => res.json())
                 .then((res) => {
@@ -225,10 +248,10 @@ let validate_step_3 = (
                             id: bio,
                         },
                     });
-    
+
                     return;
                 });
-        }
+        };
         // Uploads the file
         if (AvatarFile) {
             let file = new FileReader();
@@ -236,12 +259,12 @@ let validate_step_3 = (
             file.onload = () => {
                 new FileUploader(file.result as string, AvatarFile?.name || "")
                     .upload()
-                    ?.then((res: {url: string}) => {
-                        upload_bio_and_save_user(res.url)
+                    ?.then((res: { url: string }) => {
+                        upload_bio_and_save_user(res.url);
                     });
             };
         } else {
-            upload_bio_and_save_user()
+            upload_bio_and_save_user();
         }
     });
 };
