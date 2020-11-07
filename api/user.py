@@ -47,6 +47,7 @@ class UserSignup(View):
                 "error": "This email is already being used by someone else."
             }
         body["password"] = bcrypt.hashpw(body["password"].encode(), bcrypt.gensalt()).decode()
+        body.pop("step")
         app.cache.get_store("signup").add(requuid, body)
         return {"uuid": requuid, "success": True}
 
@@ -67,6 +68,7 @@ class UserSignup(View):
             return {"success": False}, 403
 
         reqid = body.pop("uuid")
+        body.pop("step")
         user.update(body)
         store.update(reqid, user)
         return {"success": True}
@@ -80,8 +82,10 @@ class UserSignup(View):
             return {"success": False}, 403
         
         reqid = body.pop("uuid")
+        body.pop("step")
         user.update(body)
-        store.update(reqid, user)
+        app.sql.users.create(**user)
+        store.delete(reqid)
         return {"success": True}
 
     def dispatch_request(self):

@@ -92,8 +92,8 @@ def create(
     password: str,
     fname: str,
     lname: str = None,
-    bString: str = None,
-    avatarURL: str = None,
+    bio: str = None,
+    avatarUrl: str = None,
 ):
     return app.sql.autocommit(
         "insert into users values (%s, %s, %s, %s, %s, %s, %s, %s)",
@@ -106,8 +106,8 @@ def create(
             email,
             password,
             lname,
-            bString,
-            avatarURL,
+            bio,
+            avatarUrl,
         ),
     )
 
