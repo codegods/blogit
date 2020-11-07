@@ -8,7 +8,7 @@ import {
   Badge,
   IconButton,
   Tooltip,
-  LinearProgress,
+  CircularProgress,
   Backdrop,
   Button,
 } from "@material-ui/core";
@@ -35,7 +35,7 @@ let Loader = withStyles(Styles.Loader)(
       const { classes } = this.props;
       return (
         <Backdrop open={true}>
-          <LinearProgress className={classes.progress} />
+          <CircularProgress className={classes.progress} />
         </Backdrop>
       );
     }
