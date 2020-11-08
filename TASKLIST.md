@@ -6,11 +6,11 @@
 - Main flask setup                      ✓
 - Homepage                              ✓
 - Cache extension                       ✓
-- Storage API                           •
+- Storage API                           ✓
 - Mysql connection                      ✓
 - Signin and signup pages               ✓
-- Signup API                            •
-- Signin API                            ⨯
+- Signup API                            ✓
+- Signin API                            ✓
 - ORM models                            •
 - Markdown render API                   ✓
 - Markdown editor                       ⨯

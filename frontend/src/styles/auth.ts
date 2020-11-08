@@ -1,4 +1,4 @@
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, Theme } from "@material-ui/core/styles";
 
 export let RootStyles = (theme: Theme) =>
     createStyles({
@@ -54,7 +54,7 @@ export let RootStyles = (theme: Theme) =>
         },
     });
 
-export let signin = makeStyles((theme: Theme) => ({
+export let signin = (theme: Theme) => createStyles({
     paper: {
         display: "flex",
         flexDirection: "column",
@@ -68,7 +68,13 @@ export let signin = makeStyles((theme: Theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-}));
+    progress: {
+        position: "absolute",
+        left: 0,
+        bottom: 0,
+        width: "100%",
+    },
+});
 
 export let signup = (theme: Theme) =>
     createStyles({
