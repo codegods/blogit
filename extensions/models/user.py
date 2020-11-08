@@ -1,41 +1,40 @@
 import hashlib
 import secrets
 import datetime
+from dataclasses import dataclass
 from flask import current_app as app, has_request_context
 
 
+@dataclass
 class Model:
-    def __init__(self):
-        class UData:
-            username: str
-            email: str
-            password: str
-            firstname: str
-            avatarURL: str
-            bio: str
-            lastname: str
-            id: str
+    username: str
+    email: str
+    password: str
+    firstname: str
+    avatarurl: str
+    bio: str
+    lastname: str
+    id: str
 
-        self.props = UData()
 
     def delete(self):
-        return app.sql.autocommit("delete from users where Id = ", (self.props.id,))
+        return app.sql.autocommit("delete from users where Id = ", (self.id,))
 
     def add_follower(self, follower: str):
         return app.sql.autocommit(
-            "insert into followers values (%s, %s)", (self.props.id, follower)
+            "insert into followers values (%s, %s)", (self.id, follower)
         )
 
     def follow(self, username: str):
         return app.sql.autocommit(
-            "insert into followers values (%s, %s)", (username, self.props.id)
+            "insert into followers values (%s, %s)", (username, self.id)
         )
 
     def get_posts(self, limit: int = 10, offset: int = 0):
         csr = app.sql.cursor(dictionary=True)
         csr.execute(
             "select * from posts where Author=%s limit %d offset %d",
-            (self.props.id, limit, offset),
+            (self.id, limit, offset),
         )
         return csr.fetchall()
 
@@ -43,7 +42,7 @@ class Model:
         csr = app.sql.cursor(dictionary=True)
         csr.execute(
             "select * from followers where Following=%s limit %d offset %d",
-            (self.props.id, limit, offset),
+            (self.id, limit, offset),
         )
         return csr.fetchall()
 
@@ -51,30 +50,30 @@ class Model:
         csr = app.sql.cursor(dictionary=True)
         csr.execute(
             "select * from followers where Follower=%s limit %d offset %d",
-            (self.props.id, limit, offset),
+            (self.id, limit, offset),
         )
         return csr.fetchall()
 
     def get_follower_count(self):
         csr = app.sql.cursor()
         csr.execute(
-            "select count(*) from followers where Following=%s", (self.props.id,)
+            "select count(*) from followers where Following=%s", (self.id,)
         )
         return csr.fetchall()
 
     def get_following_count(self):
         csr = app.sql.cursor()
         csr.execute(
-            "select count(*) from followers where Follower=%s", (self.props.id,)
+            "select count(*) from followers where Follower=%s", (self.id,)
         )
         return csr.fetchall()
 
-
+# TODO Change this thing when changing database structure
 def from_dict(dictionary: dict):
-    model = Model()
+    model = {}
     for key in dictionary:
-        setattr(model.props, key.lower(), dictionary[key])
-    return model
+        model[key.lower()] = dictionary[key]
+    return Model(**model)
 
 
 def search(searchstr: str, limit: int = 10, offset: int = 0):
@@ -132,8 +131,8 @@ def loadByUserName(username: str):
 
     cursor = app.sql.cursor(dictionary=True)
     cursor.execute("select * from users where Username=%s limit 1", (username,))
-    result = cursor.fetchall()
-    return len(result) and from_dict(result[0])
+    result = cursor.fetchone()
+    return result and from_dict(result)
 
 
 def loadByEmail(email: str):
@@ -147,5 +146,5 @@ def loadByEmail(email: str):
 
     cursor = app.sql.cursor(dictionary=True)
     cursor.execute("select * from users where Email=%s limit 1", (email,))
-    result = cursor.fetchall()
-    return len(result) and from_dict(result[0])
+    result = cursor.fetchone()
+    return result and from_dict(result)
