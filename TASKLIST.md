@@ -13,8 +13,8 @@
 - Signin API                            ✓
 - ORM models                            •
 - Markdown render API                   ✓
-- Markdown editor                       ⨯
-- Create new post API                   ⨯
+- Markdown editor                       •
+- Create new post API                   •
 - Posts view                            ⨯
 - Profile view                          ⨯
 - Profile stats API                     ⨯
