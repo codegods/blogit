@@ -99,7 +99,7 @@ class Auth extends React.Component<AppProps> {
             >
               <Tab
                 component={Link}
-                to={url_for("view.auth.login")}
+                to={url_for("views.auth.login")}
                 className={classes.tab}
                 label="Sign-In"
                 {...a11yProps(0)}

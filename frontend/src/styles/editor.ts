@@ -1,7 +1,6 @@
 import { createStyles, Theme } from "@material-ui/core/styles";
 
 export let RootStyles = (theme: Theme) => {
-    console.log(theme);
     return createStyles({
         root: {
             position: "absolute",
@@ -31,3 +30,22 @@ export let RootStyles = (theme: Theme) => {
         }
     });
 };
+
+export let ToolBox = (theme: Theme) => createStyles({
+    root: {
+        width: "fit-content",
+        position: "absolute",
+        left: "50%",
+        top: "90%",
+        transform: "translateX(-50%) translateY(-90%)",
+        "& button": {
+            padding: theme.spacing(1)
+        },
+        [theme.breakpoints.down("xs")]: {
+            transform: "scale(0.8) translateX(-50%) translateY(-90%)"
+        }
+    },
+    dragger: {
+        cursor: "move"
+    }
+})

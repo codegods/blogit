@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Check } from "@material-ui/icons";
+import Toolbox from "./toolbox";
 import { RootStyles } from "../../styles/editor";
 
 interface TabPanelProps extends React.ComponentProps<"div"> {
@@ -99,7 +100,9 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
               multiline
               className={classes.writer}
               rows={10}
+              id="create-post-textarea"
             />
+            <Toolbox textarea="create-post-textarea" />
           </div>
         </TabPanel>
         <TabPanel className={classes.content} value={this.state.value} index={1}>
