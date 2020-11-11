@@ -23,18 +23,19 @@ class Preview extends React.Component<PreviewProps> {
   }
 
   componentDidMount() {
-    console.log("Reloading...")
-    if(this.props.show){
+    console.log("Reloading...");
+    if (this.props.show) {
       fetch(url_for("api.renderer"), {
         method: "POST",
         body: `# ${
-          (document.getElementById(this.props.heading) as HTMLInputElement).value
+          (document.getElementById(this.props.heading) as HTMLInputElement)
+            .value
         }\n\n${
           (document.getElementById(this.props.content) as HTMLTextAreaElement)
             .value
         }`,
       }).then((res) => {
-        console.log(res)
+        console.log(res);
         if (!res.ok) {
           this.setState({
             isLoaded: true,

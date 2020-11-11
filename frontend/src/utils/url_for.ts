@@ -10,8 +10,9 @@ let _url_database: {
     "api.auth.login": "/api/auth/login",
     "api.uploader": "/api/uploader",
     "api.renderer": "/api/render",
-    "storage": "/storage/:uuid",
-    "new": "/create"
+    "api.user_info": "/api/user",
+    storage: "/storage/:uuid",
+    new: "/create",
 };
 
 let url_for = (name: keyof typeof _url_database): string => {

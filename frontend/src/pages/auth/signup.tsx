@@ -57,7 +57,7 @@ class SignUp extends React.Component<PropTypes> {
     this.uuid = "";
   }
 
-  fileHandler(): File | null{
+  fileHandler(): File | null {
     let elem = document.getElementById(
       this._ids.proxyPicker
     ) as HTMLInputElement;
@@ -141,7 +141,7 @@ class SignUp extends React.Component<PropTypes> {
         break;
       case 2:
         let file = this.fileHandler();
-        if(file){
+        if (file) {
           // Go for validation
           Validator.validate_step_3(this.uuid, this._ids.bio, file).then(
             (res) => {
@@ -313,7 +313,7 @@ class SignUp extends React.Component<PropTypes> {
                 onChange={this.fileHandler}
                 accept="image/*"
               />
-              <Grid container style={{textAlign: "center"}}>
+              <Grid container style={{ textAlign: "center" }}>
                 <Grid item sm={12}>
                   <Button
                     variant="contained"

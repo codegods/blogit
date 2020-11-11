@@ -62,7 +62,7 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
 
   render() {
     const { classes } = this.props;
-    console.log("Rerendering...")
+    console.log("Rerendering...");
     return (
       <div className={classes.root}>
         <Typography variant="h4" className={classes.heading}>
@@ -87,7 +87,11 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
             aria-controls="create-tabpanel-1"
           />
         </Tabs>
-        <TabPanel className={classes.content} value={this.state.value} index={0}>
+        <TabPanel
+          className={classes.content}
+          value={this.state.value}
+          index={0}
+        >
           {/* Writer */}
           <div>
             <TextField
@@ -108,11 +112,22 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
             <Toolbox textarea="create-post-textarea" />
           </div>
         </TabPanel>
-        <TabPanel className={classes.content} value={this.state.value} index={1}>
+        <TabPanel
+          className={classes.content}
+          value={this.state.value}
+          index={1}
+        >
           {/*Previwer */}
-          <Preview key={String(this.state.value === 1)} heading="create-post-title" content="create-post-textarea" show={this.state.value === 1}/>
+          <Preview
+            key={String(this.state.value === 1)}
+            heading="create-post-title"
+            content="create-post-textarea"
+            show={this.state.value === 1}
+          />
         </TabPanel>
-        <Fab color="primary" variant="extended" className={classes.fab}><Check /> Create</Fab>
+        <Fab color="primary" variant="extended" className={classes.fab}>
+          <Check /> Create
+        </Fab>
       </div>
     );
   }

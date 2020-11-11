@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@material-ui/core";
 import App from "./App";
 import theme from "./styles/theme";
+import { UserContextProvider } from "./utils/UserContext";
 import * as serviceWorker from "./serviceWorker";
 
 let render = ReactDOM.render;
@@ -16,10 +17,12 @@ if (document.getElementById("app-root")?.innerHTML !== "")
 render(
   <React.StrictMode>
     <Router>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <UserContextProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </UserContextProvider>
     </Router>
   </React.StrictMode>,
   document.getElementById("app-root")

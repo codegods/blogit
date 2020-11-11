@@ -30,7 +30,7 @@ from typing import Dict
 from flask.views import View
 from helpers.url_for import url_for
 from flask import current_app as app
-from helpers.cookies import with_cookie
+from helpers.cookies import login_required, with_cookie
 
 blueprint = flask.Blueprint(__name__, "api.users")
 
@@ -122,13 +122,24 @@ class UserSignin(View):
         if bcrypt.checkpw(body["password"].encode(), user.password.encode()):
             return with_cookie(
                 "l_id",
-                {"username": body["username"], "ip": flask.request.remote_addr},
+                # Ok, the request sends the email as the 'username' field
+                # and I am in no mood to change it now
+                {"email": body["username"], "ip": flask.request.remote_addr},
                 {"success": True},
                 # Cookie remains valid for 30 days "only"
                 expires=datetime.datetime.now() + datetime.timedelta(days=30)
             )
         return {"message": "Invalid password", "error_with": "password"}, 403
 
+
+@blueprint.route(url_for("api.user_info"))
+@login_required(user_needed = True)
+def user_info():
+    return {
+        "name": flask.g.user.firstname + " " + (flask.g.user.lastname or ""),
+        "avatarUrl": flask.g.user.avatarurl,
+        "username": flask.g.user.username
+    }
 
 blueprint.add_url_rule(
     url_for("api.auth.signup.validate"), view_func=UserSignup.as_view("users_signup")

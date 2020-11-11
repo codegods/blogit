@@ -41,7 +41,6 @@ class SignIn extends React.Component<WithStyles<typeof Styles>> {
     fetch(url_for("api.auth.login"), {
       method: "POST",
       body: JSON.stringify({
-
         // Give it the vaues it needs
         username: (document.getElementById(
           this._ids.username
@@ -52,7 +51,6 @@ class SignIn extends React.Component<WithStyles<typeof Styles>> {
       }),
     }).then((res) => {
       res.json().then((json) => {
-
         // Done loading
         this.setState({ isLoading: false });
         /**@todo Change the url to a possible refferer */

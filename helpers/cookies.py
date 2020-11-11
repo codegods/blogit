@@ -18,7 +18,7 @@ def with_cookie(
     serializer = URLSafeSerializer(flask.current_app.config["SECRET_KEY"])
     data = serializer.dumps(cookie_data)
     res = flask.make_response(response)
-    res.set_cookie(cookie_name, data, httponly=True , *args, **kwargs)
+    res.set_cookie(cookie_name, data, httponly=True, *args, **kwargs)
     return res
 
 
@@ -29,7 +29,7 @@ def retrieve_cookie(
     Returns the decoded version of a signed cookie. If the cookie was
     tampered with, then it will return `None`.
     """
-    serializer = URLSafeSerializer(flask.current_app.config["SECRET_COOKIE"])
+    serializer = URLSafeSerializer(flask.current_app.config["SECRET_KEY"])
     try:
         return serializer.loads(request.cookies[cookie_name])
     except (BadSignature, BadData):
@@ -46,20 +46,21 @@ def login_required(user_needed=False):
     be needed for customised views such as profile, settings, home page, etc.
     """
 
-    def wrapper(view: function):
+    def wrapper(view):
         def real_wrapper(*args, **kwargs):
             user_id = retrieve_cookie("l_id")
             is_authenticated = False
             if user_id:
 
                 # Make sure the ip address is the same
-                if user_id["remote"] == flask.request.remote_addr:
+                if user_id["ip"] == flask.request.remote_addr:
                     is_authenticated = True
             if is_authenticated:
                 del is_authenticated
                 if user_needed:
-                    flask.g.user = flask.current_app.sql.users.get(
-                        username=user_id["username"]
+                    flask.g.setdefault(
+                        "user",
+                        flask.current_app.sql.users.get(email=user_id["email"]),
                     )
                 return view(*args, **kwargs)
 
