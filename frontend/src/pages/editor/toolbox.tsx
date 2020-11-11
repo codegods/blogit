@@ -20,7 +20,7 @@ import {
   FormatSize,
   Image,
   CloudUpload,
-  Http,
+  InsertLink,
 } from "@material-ui/icons";
 import { ToolBox as Styles } from "../../styles/editor";
 
@@ -54,10 +54,6 @@ class Toolbox extends React.Component<ToolBoxProps> {
       let start = textarea.selectionStart,
         end = textarea.selectionEnd;
       if (start && end) {
-        console.log("Having selection", start, end);
-        console.log("start", textarea.value.substring(0, start));
-        console.log("end", textarea.value.substring(end));
-        console.log("selection", textarea.value.substring(start, end));
         textarea.value =
           textarea.value.substring(0, start) +
           start_char +
@@ -68,7 +64,6 @@ class Toolbox extends React.Component<ToolBoxProps> {
         textarea.selectionEnd = end + start_char.length;
       } else {
         let len = textarea.value.length;
-        console.log("Current length", len);
         textarea.value = textarea.value + start_char + end_char;
         textarea.focus();
         textarea.selectionEnd = len + start_char.length;
@@ -131,41 +126,37 @@ class Toolbox extends React.Component<ToolBoxProps> {
     return (
       <Card className={classes.root} id="toolbox">
         <ButtonGroup variant="text">
-          <Tooltip
-            title="Move the toolbox"
-            arial-label="Move the toolbox"
-            arrow
-          >
+          <Tooltip title="Move the toolbox" arial-label="Move the toolbox">
             <Button id="toolbox-draggable-header" className={classes.dragger}>
               <DragIndicator />
             </Button>
           </Tooltip>
-          <Tooltip title="Bold" arial-label="Bold" arrow>
+          <Tooltip title="Bold" arial-label="Bold">
             <Button onClick={this.md_handler("**", "**")}>
               <FormatBold />
             </Button>
           </Tooltip>
-          <Tooltip title="Italics" arial-label="Italics" arrow>
+          <Tooltip title="Italics" arial-label="Italics">
             <Button onClick={this.md_handler("_", "_")}>
               <FormatItalic />
             </Button>
           </Tooltip>
-          <Tooltip title="Link" arial-label="Link" arrow>
+          <Tooltip title="Link" arial-label="Link">
             <Button
               onClick={this.md_handler(
                 "[Link text here](",
                 "The actual url goes here)"
               )}
             >
-              <Http />
+              <InsertLink />
             </Button>
           </Tooltip>
-          <Tooltip title="Strikethrough" arial-label="Strikethrough" arrow>
+          <Tooltip title="Strikethrough" arial-label="Strikethrough">
             <Button onClick={this.md_handler("~", "~")}>
               <FormatStrikethrough />
             </Button>
           </Tooltip>
-          <Tooltip title="Headings" arial-label="Headings" arrow>
+          <Tooltip title="Headings" arial-label="Headings">
             <Button
               aria-haspopup="true"
               aria-controls="toolbox-heading-menu"
@@ -174,17 +165,17 @@ class Toolbox extends React.Component<ToolBoxProps> {
               <FormatSize />
             </Button>
           </Tooltip>
-          <Tooltip title="Quote" arial-label="Quote" arrow>
+          <Tooltip title="Quote" arial-label="Quote">
             <Button onClick={this.md_handler(">", "")}>
               <FormatQuote />
             </Button>
           </Tooltip>
-          <Tooltip title="List" arial-label="List" arrow>
+          <Tooltip title="List" arial-label="List">
             <Button onClick={this.md_handler("- ", "\n")}>
               <FormatListBulleted />
             </Button>
           </Tooltip>
-          <Tooltip title="Add an image" arial-label="Add an image" arrow>
+          <Tooltip title="Add an image" arial-label="Add an image">
             <Button
               aria-haspopup="true"
               aria-controls="toolbox-image-menu"
@@ -208,7 +199,7 @@ class Toolbox extends React.Component<ToolBoxProps> {
           </MenuItem>
           <MenuItem onClick={this.menuClose_img}>
             <ListItemIcon>
-              <Http />
+              <InsertLink />
             </ListItemIcon>
             From web URL
           </MenuItem>

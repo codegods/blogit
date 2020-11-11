@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import { Check } from "@material-ui/icons";
 import Toolbox from "./toolbox";
+import Preview from "./preview";
 import { RootStyles } from "../../styles/editor";
 
 interface TabPanelProps extends React.ComponentProps<"div"> {
@@ -61,6 +62,7 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
 
   render() {
     const { classes } = this.props;
+    console.log("Rerendering...")
     return (
       <div className={classes.root}>
         <Typography variant="h4" className={classes.heading}>
@@ -90,6 +92,7 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
           <div>
             <TextField
               variant="filled"
+              id="create-post-title"
               fullWidth
               label="Give it that perfect title"
             />
@@ -107,7 +110,7 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
         </TabPanel>
         <TabPanel className={classes.content} value={this.state.value} index={1}>
           {/*Previwer */}
-          <div></div>
+          <Preview key={String(this.state.value === 1)} heading="create-post-title" content="create-post-textarea" show={this.state.value === 1}/>
         </TabPanel>
         <Fab color="primary" variant="extended" className={classes.fab}><Check /> Create</Fab>
       </div>

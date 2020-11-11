@@ -24,7 +24,6 @@ del os, sys
 import re
 import flask
 import markdown
-from json import loads
 from typing import List, Tuple
 from xml.etree import ElementTree
 from helpers.url_for import url_for
@@ -48,6 +47,15 @@ class MentionsProcessor(InlineProcessor):
         )
         link.text = "&#0064;" + m.group(0)[1:]
         elem.append(link)
+        elem.set("class", "markdown-mention")
+        return elem, m.start(0), m.end(0)
+
+class StrikeThroughProcessor(InlineProcessor):
+    def handleMatch(
+        self, m: re.Match, _data: str
+    ) -> Tuple[ElementTree.Element, int, int]:
+        elem = ElementTree.Element("s")
+        elem.text = m.groupdict()["text"]
         return elem, m.start(0), m.end(0)
 
 
@@ -71,7 +79,8 @@ class MentionsExtension(Extension):
         # source code, this method seems to take three arguments
         # item, name and priority. I am just guessing the priority
         md.preprocessors.register(HTMLEscaper(md), "escape_html", 9999)
-        md.inlinePatterns.register(MentionsProcessor("@[a-zA-Z0-9_]+"), "mentions", 10)
+        md.inlinePatterns.register(MentionsProcessor("@[a-zA-Z0-9_]+"), "mentions", 99)
+        md.inlinePatterns.register(StrikeThroughProcessor("~(?! )(?P<text>.+)(?<! )~"), "strikethrough", 98)
 
 
 blueprint = flask.Blueprint(__name__, "renderer")
@@ -80,7 +89,5 @@ blueprint = flask.Blueprint(__name__, "renderer")
 @blueprint.route(url_for("api.renderer"), methods=["POST"])
 def renderer():
     """API endpoint for rendering markdown requests"""
-    request = loads(flask.request.get_data())
-    return {
-        "markdown": markdown.markdown(request["text"], extensions=[MentionsExtension()])
-    }
+    request = flask.request.get_data().decode()
+    return markdown.markdown(request, extensions=[MentionsExtension()])
