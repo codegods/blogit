@@ -8,6 +8,7 @@ _url_database = {
     "api.auth.login": "/api/auth/login",
     "api.uploader": "/api/uploader",
     "api.renderer": "/api/render",
+    "api.user_info": "/api/user",
     "storage": "/storage/<uuid>",
     "new": "/create"
 }

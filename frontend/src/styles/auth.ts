@@ -54,27 +54,28 @@ export let RootStyles = (theme: Theme) =>
         },
     });
 
-export let signin = (theme: Theme) => createStyles({
-    paper: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-    },
-    form: {
-        width: "100%",
-        marginTop: theme.spacing(1),
-        padding: theme.spacing(1),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-    progress: {
-        position: "absolute",
-        left: 0,
-        bottom: 0,
-        width: "100%",
-    },
-});
+export let signin = (theme: Theme) =>
+    createStyles({
+        paper: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+        },
+        form: {
+            width: "100%",
+            marginTop: theme.spacing(1),
+            padding: theme.spacing(1),
+        },
+        submit: {
+            margin: theme.spacing(3, 0, 2),
+        },
+        progress: {
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            width: "100%",
+        },
+    });
 
 export let signup = (theme: Theme) =>
     createStyles({

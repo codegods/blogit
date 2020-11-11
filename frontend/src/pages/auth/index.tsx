@@ -22,7 +22,6 @@ interface TabPanelProps {
   value: number;
 }
 
-
 interface AppProps extends WithStyles<typeof RootStyles> {
   history: {
     [index: string]: any;

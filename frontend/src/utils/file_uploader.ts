@@ -66,7 +66,7 @@ class Uploader {
     /**
      * Upload the file
      */
-    upload(): Promise<{url: string, error?: string}>  {
+    upload(): Promise<{ url: string; error?: string }> {
         return new Promise((resolve, reject) => {
             if (!this.ready) {
                 this.init().then(() =>
@@ -81,7 +81,7 @@ class Uploader {
      * Sends the file splitted into 100 chunks.
      * And then returns the permalink of the file
      */
-    send_chunks(): Promise<{url: string, error?: string}> {
+    send_chunks(): Promise<{ url: string; error?: string }> {
         return new Promise((resolve, reject) => {
             let chunks = this.chunk(
                 this._file,
@@ -108,7 +108,7 @@ class Uploader {
      * Finishes the file upload. If not called, the uploaded file be deleted in 30 minutes.
      * @todo Give it a response type (probably a permalink)
      */
-    finish(): Promise<{url: string, error?: string}> {
+    finish(): Promise<{ url: string; error?: string }> {
         return new Promise((resolve, reject) => {
             fetch(url_for("api.uploader"), {
                 method: "POST",
