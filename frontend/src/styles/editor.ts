@@ -49,3 +49,16 @@ export let ToolBox = (theme: Theme) => createStyles({
         cursor: "move"
     }
 })
+
+export let Preview = (theme: Theme) => createStyles({
+    root: {
+        fontFamily: "'Montserrat'",
+        "& a": {
+            textDecoration: "none",
+            color: theme.palette.secondary.main
+        },
+        "& .markdown-mention:hover": {
+            textDecoration: "underline"
+        }
+    }
+})
