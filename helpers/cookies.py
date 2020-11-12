@@ -1,4 +1,5 @@
 import flask
+from urllib.parse import quote
 from .url_for import url_for
 from typing import Any, Union
 from itsdangerous.url_safe import URLSafeSerializer
@@ -32,7 +33,7 @@ def retrieve_cookie(
     serializer = URLSafeSerializer(flask.current_app.config["SECRET_KEY"])
     try:
         return serializer.loads(request.cookies[cookie_name])
-    except (BadSignature, BadData):
+    except (BadSignature, BadData, KeyError):
         # Somebody tampered with the data and its better to return None.
         return None
 
@@ -65,7 +66,7 @@ def login_required(user_needed=False):
                 return view(*args, **kwargs)
 
             # User not authenticated, redirect to login view.
-            return flask.redirect(url_for("views.auth.login"))
+            return flask.redirect(url_for("views.auth.login") + "?next=" + quote(flask.request.full_path)), 403
 
         return real_wrapper
 

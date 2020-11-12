@@ -23,33 +23,48 @@ class Preview extends React.Component<PreviewProps> {
   }
 
   componentDidMount() {
-    console.log("Reloading...");
     if (this.props.show) {
-      fetch(url_for("api.renderer"), {
-        method: "POST",
-        body: `# ${
-          (document.getElementById(this.props.heading) as HTMLInputElement)
-            .value
-        }\n\n${
-          (document.getElementById(this.props.content) as HTMLTextAreaElement)
-            .value
-        }`,
-      }).then((res) => {
-        console.log(res);
-        if (!res.ok) {
-          this.setState({
-            isLoaded: true,
-            content: `<h5 style="color: red">Sorry, we couldn't load this content. Please try again.</h5>`,
-          });
-        } else {
-          res.text().then((content) =>
+      let text = (document.getElementById(
+        this.props.content
+      ) as HTMLTextAreaElement).value;
+      let heading = (document.getElementById(
+        this.props.heading
+      ) as HTMLInputElement).value;
+
+      if (text === "" || heading === "") {
+        this.setState({
+          isLoaded: true,
+          content: `
+            <div style="color:red">
+            You have to give your article a heading and some content before you can preview it.
+            </div>
+          `,
+        });
+      } else {
+        fetch(url_for("api.renderer"), {
+          method: "POST",
+          body: `# ${heading}\n\n${text}`,
+        }).then((res) => {
+          if (!res.ok) {
             this.setState({
               isLoaded: true,
-              content,
-            })
-          );
-        }
-      });
+              content: `<h5 style="color: red">Sorry, we couldn't load this content. Please try again.</h5>`,
+            });
+          } else {
+            res.text().then((content) =>
+              this.setState({
+                isLoaded: true,
+                content,
+              })
+            );
+          }
+        }).catch(err => {
+          this.setState({
+            isLoaded: true,
+            content: `<h5 style="color: red">Sorry, we couldn't load this content. Please try again. Got error ${err}</h5>`,
+          });
+        });
+      }
     }
   }
   render() {
@@ -60,8 +75,8 @@ class Preview extends React.Component<PreviewProps> {
           {this.state.isLoaded ? (
             <div dangerouslySetInnerHTML={{ __html: this.state.content }} />
           ) : (
-            <div>
-              Loading
+            <div className={classes.loading}>
+              Loading <br />
               <CircularProgress />
             </div>
           )}

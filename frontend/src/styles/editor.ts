@@ -63,4 +63,10 @@ export let Preview = (theme: Theme) =>
                 textDecoration: "underline",
             },
         },
+        loading: {
+            position: "absolute",
+            left: "50%",
+            textAlign: "center",
+            transform: "translate(-50%)"
+        }
     });
