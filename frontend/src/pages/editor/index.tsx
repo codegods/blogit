@@ -62,7 +62,6 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
 
   render() {
     const { classes } = this.props;
-    console.log("Rerendering...");
     return (
       <div className={classes.root}>
         <Typography variant="h4" className={classes.heading}>

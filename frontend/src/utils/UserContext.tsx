@@ -23,12 +23,20 @@ class UserContextProvider extends React.Component {
       username: "",
       avatarUrl: "",
       name: "",
-      refresh: this.componentDidMount,
+      // For some reason I am not aware of, directly referencing the
+      // refresh function over here was breaking things by changing the
+      // object referred by `this`. Making an anonymous arrow function to
+      // kind of "proxy" the refresh function fixed it though.
+      refresh: ()  => this.refresh(),
     };
-    this.componentDidMount = this.componentDidMount.bind(this)
+    this.refresh = this.refresh.bind(this)
   }
 
-  componentDidMount() {
+  componentDidMount(){
+    this.refresh();
+  }
+
+  refresh() {
     fetch(url_for("api.user_info"), {
       credentials: "same-origin"
     }).then(res => {

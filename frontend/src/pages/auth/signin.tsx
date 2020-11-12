@@ -9,25 +9,31 @@ import {
   WithStyles,
   withStyles,
 } from "@material-ui/core";
+import { Redirect } from "react-router-dom";
 import { signin as Styles } from "../../styles/auth";
+import { UserContextType, withUserContext } from "../../utils/UserContext";
 import url_for from "../../utils/url_for";
 
-class SignIn extends React.Component<WithStyles<typeof Styles>> {
+class SignIn extends React.Component<
+  WithStyles<typeof Styles> & { context: UserContextType }
+> {
   state: {
     error: string;
     isLoading: boolean;
     error_with: string;
+    redirect: boolean;
   };
   _ids: {
     username: string;
     password: string;
   };
-  constructor(props: WithStyles<typeof Styles>) {
+  constructor(props: WithStyles<typeof Styles> & { context: UserContextType }) {
     super(props);
     this.state = {
       error: "",
       error_with: "",
       isLoading: false,
+      redirect: false,
     };
     this._ids = {
       username: "auth-signin-email",
@@ -52,15 +58,17 @@ class SignIn extends React.Component<WithStyles<typeof Styles>> {
     }).then((res) => {
       res.json().then((json) => {
         // Done loading
-        this.setState({ isLoading: false });
-        /**@todo Change the url to a possible refferer */
-        if (res.ok) alert("Successfull");
+        if (res.ok) {
+          this.props.context.refresh();
+          this.setState({ redirect: true, isLoading: false });
+        }
 
         // Unauthorised access
         if (res.status === 403)
           return this.setState({
             error: json.message,
             error_with: json.error_with,
+            isLoading: false,
           });
       });
     });
@@ -125,10 +133,18 @@ class SignIn extends React.Component<WithStyles<typeof Styles>> {
             variant={this.state.isLoading ? "indeterminate" : "determinate"}
             value={0}
           />
+          {this.state.redirect && (
+            // Auth successfull, now redirect
+            <Redirect
+              to={decodeURIComponent(
+                new URLSearchParams(window.location.search).get("next") || "/"
+              )}
+            />
+          )}
         </div>
       </Container>
     );
   }
 }
 
-export default withStyles(Styles)(SignIn);
+export default withUserContext(withStyles(Styles)(SignIn));
