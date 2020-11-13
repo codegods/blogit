@@ -29,6 +29,7 @@ from xml.etree import ElementTree
 from helpers.url_for import url_for
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
+from markdown.postprocessors import Postprocessor
 from markdown.inlinepatterns import InlineProcessor
 
 
@@ -50,6 +51,7 @@ class MentionsProcessor(InlineProcessor):
         elem.set("class", "markdown-mention")
         return elem, m.start(0), m.end(0)
 
+
 class StrikeThroughProcessor(InlineProcessor):
     def handleMatch(
         self, m: re.Match, _data: str
@@ -57,6 +59,42 @@ class StrikeThroughProcessor(InlineProcessor):
         elem = ElementTree.Element("s")
         elem.text = m.groupdict()["text"]
         return elem, m.start(0), m.end(0)
+
+
+class Unescaper(Postprocessor):
+    def run(self, text: str) -> None:
+        code_elements_in_doc = True
+        while code_elements_in_doc:
+            match = re.search("<code>(?!<pre>)(?P<content>.+)(?<!</pre>)</code>", text, re.DOTALL)
+            if match:
+                # Escaping the input through `flask.markup.escape` escapes
+                # all convertible strings to html escape characters, which
+                # if inside `code(```)` fences are re-escaped by the
+                # markdown parser. This will find all such double escapes
+                # and correct them.
+                span = match.span(1)
+                the_actual_code = text[span[0] : span[1]]
+                still_has_a_match = True
+                while still_has_a_match:
+                    char = re.search("&amp;(?P<char>[#a-z0-9]+);", the_actual_code)
+                    if char:
+                        the_actual_code = (
+                            the_actual_code[: char.span()[0]]
+                            + f"&{char.groupdict()['char']};"
+                            + the_actual_code[char.span()[1] :]
+                        )
+                    else:
+                        still_has_a_match = False
+                text = (
+                    text[: match.span()[0]]
+                    + "<code><pre>"
+                    + the_actual_code
+                    + "</pre></code>"
+                    + text[match.span()[1] :]
+                )
+            else:
+                code_elements_in_doc = False
+        return text
 
 
 class HTMLEscaper(Preprocessor):
@@ -80,7 +118,10 @@ class MentionsExtension(Extension):
         # item, name and priority. I am just guessing the priority
         md.preprocessors.register(HTMLEscaper(md), "escape_html", 9999)
         md.inlinePatterns.register(MentionsProcessor("@[a-zA-Z0-9_]+"), "mentions", 99)
-        md.inlinePatterns.register(StrikeThroughProcessor("~(?! )(?P<text>.+)(?<! )~"), "strikethrough", 98)
+        md.inlinePatterns.register(
+            StrikeThroughProcessor("~(?! )(?P<text>.+)(?<! )~"), "strikethrough", 98
+        )
+        md.postprocessors.register(Unescaper(), "unescaper", 101)
 
 
 blueprint = flask.Blueprint(__name__, "renderer")
