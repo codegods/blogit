@@ -5,7 +5,7 @@ interface Context {
   username: string;
   avatarUrl: string;
   name: string;
-  refresh(): void;
+  refresh(): Promise<Context> | void;
 }
 
 const UserContext = React.createContext<Context>({
@@ -27,31 +27,35 @@ class UserContextProvider extends React.Component {
       // refresh function over here was breaking things by changing the
       // object referred by `this`. Making an anonymous arrow function to
       // kind of "proxy" the refresh function fixed it though.
-      refresh: ()  => this.refresh(),
+      refresh: () => this.refresh(),
     };
-    this.refresh = this.refresh.bind(this)
+    this.refresh = this.refresh.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.refresh();
   }
 
-  refresh() {
-    fetch(url_for("api.user_info"), {
-      credentials: "same-origin"
-    }).then(res => {
-      if (!res.ok){
-        this.setState({
-          username: "",
-          avatarUrl: "",
-          name: "",
-        })
-      }else{
-        res.json().then(json => {
-          this.setState(json)
-        })
-      }
-    })
+  refresh(): Promise<Context> {
+    return new Promise((resolve, reject) => {
+      fetch(url_for("api.user_info"), {
+        credentials: "same-origin",
+      }).then((res) => {
+        if (!res.ok) {
+          reject({})
+          this.setState({
+            username: "",
+            avatarUrl: "",
+            name: "",
+          });
+        } else {
+          res.json().then((json) => {
+            resolve(json)
+            this.setState(json);
+          });
+        }
+      });
+    });
   }
 
   render() {
@@ -63,17 +67,17 @@ class UserContextProvider extends React.Component {
   }
 }
 
-const withUserContext = <PropTypes extends {context: Context}>(
+const withUserContext = <PropTypes extends { context: Context }>(
   Component: React.ComponentType<PropTypes>
 ) => {
   return (props: Omit<PropTypes, "context">) => {
     return (
       <UserContext.Consumer>
-        {(context) => <Component {...props as PropTypes} context={context} />}
+        {(context) => <Component {...(props as PropTypes)} context={context} />}
       </UserContext.Consumer>
     );
   };
 };
 
 export type UserContextType = Context;
-export { UserContext, UserContextProvider, withUserContext}
+export { UserContext, UserContextProvider, withUserContext };
