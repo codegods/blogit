@@ -10,6 +10,7 @@ import AppBar from "./AppBar";
 
 import Styles from "./styles/appbar";
 import url_for from "./utils/url_for";
+import PrivateRoute from "./utils/PrivateRoute";
 
 // Lazy load other app pages
 const Auth = React.lazy(() => import("./pages/auth/index"));
@@ -43,7 +44,7 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
           <Switch>
             <Route path="/" exact component={HomePage} />
             <Route path="/auth/:page" component={Auth} />
-            <Route path={url_for("new")} component={CreateNew} />
+            <PrivateRoute path={url_for("new")} component={CreateNew} />
           </Switch>
         </React.Suspense>
       </div>
