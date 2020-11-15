@@ -5,14 +5,13 @@ import {
   Fab,
   Tab,
   Tabs,
-  TextField,
   withStyles,
   WithStyles,
   Typography,
 } from "@material-ui/core";
 import { Check } from "@material-ui/icons";
-import Toolbox from "./toolbox";
 import Preview from "./preview";
+import Writer from "./writer"
 import { RootStyles } from "../../styles/editor";
 
 interface TabPanelProps extends React.ComponentProps<"div"> {
@@ -91,25 +90,7 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
           value={this.state.value}
           index={0}
         >
-          {/* Writer */}
-          <div>
-            <TextField
-              variant="filled"
-              id="create-post-title"
-              fullWidth
-              label="Give it that perfect title"
-            />
-            <TextField
-              variant="filled"
-              fullWidth
-              label="Your content goes here"
-              multiline
-              className={classes.writer}
-              rows={10}
-              id="create-post-textarea"
-            />
-            <Toolbox textarea="create-post-textarea" />
-          </div>
+          <Writer />
         </TabPanel>
         <TabPanel
           className={classes.content}
