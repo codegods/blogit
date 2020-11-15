@@ -22,6 +22,7 @@ sys.path.append(
 del os, sys
 
 import re
+import json
 import flask
 import markdown
 from typing import List, Tuple
@@ -65,7 +66,11 @@ class Unescaper(Postprocessor):
     def run(self, text: str) -> None:
         code_elements_in_doc = True
         while code_elements_in_doc:
-            match = re.search("<code>(?!<pre>)(?P<content>.+)(?<!</pre>)</code>", text, re.DOTALL)
+            match = re.search(
+                "(?<=<code>)(?!<pre>)(?P<content>.+?)(?<!<\/pre>)(?=<\/code>)",
+                text,
+                re.DOTALL,
+            )
             if match:
                 # Escaping the input through `flask.markup.escape` escapes
                 # all convertible strings to html escape characters, which
@@ -87,9 +92,9 @@ class Unescaper(Postprocessor):
                         still_has_a_match = False
                 text = (
                     text[: match.span()[0]]
-                    + "<code><pre>"
+                    + "<pre>"
                     + the_actual_code
-                    + "</pre></code>"
+                    + "</pre>"
                     + text[match.span()[1] :]
                 )
             else:
@@ -130,5 +135,20 @@ blueprint = flask.Blueprint(__name__, "renderer")
 @blueprint.route(url_for("api.renderer"), methods=["POST"])
 def renderer():
     """API endpoint for rendering markdown requests"""
-    request = flask.request.get_data().decode()
-    return markdown.markdown(request, extensions=[MentionsExtension()])
+    try:
+        request = json.loads(flask.request.get_data().decode())
+    except json.JSONDecodeError:
+        return "Bad Request Encoding", 400
+
+    if "heading" not in request or "content" not in request:
+        return "Not all parameters were specified", 400
+
+    # Although we implement checks on frontend for max content length
+    # but we need to recheck it because frontend code can always be
+    # manipulated
+    if len(request["heading"]) > 100 or len(request["content"]) > 40960:
+        return "Request length too long", 413
+    return markdown.markdown(
+        f"# {request['heading']}\n\n{request['content']}",
+        extensions=[MentionsExtension()],
+    )

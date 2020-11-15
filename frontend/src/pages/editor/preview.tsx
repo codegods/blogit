@@ -10,18 +10,11 @@ interface PreviewProps extends WithStyles<typeof Style> {
 }
 
 class Preview extends React.Component<PreviewProps> {
-  state: {
-    isLoaded: boolean;
-    content: string;
+  state = {
+    isLoaded: false,
+    content: "",
+    error: "",
   };
-  constructor(props: PreviewProps) {
-    super(props);
-    this.state = {
-      isLoaded: false,
-      content: "",
-    };
-  }
-
   componentDidMount() {
     if (this.props.show) {
       let text = (document.getElementById(
@@ -31,45 +24,52 @@ class Preview extends React.Component<PreviewProps> {
         this.props.heading
       ) as HTMLInputElement).value;
 
-      if (text === "" || heading === "") {
+      if (heading.length > 100 || text.length > 40960)
         this.setState({
           isLoaded: true,
-          content: `
-            <div style="color:red">
-            You have to give your article a heading and some content before you can preview it.
-            </div>
-          `,
+          error:
+            "Your content or heading is too long to be submitted.\nPlease make it shorter.",
         });
-      } else {
+      else if (text === "" || heading === "")
+        this.setState({
+          isLoaded: true,
+          error:
+            "You have to give your article a heading and some content before you can preview it.",
+        });
+      else {
         fetch(url_for("api.renderer"), {
           method: "POST",
-          body: `# ${heading}\n\n${text}`,
-        }).then((res) => {
-          if (!res.ok) {
+          body: JSON.stringify({heading, content: text}),
+        })
+          .then((res) => {
+            res.text().then((content) => {
+              if (res.ok)
+                this.setState({
+                  isLoaded: true,
+                  content,
+                });
+              else
+                this.setState({
+                  isLoaded: true,
+                  error: `Sorry, we couldn't load this content.\nPlease try again.\nServer responded with text: "${content}". Request Status: ${res.status}`,
+                });
+            });
+          })
+          .catch((err) => {
             this.setState({
               isLoaded: true,
-              content: `<h5 style="color: red">Sorry, we couldn't load this content. Please try again.</h5>`,
+              error: `Sorry, we couldn't load this content.\nPlease try again. Got error ${err}`,
             });
-          } else {
-            res.text().then((content) =>
-              this.setState({
-                isLoaded: true,
-                content,
-              })
-            );
-          }
-        }).catch(err => {
-          this.setState({
-            isLoaded: true,
-            content: `<h5 style="color: red">Sorry, we couldn't load this content. Please try again. Got error ${err}</h5>`,
           });
-        });
       }
     }
   }
   render() {
     const { classes } = this.props;
-    if (this.props.show)
+    // Got an error
+    if (this.state.error) return <div className={classes.error}>{this.state.error}</div>;
+    // Content to show
+    else if (this.props.show)
       return (
         <div className={classes.root}>
           {this.state.isLoaded ? (
@@ -82,6 +82,7 @@ class Preview extends React.Component<PreviewProps> {
           )}
         </div>
       );
+    // Nothing to show
     else return null;
   }
 }

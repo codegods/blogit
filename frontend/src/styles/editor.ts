@@ -62,11 +62,20 @@ export let Preview = (theme: Theme) =>
             "& .markdown-mention:hover": {
                 textDecoration: "underline",
             },
+            "& pre": {
+                backgroundColor: "#ccc",
+                padding: theme.spacing(1),
+                borderRadius: "4px"
+            }
         },
         loading: {
             position: "absolute",
             left: "50%",
             textAlign: "center",
             transform: "translate(-50%)"
+        },
+        error: {
+            fontFamily: "'Montserrat'",
+            color: "red"
         }
     });
