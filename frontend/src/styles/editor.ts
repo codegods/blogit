@@ -74,6 +74,14 @@ export let Preview = (theme: Theme) =>
                 padding: theme.spacing(1),
                 borderRadius: "4px",
             },
+            "& .markdown-highlight": {
+                background: theme.palette.secondary.light,
+            },
+            "& blockquote": {
+                marginLeft: 0,
+                borderLeft: "3px solid #aaa",
+                paddingLeft: theme.spacing(2)
+            }
         },
         loading: {
             position: "absolute",

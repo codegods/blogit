@@ -61,6 +61,24 @@ class StrikeThroughProcessor(InlineProcessor):
         elem.text = m.groupdict()["text"]
         return elem, m.start(0), m.end(0)
 
+class HighlightProcessor(InlineProcessor):
+    def handleMatch(
+        self, m: re.Match, _data: str
+    ) -> Tuple[ElementTree.Element, int, int]:
+        elem = ElementTree.Element("span")
+        elem.text = m.groupdict()["text"]
+        elem.set("class", "markdown-highlight")
+        return elem, m.start(0), m.end(0)
+
+class BlockQuoteUnescaper(InlineProcessor):
+    def handleMatch(
+        self, m: re.Match, _data: str
+    ) -> Tuple[ElementTree.Element, int, int]:
+        elem = ElementTree.Element("blockquote")
+        italics = ElementTree.Element("i")
+        italics.text = m.groupdict()["text"]
+        elem.append(italics)
+        return elem, m.start(0), m.end(0)
 
 class Unescaper(Postprocessor):
     def run(self, text: str) -> None:
@@ -99,6 +117,9 @@ class Unescaper(Postprocessor):
                 )
             else:
                 code_elements_in_doc = False
+        
+        # And now we'll remove empty p tags because the take useless space
+        text = re.sub("<p>[\s]*</p>", "", text)
         return text
 
 
@@ -126,7 +147,17 @@ class MentionsExtension(Extension):
         md.inlinePatterns.register(
             StrikeThroughProcessor("~(?! )(?P<text>.+)(?<! )~"), "strikethrough", 98
         )
-        md.postprocessors.register(Unescaper(), "unescaper", 101)
+        # Since we escape all the input html during preprocessing, we have
+        # `&gt;` in place of '>' and `&lt;` in place of '<'. So we will
+        # have to make sure that these things go back to what they were originally
+        # and we need to re-code some functionality such as blockquotes to get it working.
+        md.inlinePatterns.register(
+            HighlightProcessor("-&gt;(?! )(?P<text>.+)(?<! )&lt;-"), "highlight", 101
+        )
+        md.inlinePatterns.register(
+            BlockQuoteUnescaper("^&gt;(?P<text>.+)"), "blockquotes", 102
+        )
+        md.postprocessors.register(Unescaper(), "unescaper", 103)
 
 
 blueprint = flask.Blueprint(__name__, "renderer")
@@ -150,7 +181,9 @@ def renderer():
         return "Request is empty", 400
     if len(request["heading"]) > 100 or len(request["content"]) > 40960:
         return "Request length too long", 413
-    return markdown.markdown(
+    md = markdown.markdown(
         f"# {request['heading']}\n\n{request['content']}",
         extensions=[MentionsExtension()],
     )
+    print(md)
+    return md
