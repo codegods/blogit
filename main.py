@@ -14,7 +14,7 @@ import json
 import flask
 import base64
 import logging
-from api import user, uploader, render
+from api import user, uploader, render, posts
 from helpers import formatter
 from extensions import database, cache
 from typing import NoReturn, Union
@@ -37,6 +37,7 @@ def create_app(config: object, mysql_config: object) -> flask.app:
     app.register_blueprint(user.blueprint)
     app.register_blueprint(uploader.blueprint)
     app.register_blueprint(render.blueprint)
+    app.register_blueprint(posts.blueprint)
 
     # Initiate logging
     app.logger = logger

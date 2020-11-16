@@ -3,7 +3,7 @@ import { TextField, withStyles, WithStyles } from "@material-ui/core";
 import Toolbox from "./toolbox";
 import { RootStyles } from "../../styles/editor";
 
-class Writer extends React.Component<WithStyles<typeof RootStyles>> {
+class Writer extends React.Component<WithStyles<typeof RootStyles> & { title_id: string, content_id: string}> {
   state = {
     titleLength: 0,
     contentLength: 0,
@@ -15,7 +15,7 @@ class Writer extends React.Component<WithStyles<typeof RootStyles>> {
       <div>
         <TextField
           variant="filled"
-          id="create-post-title"
+          id={this.props.title_id}
           fullWidth
           label="Give it that perfect title"
           onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,7 @@ class Writer extends React.Component<WithStyles<typeof RootStyles>> {
           multiline
           className={classes.writer}
           rows={10}
-          id="create-post-textarea"
+          id={this.props.content_id}
           onChange={(evt: React.ChangeEvent<HTMLTextAreaElement>) => {
             this.setState({
               contentLength: evt.target.value.length,
@@ -50,7 +50,7 @@ class Writer extends React.Component<WithStyles<typeof RootStyles>> {
             (this.state.contentLength > 40960 ? " Content too long" : "")
           }
         />
-        <Toolbox textarea="create-post-textarea" />
+        <Toolbox textarea={this.props.content_id} />
       </div>
     );
   }

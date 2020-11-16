@@ -28,6 +28,13 @@ export let RootStyles = (theme: Theme) => {
             bottom: theme.spacing(4),
             right: theme.spacing(4),
         },
+        flex: {
+            width: "-webkit-fill-available",
+            display: "inline-flex",
+            "& span": {
+                flex: 1,
+            },
+        },
     });
 };
 
@@ -65,17 +72,17 @@ export let Preview = (theme: Theme) =>
             "& pre": {
                 backgroundColor: "#ccc",
                 padding: theme.spacing(1),
-                borderRadius: "4px"
-            }
+                borderRadius: "4px",
+            },
         },
         loading: {
             position: "absolute",
             left: "50%",
             textAlign: "center",
-            transform: "translate(-50%)"
+            transform: "translate(-50%)",
         },
         error: {
             fontFamily: "'Montserrat'",
-            color: "red"
-        }
+            color: "red",
+        },
     });

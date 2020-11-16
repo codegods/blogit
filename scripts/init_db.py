@@ -38,47 +38,55 @@ class Execute:
         # Tables we will need
         self._structures = {
             "users": [
-                "Id char(64) NOT NULL",
-                "Username varchar(20) NOT NULL",
-                "FirstName varchar(20) NOT NULL",
-                "Email varchar(200) NOT NULL",
-                "Password char(60) NOT NULL",
-                "LastName varchar(20)",
-                "Bio varchar(500)",
-                "AvatarUrl varchar(200)",
-                "PRIMARY KEY(Id)",
+                "id char(64) NOT NULL",
+                "username varchar(20) NOT NULL",
+                "firstname varchar(20) NOT NULL",
+                "email varchar(200) NOT NULL",
+                "password char(60) NOT NULL",
+                "lastname varchar(20)",
+                "bio varchar(500)",
+                "avatarurl varchar(200)",
+                "PRIMARY KEY(id)",
                 "UNIQUE (Username)",
                 "UNIQUE (Email)",
             ],
             "posts": [
-                "Id char(64) NOT NULL",
-                "Author char(64) NOT NULL",
-                "Likes_Count int DEFAULT 0",
-                "Comments int DEFAULT 0",
-                "Content text(409600)",  # 409600chars = 1024char/kb * 400 characters = 400kB
-                "PRIMARY KEY (Id)",
-                "FOREIGN KEY (Author) REFERENCES users(Id)",
+                "id char(64) NOT NULL",
+                "author char(64) NOT NULL",
+                "date_posted datetime",
+                "title varchar(100)",
+                "content text(409600)",  # 40960chars = 1024char/kb * 40 characters = 40kB
+                "PRIMARY KEY (id)",
+                "FOREIGN KEY (author) REFERENCES users(username)",
             ],
             "comments": [
-                "Id char(64) NOT NULL",
-                "Author char(64) NOT NULL",
-                "Post char(64) NOT NULL",
-                "Content varchar(1024) NOT NULL",
-                "PRIMARY KEY (Id)",
-                "FOREIGN KEY (Author) REFERENCES users(Id)",
-                "FOREIGN KEY (Post) REFERENCES posts(Id)",
+                "id char(64) NOT NULL",
+                "author char(64) NOT NULL",
+                "post char(64) NOT NULL",
+                "content varchar(1024) NOT NULL",
+                "PRIMARY KEY (id)",
+                "FOREIGN KEY (author) REFERENCES users(id)",
+                "FOREIGN KEY (post) REFERENCES posts(id)",
             ],
             "storage": [
-                "Id char(64) NOT NULL",
-                "Name varchar(32) NOT NULL",
-                "Contents text(5242880) NOT NULL",  # 5242880chars = 1024 chars/kb * 1024kb/mb * 5 = 5MB,
-                "PRIMARY KEY (Id)"
+                "id char(64) NOT NULL",
+                "name varchar(32) NOT NULL",
+                "contents text(5242880) NOT NULL",  # 5242880chars = 1024 chars/kb * 1024kb/mb * 5 = 5MB,
+                "PRIMARY KEY (id)"
             ],
             "followers": [
-                "Following char(64) NOT NULL",
-                "Follower char(64) NOT NULL",
-                "FOREIGN KEY (Following) REFERENCES users(Id)",
-                "FOREIGN KEY (Follower) REFERENCES users(Id)",
+                "following char(64) NOT NULL",
+                "follower char(64) NOT NULL",
+                "FOREIGN KEY (following) REFERENCES users(id)",
+                "FOREIGN KEY (follower) REFERENCES users(id)",
+            ],
+
+            # This helps prevent multiple likes by same user on same post
+            "likes": [
+                "likee char(64) NOT NULL",
+                "post char(64) NOT NULL",
+                "FOREIGN KEY (likee) REFERENCES users(id)",
+                "FOREIGN KEY (post) REFERENCES posts(id)"
             ]
         }
 

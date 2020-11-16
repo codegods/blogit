@@ -8,10 +8,16 @@ import {
   withStyles,
   WithStyles,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress,
 } from "@material-ui/core";
 import { Check } from "@material-ui/icons";
+import { Redirect } from "react-router-dom";
 import Preview from "./preview";
-import Writer from "./writer"
+import Writer from "./writer";
+import url_for from "../../utils/url_for";
 import { RootStyles } from "../../styles/editor";
 
 interface TabPanelProps extends React.ComponentProps<"div"> {
@@ -43,20 +49,75 @@ function TabPanel(props: TabPanelProps) {
 class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
   state: {
     value: number;
+    isLoading: boolean;
+    error: string;
+    redirectTo: string;
   };
 
   constructor(props: WithStyles<typeof RootStyles>) {
     super(props);
     this.state = {
       value: 0,
+      isLoading: false,
+      error: "",
+      redirectTo: "",
     };
     this.handleChange = this.handleChange.bind(this);
+    this.create = this.create.bind(this);
   }
 
   handleChange(_e: React.ChangeEvent<{}>, newValue: number) {
     this.setState({
       value: newValue,
     });
+  }
+
+  create() {
+    let title = (document.getElementById(
+        "create-post-title"
+      ) as HTMLInputElement).value,
+      content = (document.getElementById(
+        "create-post-textarea"
+      ) as HTMLTextAreaElement).value;
+
+    if (title === "" || content === "")
+      this.setState({
+        error: "Please give your post a title and some content to get started.",
+      });
+    else if (title.length > 100 || content.length > 40960)
+      this.setState({
+        error:
+          "Your title or content seem to be too long please stay within the limit to get started",
+      });
+    else {
+      this.setState({ isLoading: true });
+      fetch(url_for("api.posts.create"), {
+        method: "POST",
+        body: JSON.stringify({
+          title,
+          content,
+        }),
+      }).then((res) => {
+        res.text().then((txt) => {
+          if (!res.ok)
+            this.setState({
+              isLoading: false,
+              error:
+                "Couldn't create this post because server responded with: \"" +
+                txt +
+                "\"\nStatus: " +
+                res.status +
+                " " +
+                res.statusText,
+            });
+          else
+            this.setState({
+              isLoading: false,
+              redirectTo: txt,
+            });
+        });
+      }).catch(e => console.error(e));
+    }
   }
 
   render() {
@@ -90,7 +151,10 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
           value={this.state.value}
           index={0}
         >
-          <Writer />
+          <Writer
+            title_id="create-post-title"
+            content_id="create-post-textarea"
+          />
         </TabPanel>
         <TabPanel
           className={classes.content}
@@ -105,9 +169,43 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
             show={this.state.value === 1}
           />
         </TabPanel>
-        <Fab color="primary" variant="extended" className={classes.fab}>
+        <Fab
+          color="primary"
+          variant="extended"
+          className={classes.fab}
+          onClick={this.create}
+        >
           <Check /> Create
         </Fab>
+        <Dialog
+          disableBackdropClick={this.state.isLoading}
+          disableEscapeKeyDown={this.state.isLoading}
+          open={this.state.error !== "" || this.state.isLoading}
+          onClose={() => this.setState({ error: "", isLoading: false })}
+        >
+          <DialogTitle>
+            {this.state.isLoading ? "Loading..." : "Unable to create post"}
+          </DialogTitle>
+          <DialogContent>
+            {this.state.isLoading ? (
+              <div className={classes.flex}>
+                <span />
+                <CircularProgress />
+                <span />
+              </div>
+            ) : (
+              this.state.error
+            )}
+          </DialogContent>
+        </Dialog>
+        {this.state.redirectTo !== "" && (
+          <Redirect
+            to={url_for("views.posts").replace(
+              /\/:[a-zA-Z0-9-]+/,
+              "/" + this.state.redirectTo
+            )}
+          />
+        )}
       </div>
     );
   }

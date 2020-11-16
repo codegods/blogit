@@ -68,12 +68,8 @@ class Model:
         )
         return csr.fetchall()
 
-# TODO Change this thing when changing database structure
 def from_dict(dictionary: dict):
-    model = {}
-    for key in dictionary:
-        model[key.lower()] = dictionary[key]
-    return Model(**model)
+    return Model(**dictionary)
 
 
 def search(searchstr: str, limit: int = 10, offset: int = 0):
