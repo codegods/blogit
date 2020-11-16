@@ -31,10 +31,7 @@ class Model:
 
 
 def from_dict(dictionary: dict):
-    d = {}
-    for k, v in dictionary.items():
-        d[k.lower()] = v
-    return Model(**d)
+    return Model(**dictionary)
 
 
 def upload(name: str, contents: str):

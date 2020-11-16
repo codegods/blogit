@@ -146,6 +146,8 @@ def renderer():
     # Although we implement checks on frontend for max content length
     # but we need to recheck it because frontend code can always be
     # manipulated
+    if len(request["heading"]) == "" or len(request["content"]) == "":
+        return "Request is empty", 400
     if len(request["heading"]) > 100 or len(request["content"]) > 40960:
         return "Request length too long", 413
     return markdown.markdown(
