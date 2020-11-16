@@ -21,6 +21,8 @@ import {
   Image,
   CloudUpload,
   InsertLink,
+  Code,
+  Highlight
 } from "@material-ui/icons";
 import { ToolBox as Styles } from "../../styles/editor";
 
@@ -154,6 +156,16 @@ class Toolbox extends React.Component<ToolBoxProps> {
           <Tooltip title="Strikethrough" arial-label="Strikethrough">
             <Button onClick={this.md_handler("~", "~")}>
               <FormatStrikethrough />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Code" arial-label="Code">
+            <Button onClick={this.md_handler("\n```\n", "\n```\n")}>
+              <Code />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Highlight" arial-label="Highlight">
+            <Button onClick={this.md_handler("->", "<-")}>
+              <Highlight />
             </Button>
           </Tooltip>
           <Tooltip title="Headings" arial-label="Headings">

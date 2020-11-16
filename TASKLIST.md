@@ -13,9 +13,11 @@
 - Signin API                            ✓
 - ORM models                            •
 - Markdown render API                   ✓
-- Markdown editor                       •
-- Create new post API                   •
-- Posts view                            ⨯
+- Markdown editor                       ✓
+- Create new post API                   ✓
+- Posts view                            •
+- Post stats API                        •
+- Like API and view                     •
 - Profile view                          ⨯
 - Profile stats API                     ⨯
 - Following and followers API           ⨯
