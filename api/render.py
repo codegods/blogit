@@ -181,9 +181,7 @@ def renderer():
         return "Request is empty", 400
     if len(request["heading"]) > 100 or len(request["content"]) > 40960:
         return "Request length too long", 413
-    md = markdown.markdown(
+    return markdown.markdown(
         f"# {request['heading']}\n\n{request['content']}",
         extensions=[MentionsExtension()],
     )
-    print(md)
-    return md
