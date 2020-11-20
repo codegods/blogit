@@ -22,9 +22,8 @@ sys.path.append(
 del os, sys
 import json
 import flask
-from markdown import markdown as md
 from helpers.url_for import url_for
-from .render import MentionsExtension
+from helpers.md import render
 from helpers.cookies import login_required
 from flask import Blueprint, current_app as app
 
@@ -50,7 +49,7 @@ def create():
 
     try:
         uuid = app.sql.posts.create(
-            flask.g.user.username, request["title"], md(request["content"])
+            flask.g.user.username, request["title"], render(request["content"])
         )
         return uuid, 200
     except Exception:
