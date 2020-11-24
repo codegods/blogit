@@ -16,7 +16,6 @@ class Model:
     lastname: str
     id: str
 
-
     def delete(self):
         return app.sql.autocommit("delete from users where Id = ", (self.id,))
 
@@ -56,17 +55,14 @@ class Model:
 
     def get_follower_count(self):
         csr = app.sql.cursor()
-        csr.execute(
-            "select count(*) from followers where Following=%s", (self.id,)
-        )
+        csr.execute("select count(*) from followers where Following=%s", (self.id,))
         return csr.fetchall()
 
     def get_following_count(self):
         csr = app.sql.cursor()
-        csr.execute(
-            "select count(*) from followers where Follower=%s", (self.id,)
-        )
+        csr.execute("select count(*) from followers where Follower=%s", (self.id,))
         return csr.fetchall()
+
 
 def from_dict(dictionary: dict):
     return Model(**dictionary)

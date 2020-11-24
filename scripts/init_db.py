@@ -56,6 +56,7 @@ class Execute:
                 "date_posted datetime",
                 "title varchar(100)",
                 "content text(409600)",  # 40960chars = 1024char/kb * 40 characters = 40kB
+                "share_count integer default 0",
                 "PRIMARY KEY (id)",
                 "FOREIGN KEY (author) REFERENCES users(username)",
             ],
@@ -72,7 +73,7 @@ class Execute:
                 "id char(64) NOT NULL",
                 "name varchar(32) NOT NULL",
                 "contents text(5242880) NOT NULL",  # 5242880chars = 1024 chars/kb * 1024kb/mb * 5 = 5MB,
-                "PRIMARY KEY (id)"
+                "PRIMARY KEY (id)",
             ],
             "followers": [
                 "following char(64) NOT NULL",
@@ -80,14 +81,13 @@ class Execute:
                 "FOREIGN KEY (following) REFERENCES users(id)",
                 "FOREIGN KEY (follower) REFERENCES users(id)",
             ],
-
             # This helps prevent multiple likes by same user on same post
             "likes": [
                 "likee char(64) NOT NULL",
                 "post char(64) NOT NULL",
                 "FOREIGN KEY (likee) REFERENCES users(id)",
-                "FOREIGN KEY (post) REFERENCES posts(id)"
-            ]
+                "FOREIGN KEY (post) REFERENCES posts(id)",
+            ],
         }
 
     def start(self) -> None:

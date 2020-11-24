@@ -31,5 +31,28 @@ export let RootStyles = (theme: Theme) => {
             justifyContent: "center",
             paddingTop: theme.spacing(1),
         },
+        post: {
+            fontFamily: "'Montserrat'",
+            "& a": {
+                textDecoration: "none",
+                color: theme.palette.secondary.main,
+            },
+            "& .markdown-mention:hover": {
+                textDecoration: "underline",
+            },
+            "& pre": {
+                backgroundColor: "#ccc",
+                padding: theme.spacing(1),
+                borderRadius: "4px",
+            },
+            "& .markdown-highlight": {
+                background: theme.palette.secondary.light,
+            },
+            "& blockquote": {
+                marginLeft: 0,
+                borderLeft: "3px solid #aaa",
+                paddingLeft: theme.spacing(2)
+            }
+        }
     });
 };

@@ -155,9 +155,11 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
             proc.wait()
             logger.info("Shutted down.")
 
+
 def gunicorn():
     """Utility function to run the app with gunicorn"""
     import main
+
     config = config_loader.main()
     config.MODE = "production"
     config.flask.MODE = config.MODE

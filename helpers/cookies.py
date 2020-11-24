@@ -66,7 +66,14 @@ def login_required(user_needed=False):
                 return view(*args, **kwargs)
 
             # User not authenticated, redirect to login view.
-            return flask.redirect(url_for("views.auth.login") + "?next=" + quote(flask.request.full_path)), 403
+            return (
+                flask.redirect(
+                    url_for("views.auth.login")
+                    + "?next="
+                    + quote(flask.request.full_path)
+                ),
+                403,
+            )
 
         return real_wrapper
 

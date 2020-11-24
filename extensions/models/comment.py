@@ -14,7 +14,7 @@ class Model:
         pass
 
 
-def get(post_uuid: str, limits:Tuple[int, int] = (0,10)):
+def get(post_uuid: str, limits: Tuple[int, int] = (0, 10)):
     if not has_request_context():
         raise Exception("A flask request context is needed to work")
 
@@ -27,6 +27,8 @@ def get(post_uuid: str, limits:Tuple[int, int] = (0,10)):
         raise Exception("The app is not connected to a mysql server")
 
     cursor = app.sql.cursor(dictionary=True)
-    cursor.execute("select * from users where Post=%s limit %d, %d", (post_uuid, *limits))
+    cursor.execute(
+        "select * from users where Post=%s limit %d, %d", (post_uuid, *limits)
+    )
     result = cursor.fetchall()
     return len(result) and Model.from_dict(result[0])

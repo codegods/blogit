@@ -116,7 +116,7 @@ def validate(config: Any) -> None:
                 "WDS_SPCKET_PORT",
                 "SSL_KEY_FILE",
                 "SSL_CRT_FILE",
-                "PORT"
+                "PORT",
             ],
             "mysql": ["AUTH_PLUGIN", "HOST"],
             "flask": ["ENABLE_CACHING_IN_DEVELOPMENT"],
