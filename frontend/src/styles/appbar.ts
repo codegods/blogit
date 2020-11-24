@@ -77,19 +77,23 @@ let App = (theme: Theme) =>
         barProxy: theme.mixins.toolbar,
         backdrop: {
             background: `linear-gradient(182deg, ${theme.palette.primary.main} 40%, ${theme.palette.secondary.main})`,
-            position: "absolute",
             width: "100vw",
             height: "100vh",
         },
         logoBackground: {
             backgroundImage: `url(${LogoImage})`,
             width: "100vw",
-            position: "absolute",
             height: "100vh",
             top: theme.mixins.toolbar.height,
-            backgroundSize: "contain",
+            backgroundSize: "cover",
+            overflowY: "hidden",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
+        },
+        new_post: {
+            position: "fixed",
+            left: theme.spacing(4),
+            bottom: theme.spacing(4),
         },
     });
 

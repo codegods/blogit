@@ -8,7 +8,6 @@ let HomePage = withStyles(App)(
       const { classes } = this.props;
       return (
         <div>
-          <div className={classes.barProxy} />
           <div className={classes.backdrop}>
             <div className={classes.logoBackground} />
           </div>
