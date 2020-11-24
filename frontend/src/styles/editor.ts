@@ -3,9 +3,7 @@ import { createStyles, Theme } from "@material-ui/core/styles";
 export let RootStyles = (theme: Theme) => {
     return createStyles({
         root: {
-            position: "absolute",
             width: "100%",
-            top: "72px",
         },
         heading: {
             fontFamily: "Comfortaa, cursive",
