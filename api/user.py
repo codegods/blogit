@@ -90,7 +90,13 @@ class UserSignup(View):
         user.update(body)
         app.sql.users.create(**user)
         store.delete(reqid)
-        return {"success": True}
+        return with_cookie(
+            "l_id",
+            {"email": user["email"], "ip": flask.request.remote_addr},
+            {"success": True},
+            # Cookie remains valid for 30 days "only"
+            expires=datetime.datetime.now() + datetime.timedelta(days=30),
+        )
 
     def dispatch_request(self):
         body = json.loads(flask.request.get_data(as_text=True))
@@ -118,7 +124,10 @@ class UserSignin(View):
             return "400 - Bad Request", 400
         user = app.sql.users.get(email=body["username"])
         if not user:
-            return {"message": "This email is not registered with us.", "error_with": "username"}, 403
+            return {
+                "message": "This email is not registered with us.",
+                "error_with": "username",
+            }, 403
         if bcrypt.checkpw(body["password"].encode(), user.password.encode()):
             return with_cookie(
                 "l_id",
@@ -127,19 +136,20 @@ class UserSignin(View):
                 {"email": body["username"], "ip": flask.request.remote_addr},
                 {"success": True},
                 # Cookie remains valid for 30 days "only"
-                expires=datetime.datetime.now() + datetime.timedelta(days=30)
+                expires=datetime.datetime.now() + datetime.timedelta(days=30),
             )
         return {"message": "Invalid password", "error_with": "password"}, 403
 
 
 @blueprint.route(url_for("api.user_info"))
-@login_required(user_needed = True)
+@login_required(user_needed=True)
 def user_info():
     return {
         "name": flask.g.user.firstname + " " + (flask.g.user.lastname or ""),
         "avatarUrl": flask.g.user.avatarurl,
-        "username": flask.g.user.username
+        "username": flask.g.user.username,
     }
+
 
 blueprint.add_url_rule(
     url_for("api.auth.signup.validate"), view_func=UserSignup.as_view("users_signup")
