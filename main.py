@@ -4,7 +4,16 @@ import sys
 PROJECT_ROOT = os.path.abspath(
     ".."
     if os.path.abspath(".").split("/")[-1]
-    in ["lib", "api", "helpers", "scripts", "tests", "extensions", "docs", "frontend"]
+    in [
+        "lib",
+        "api",
+        "helpers",
+        "scripts",
+        "tests",
+        "extensions",
+        "docs",
+        "frontend",
+    ]
     else "."
 )
 
@@ -14,7 +23,7 @@ import json
 import flask
 import base64
 import logging
-from api import user, uploader, render, posts
+from api import user, uploader, render, posts, static_files
 from helpers import formatter
 from extensions import database, cache
 from typing import NoReturn, Union
@@ -23,7 +32,7 @@ logger: Union[logging.Logger, None] = None
 
 
 def create_app(config: object, mysql_config: object) -> flask.app:
-    app = flask.Flask(__name__)
+    app = flask.Flask(__name__, static_folder=os.path.join(PROJECT_ROOT, "build", "static"), static_url_path="/static")
 
     # The database extension
     database.DataBase(mysql_config, app)
@@ -38,7 +47,7 @@ def create_app(config: object, mysql_config: object) -> flask.app:
     app.register_blueprint(uploader.blueprint)
     app.register_blueprint(render.blueprint)
     app.register_blueprint(posts.blueprint)
-
+    app.register_blueprint(static_files.blueprint)
     # Initiate logging
     app.logger = logger
 
@@ -49,10 +58,6 @@ def create_app(config: object, mysql_config: object) -> flask.app:
             "Secret key not specified in config file. Using default security key."
             + " This is very dangerous in production mode"
         )
-
-    @app.route("/")
-    def index():
-        return "It works"
 
     return app
 
@@ -69,7 +74,7 @@ def run_development_server(config: object, mysql: object) -> NoReturn:
 
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
-    app = create_app(config.config, mysql)
+    app = create_app(config, mysql)
     from meinheld import server
 
     server.listen(
