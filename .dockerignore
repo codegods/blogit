@@ -1,7 +1,7 @@
-*/node_modules
 venv
-build
+.winvenv
 chromedriver
+frontend
 .vscode
 .github
 .git
