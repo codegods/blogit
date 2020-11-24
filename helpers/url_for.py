@@ -1,3 +1,4 @@
+# TODO Create API endpoint for post content, stats and author.
 _url_database = {
     "new": "/create",
     "storage": "/storage/<uuid>",
@@ -14,6 +15,7 @@ _url_database = {
 
     "api.posts.create": "/api/post/create",
     "api.posts.likes": "/api/post/likes",
+    "api.posts.get": "/api/post",
     "api.posts.like": "/api/post/like",
     "api.posts.get_comments": "/api/posts/comments",
     "api.posts.comment": "/api/posts/comment",
