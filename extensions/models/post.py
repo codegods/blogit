@@ -12,6 +12,7 @@ class Model:
     title: str
     author: str
     content: str
+    share_count: int
     date_posted: datetime
 
     def delete(self):
@@ -26,12 +27,24 @@ class Model:
             raise ValueError("User has alreay liked the post")
         except Exception:
             return app.sql.autocommit(
-                "insert into posts values (%s, %s)", (username, self.id)
+                "insert into likes values (%s, %s)", (username, self.id)
             )
 
-    def get_like_count(self):
-        csr = app.sql.cursor()
-        csr.execute("select count(likee) from likes where post=%s", (self.id))
+    def get_stats(self):
+        csr = app.sql.cursor(dictionary=True)
+        csr.execute(
+            "SELECT "
+            "COUNT(likes.likee) AS 'likes', "
+            "COUNT(comments.id) AS 'comments', "
+            "posts.share_count AS 'shares' "
+            "FROM ("
+            "(posts LEFT JOIN likes ON posts.id=likes.post) "
+            "LEFT JOIN comments ON comments.post=posts.id"
+            ") "
+            "WHERE posts.id=%s "
+            "GROUP BY posts.id;",
+            (self.id,),
+        )
         return csr.fetchone()
 
 
@@ -44,7 +57,7 @@ def create(author: str, title: str, content: str):
         secrets.token_bytes() + datetime.datetime.now().isoformat().encode()
     ).hexdigest()
     app.sql.autocommit(
-        "insert into posts values (%s, %s, %s, %s, %s)",
+        "insert into posts values (%s, %s, %s, %s, %s, 0)",
         (uuid, author, datetime.datetime.now(), title, content),
     )
     return uuid
@@ -80,7 +93,7 @@ def loadByauthor(author: str):
     cursor = app.sql.cursor(dictionary=True)
     cursor.execute("select * from posts where author=%s limit 1", (author,))
     result = cursor.fetchall()
-    return len(result) and Model.from_dict(result[0])
+    return len(result) and from_dict(result[0])
 
 
 def loadByuuid(uuid: str):
@@ -93,6 +106,6 @@ def loadByuuid(uuid: str):
         raise Exception("The app is not connected to a mysql server")
 
     cursor = app.sql.cursor(dictionary=True)
-    cursor.execute("select * from posts where uuid=%s limit 1", (uuid,))
+    cursor.execute("select * from posts where id=%s limit 1", (uuid,))
     result = cursor.fetchall()
-    return len(result) and Model.from_dict(result[0])
+    return len(result) and from_dict(result[0])

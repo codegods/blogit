@@ -63,7 +63,7 @@ class DataBase:
     def commit(self) -> None:
         """Commits the current connection"""
         self._connection.commit()
-    
+
     def autocommit(self, command: str, parameters: tuple):
         cursor = self.cursor()
         cursor.execute(command, parameters)

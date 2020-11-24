@@ -16,15 +16,17 @@ class Model:
 
     def delete(self):
         app.sql.autocommit("delete from storage where id=%s", (self.id,))
-    
+
     def get_mimetype(self) -> Union[str, None]:
         match = re.match("^data:(?P<mime>[a-zA-Z0-9/]+);base64,", self.contents)
         return match and match.groupdict()["mime"]
-    
+
     def get_contents(self) -> Union[str, None]:
-        match = re.match("data:[a-zA-Z]+/[a-zA-Z0-9]+;base64,(?P<contents>.+)", self.contents)
+        match = re.match(
+            "data:[a-zA-Z]+/[a-zA-Z0-9]+;base64,(?P<contents>.+)", self.contents
+        )
         return match and match.groupdict()["contents"]
-    
+
     def get_bytes(self) -> Union[bytes, None]:
         contents = self.get_contents()
         return contents and base64.b64decode(contents.encode())

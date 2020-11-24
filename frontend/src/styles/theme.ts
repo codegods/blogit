@@ -10,6 +10,7 @@ export default createMuiTheme({
         },
     },
     typography: {
+        fontFamily: "'Montserrat', cursive",
         button: {
             fontFamily: "Ubuntu",
         },

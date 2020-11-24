@@ -1,12 +1,23 @@
 #!../venv/bin/python
 import os
 
-os.chdir(os.path.abspath(
-    ".."
-    if os.path.abspath(".").split("/")[-1]
-    in ["lib", "api", "helpers", "scripts", "tests", "extensions", "docs", "frontend"]
-    else "."
-))
+os.chdir(
+    os.path.abspath(
+        ".."
+        if os.path.abspath(".").split("/")[-1]
+        in [
+            "lib",
+            "api",
+            "helpers",
+            "scripts",
+            "tests",
+            "extensions",
+            "docs",
+            "frontend",
+        ]
+        else "."
+    )
+)
 
 import re
 import time
@@ -159,10 +170,10 @@ class CompletionStatus:
             "[",
             term.white("\u2588" * round(completed * 50)),
             "\u2588" * round(working * 50),
-            " "*(50 - round(completed * 50) - round(working * 50)),
+            " " * (50 - round(completed * 50) - round(working * 50)),
             "]",
             sep="",
-            end=" "
+            end=" ",
         )
         print(str(completed * 100)[:5] + "% completed")
 

@@ -32,7 +32,11 @@ logger: Union[logging.Logger, None] = None
 
 
 def create_app(config: object, mysql_config: object) -> flask.app:
-    app = flask.Flask(__name__, static_folder=os.path.join(PROJECT_ROOT, "build", "static"), static_url_path="/static")
+    app = flask.Flask(
+        __name__,
+        static_folder=os.path.join(PROJECT_ROOT, "build", "static"),
+        static_url_path="/static",
+    )
 
     # The database extension
     database.DataBase(mysql_config, app)
@@ -81,7 +85,9 @@ def run_production_server(config: object, mysql: object) -> NoReturn:
         (config.HOST, int(config.PORT)),
     )
     try:
-        logger.info("Starting server on {}://{}:{}".format("http", config.HOST, config.PORT))
+        logger.info(
+            "Starting server on {}://{}:{}".format("http", config.HOST, config.PORT)
+        )
         server.run(app)
     except KeyboardInterrupt:
         logger.info("Server shutting down...")
