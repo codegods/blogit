@@ -46,6 +46,19 @@ class Model:
             (self.id,),
         )
         return csr.fetchone()
+    
+    def get_author(self):
+        csr = app.sql.cursor(dictionary=True)
+        csr.execute(
+            "select "
+            'avatarurl as "avatar", '
+            'concat(firstname, " ", lastname) as "name", '
+            "username "
+            "from users "
+            "where username=%s",
+            (self.author,),
+        )
+        return csr.fetchone()
 
 
 def from_dict(dictionary: dict):

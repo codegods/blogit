@@ -3,7 +3,9 @@ import { TextField, withStyles, WithStyles } from "@material-ui/core";
 import Toolbox from "./toolbox";
 import { RootStyles } from "../../styles/editor";
 
-class Writer extends React.Component<WithStyles<typeof RootStyles> & { title_id: string, content_id: string}> {
+class Writer extends React.Component<
+  WithStyles<typeof RootStyles> & { title_id: string; content_id: string }
+> {
   state = {
     titleLength: 0,
     contentLength: 0,

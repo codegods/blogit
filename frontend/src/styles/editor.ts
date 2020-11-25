@@ -78,8 +78,8 @@ export let Preview = (theme: Theme) =>
             "& blockquote": {
                 marginLeft: 0,
                 borderLeft: "3px solid #aaa",
-                paddingLeft: theme.spacing(2)
-            }
+                paddingLeft: theme.spacing(2),
+            },
         },
         loading: {
             position: "absolute",

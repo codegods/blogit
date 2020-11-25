@@ -97,26 +97,28 @@ class CreateAPost extends React.Component<WithStyles<typeof RootStyles>> {
           title,
           content,
         }),
-      }).then((res) => {
-        res.text().then((txt) => {
-          if (!res.ok)
-            this.setState({
-              isLoading: false,
-              error:
-                "Couldn't create this post because server responded with: \"" +
-                txt +
-                "\"\nStatus: " +
-                res.status +
-                " " +
-                res.statusText,
-            });
-          else
-            this.setState({
-              isLoading: false,
-              redirectTo: txt,
-            });
-        });
-      }).catch(e => console.error(e));
+      })
+        .then((res) => {
+          res.text().then((txt) => {
+            if (!res.ok)
+              this.setState({
+                isLoading: false,
+                error:
+                  "Couldn't create this post because server responded with: \"" +
+                  txt +
+                  '"\nStatus: ' +
+                  res.status +
+                  " " +
+                  res.statusText,
+              });
+            else
+              this.setState({
+                isLoading: false,
+                redirectTo: txt,
+              });
+          });
+        })
+        .catch((e) => console.error(e));
     }
   }
 

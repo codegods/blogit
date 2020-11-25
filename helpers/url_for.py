@@ -10,6 +10,7 @@ _url_database = {
     "api.auth.signup.validate": "/api/auth/signup/validate/",
     "api.auth.login": "/api/auth/login",
     "api.posts.create": "/api/post/create",
+    "api.posts.author": "/api/post/author",
     "api.posts.stats": "/api/post/stats",
     "api.posts.get": "/api/post",
     "api.posts.like": "/api/post/like",

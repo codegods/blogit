@@ -17,6 +17,7 @@ let _url_database: {
     "api.posts.create": "/api/post/create",
     "api.posts.get": "/api/post",
     "api.posts.stats": "/api/post/stats",
+    "api.posts.author": "/api/post/author",
     "api.posts.like": "/api/post/like",
     "api.posts.get_comments": "/api/posts/comments",
     "api.posts.comment": "/api/posts/comment",

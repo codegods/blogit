@@ -14,11 +14,13 @@ export class PrivateRoute extends Route<
   componentDidMount() {
     let ctx = this.props.context.refresh();
     ctx &&
-      ctx.then((context) => {
-        this.setState({ loaded: true });
-      }).catch(err => {
-          this.setState({ loaded: true});
-      });
+      ctx
+        .then((context) => {
+          this.setState({ loaded: true });
+        })
+        .catch((err) => {
+          this.setState({ loaded: true });
+        });
   }
   render() {
     if (this.state.loaded) {
