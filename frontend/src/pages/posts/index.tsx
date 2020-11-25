@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import { Favorite, FavoriteBorder, Share, Chat } from "@material-ui/icons";
 import { Skeleton } from "@material-ui/lab";
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, Link } from "react-router-dom";
 import { RootStyles as Styles } from "../../styles/post";
 import url_for from "../../utils/url_for";
 
@@ -64,7 +64,9 @@ class Post extends React.Component<Props> {
       });
   }
   load_stats() {
-    fetch(url_for("api.posts.stats") + "?uuid=" + this.props.match.params.postid)
+    fetch(
+      url_for("api.posts.stats") + "?uuid=" + this.props.match.params.postid
+    )
       .then((res) => {
         if (res.ok) return res.json();
         else
@@ -78,7 +80,46 @@ class Post extends React.Component<Props> {
         this.load_author();
       });
   }
-  load_author() {}
+  load_author() {
+    fetch(
+      url_for("api.posts.author") + "?uuid=" + this.props.match.params.postid
+    )
+      .then((res) => {
+        if (res.ok) return res.json();
+        else
+          throw Error(
+            `Server gave an invalid response code: ${res.status}. Reponse String: ${res.statusText}`
+          );
+      })
+      .catch((err) => {})
+      .then((json) => {
+        this.setState({
+          author: {
+            name: json.name,
+            username: json.username,
+            avatar: "",
+          },
+        });
+        // Preload the avatar image
+        let img = new Image();
+        let src =
+          url_for("api.storage.avatar") +
+          "?user=" +
+          json.username +
+          "&size=" +
+          128;
+        img.src = src;
+        img.onload = () => {
+          this.setState({
+            author: {
+              name: json.name,
+              username: json.username,
+              avatar: src,
+            },
+          });
+        };
+      });
+  }
   componentDidMount() {
     this.load_post();
   }
@@ -95,15 +136,33 @@ class Post extends React.Component<Props> {
         )}
         <Grid container className={classes.author}>
           <Grid item xs={5} sm={3}>
-            <Skeleton
-              animation="wave"
-              width="3em"
-              height="3em"
-              variant="circle"
-            />
+            {this.state.author && this.state.author.avatar !== "" ? (
+              <img
+                src={this.state.author.avatar}
+                className={classes.avatar}
+                alt={`${this.state.author.username}'s profile picture`}
+              />
+            ) : (
+              <Skeleton
+                animation="wave"
+                width="3em"
+                height="3em"
+                variant="circle"
+              />
+            )}
           </Grid>
           <Grid item xs={7} sm={9}>
-            <Skeleton animation="wave" height="1.3em" width="30vw" />
+            {this.state.author ? (
+              <Link className={classes.uname} to={url_for("views.user").replace(/:username$/, this.state.author.username)}>
+                {this.state.author.username +
+                  "  (" +
+                  this.state.author.name +
+                  ")"}
+              </Link>
+            ) : (
+              <Skeleton animation="wave" height="1.3em" width="30vw" />
+            )}
+            <br />
             {this.state.post ? (
               <span>{this.state.post.datetime}</span>
             ) : (
@@ -113,7 +172,10 @@ class Post extends React.Component<Props> {
         </Grid>
 
         {this.state.post ? (
-          <div dangerouslySetInnerHTML={{ __html: this.state.post.content }} className={classes.post}/>
+          <div
+            dangerouslySetInnerHTML={{ __html: this.state.post.content }}
+            className={classes.post}
+          />
         ) : (
           <div>
             <Skeleton animation="wave" width="90%" />
@@ -134,7 +196,9 @@ class Post extends React.Component<Props> {
             <Button className={classes.actionButton}>
               <span className={classes.actionsWrapper}>
                 <Chat />
-                <span>{this.state.stats ? this.state.stats.comments : "din"}</span>
+                <span>
+                  {this.state.stats ? this.state.stats.comments : "din"}
+                </span>
               </span>
             </Button>
           </Tooltip>
@@ -146,7 +210,9 @@ class Post extends React.Component<Props> {
             <Button className={classes.actionButton}>
               <span className={classes.actionsWrapper}>
                 <Share />
-                <span>{this.state.stats ? this.state.stats.shares : "g..."}</span>
+                <span>
+                  {this.state.stats ? this.state.stats.shares : "g..."}
+                </span>
               </span>
             </Button>
           </Tooltip>

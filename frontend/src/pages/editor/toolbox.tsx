@@ -22,7 +22,7 @@ import {
   CloudUpload,
   InsertLink,
   Code,
-  Highlight
+  Highlight,
 } from "@material-ui/icons";
 import { ToolBox as Styles } from "../../styles/editor";
 

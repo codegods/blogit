@@ -42,7 +42,7 @@ class UserContextProvider extends React.Component {
         credentials: "same-origin",
       }).then((res) => {
         if (!res.ok) {
-          reject({})
+          reject({});
           this.setState({
             username: "",
             avatarUrl: "",
@@ -50,7 +50,7 @@ class UserContextProvider extends React.Component {
           });
         } else {
           res.json().then((json) => {
-            resolve(json)
+            resolve(json);
             this.setState(json);
           });
         }

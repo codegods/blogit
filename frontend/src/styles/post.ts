@@ -36,6 +36,9 @@ export let RootStyles = (theme: Theme) => {
             "& a": {
                 textDecoration: "none",
                 color: theme.palette.secondary.main,
+                "&:hover": {
+                    textDecoration: "underline",
+                },
             },
             "& .markdown-mention:hover": {
                 textDecoration: "underline",
@@ -51,8 +54,21 @@ export let RootStyles = (theme: Theme) => {
             "& blockquote": {
                 marginLeft: 0,
                 borderLeft: "3px solid #aaa",
-                paddingLeft: theme.spacing(2)
-            }
-        }
+                paddingLeft: theme.spacing(2),
+            },
+        },
+        avatar: {
+            width: "3em",
+            height: "3em",
+            border: "1px solid grey",
+            borderRadius: "50%",
+        },
+        uname: {
+            textDecoration: "none",
+            color: "#222",
+            "&:hover": {
+                textDecoration: "underline",
+            },
+        },
     });
 };

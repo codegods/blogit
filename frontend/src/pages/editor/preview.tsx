@@ -39,7 +39,7 @@ class Preview extends React.Component<PreviewProps> {
       else {
         fetch(url_for("api.renderer"), {
           method: "POST",
-          body: JSON.stringify({heading, content: text}),
+          body: JSON.stringify({ heading, content: text }),
         })
           .then((res) => {
             res.text().then((content) => {
@@ -67,7 +67,8 @@ class Preview extends React.Component<PreviewProps> {
   render() {
     const { classes } = this.props;
     // Got an error
-    if (this.state.error) return <div className={classes.error}>{this.state.error}</div>;
+    if (this.state.error)
+      return <div className={classes.error}>{this.state.error}</div>;
     // Content to show
     else if (this.props.show)
       return (

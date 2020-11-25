@@ -101,3 +101,13 @@ def stats():
     if post is None or post == 0:
         return "Post not found", 404
     return post.get_stats()
+
+@blueprint.route(url_for("api.posts.author"))
+def author():
+    uuid = flask.request.args.get("uuid")
+    if uuid is None:
+        return "Bad Request", 400
+    post = app.sql.posts.get(uuid=uuid)
+    if post is None or post == 0:
+        return "Post not found", 404
+    return post.get_author()
