@@ -18,6 +18,8 @@ _url_database = {
     "api.uploader": "/api/uploader",
     "api.renderer": "/api/render",
     "api.user_info": "/api/user",
+    "api.storage.avatar": "/api/storage/avatar",
+    "api.storage.image": "/api/storage/image/<uuid>"
 }
 
 

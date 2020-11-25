@@ -21,14 +21,13 @@ sys.path.append(
 
 del sys, os
 
-import re
 import uuid
 from math import ceil
 from json import loads
 from typing import Tuple
 from flask.views import View
 from helpers.url_for import url_for
-from flask import request, make_response, Blueprint, current_app as app
+from flask import request, Blueprint, current_app as app
 
 # TODO: Implement user verification before allowing uploads
 
@@ -77,7 +76,7 @@ class FileUploader(View):
             store.delete(body["uuid"])
             return {
                 "success": True,
-                "url": re.sub("<[a-z:]+>", uid, url_for("storage")),
+                "url": uid
             }, 200
         except KeyError:
             return "400 - Bad Request", 400
@@ -95,17 +94,3 @@ blueprint = Blueprint(__name__, "api.uploader")
 blueprint.add_url_rule(
     url_for("api.uploader"), view_func=FileUploader.as_view("file_uploader")
 )
-
-
-@blueprint.route(url_for("storage"))
-def get_from_storage(uuid: str):
-    file = app.sql.storage.findByUUID(uuid)
-    if not file:
-        return "This file was not found on server", 404
-    response = make_response(file.get_bytes())
-    response.headers.set("Content-Type", file.get_mimetype())
-
-    # As files in storage are static assets, we ask the browser to
-    # cache all such files for a year to speed up subsequent requests.
-    response.headers.set("Cache-Control", "max-age=31536000")
-    return response
