@@ -102,6 +102,7 @@ def stats():
         return "Post not found", 404
     return post.get_stats()
 
+
 @blueprint.route(url_for("api.posts.author"))
 def author():
     uuid = flask.request.args.get("uuid")
@@ -111,3 +112,54 @@ def author():
     if post is None or post == 0:
         return "Post not found", 404
     return post.get_author()
+
+
+@blueprint.route(url_for("api.posts.liked_by_user"))
+@login_required(True)
+def has_user_liked():
+    uuid = flask.request.args.get("uuid")
+    if uuid is None:
+        return "Bad Request", 400
+    csr = app.sql.cursor()
+    csr.execute(
+        "select post from likes where likee=%s and post=%s", (flask.g.user.id, uuid)
+    )
+    try:
+        if csr.fetchone():
+            return "true"
+        return "false"
+    except Exception:
+        return "false"
+
+
+@blueprint.route(url_for("api.posts.like"))
+@login_required(True)
+def like():
+    uuid = flask.request.args.get("uuid")
+    if uuid is None:
+        return "Bad Request", 400
+    post = app.sql.posts.get(uuid=uuid)
+    if not post:
+        return "Post not found", 404
+    del post
+    csr = app.sql.cursor()
+    csr.execute(
+        "select post from likes where likee=%s and post=%s", (flask.g.user.id, uuid)
+    )
+    if csr.fetchone():
+        return "User has already liked this post", 400
+    else:
+        app.sql.autocommit("insert into likes values (%s, %s)", (flask.g.user.id, uuid))
+    return "liked"
+
+
+@blueprint.route(url_for("api.posts.share"))
+def share():
+    uuid = flask.request.args.get("uuid")
+    if uuid is None:
+        return "Bad Request", 400
+    post = app.sql.posts.get(uuid=uuid)
+    if not post:
+        return "Post not found", 404
+    app.sql.autocommit("update posts set share_count = %s where id=%s", (post.share_count + 1, post.id))
+    return "shared"

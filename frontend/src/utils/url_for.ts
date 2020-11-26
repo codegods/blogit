@@ -14,11 +14,13 @@ let _url_database: {
     "api.auth.signup.validate": "/api/auth/signup/validate/",
     "api.auth.login": "/api/auth/login",
 
-    "api.posts.create": "/api/post/create",
-    "api.posts.get": "/api/post",
-    "api.posts.stats": "/api/post/stats",
-    "api.posts.author": "/api/post/author",
-    "api.posts.like": "/api/post/like",
+    "api.posts.create": "/api/posts/create",
+    "api.posts.get": "/api/posts",
+    "api.posts.stats": "/api/posts/stats",
+    "api.posts.author": "/api/posts/author",
+    "api.posts.like": "/api/posts/like",
+    "api.posts.liked_by_user": "/api/posts/has-user-liked",
+    "api.posts.share": "/api/posts/share-count",
     "api.posts.get_comments": "/api/posts/comments",
     "api.posts.comment": "/api/posts/comment",
 

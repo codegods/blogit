@@ -47,6 +47,7 @@ class Post extends React.Component<Props> {
     this.load_author = this.load_author.bind(this);
     this.load_post = this.load_post.bind(this);
     this.load_stats = this.load_stats.bind(this);
+    this.hasUserLiked = this.hasUserLiked.bind(this);
   }
   load_post() {
     fetch(url_for("api.posts.get") + "?uuid=" + this.props.match.params.postid)
@@ -60,6 +61,7 @@ class Post extends React.Component<Props> {
       .catch((err) => {})
       .then((json) => {
         this.setState({ post: json });
+        document.title = `${json.title} - Blogit`;
         this.load_stats();
       });
   }
@@ -100,6 +102,7 @@ class Post extends React.Component<Props> {
             avatar: "",
           },
         });
+        this.hasUserLiked();
         // Preload the avatar image
         let img = new Image();
         let src =
@@ -118,6 +121,24 @@ class Post extends React.Component<Props> {
             },
           });
         };
+      });
+  }
+  hasUserLiked() {
+    fetch(
+      url_for("api.posts.liked_by_user") +
+        "?uuid=" +
+        this.props.match.params.postid
+    )
+      .then((res) => {
+        if (res.ok) return res.text();
+        else
+          throw Error(
+            `Server gave an invalid response code: ${res.status}. Reponse String: ${res.statusText}`
+          );
+      })
+      .catch((err) => {})
+      .then((res) => {
+        this.setState({ liked_by_user: res === "true" });
       });
   }
   componentDidMount() {
@@ -140,7 +161,7 @@ class Post extends React.Component<Props> {
               <img
                 src={this.state.author.avatar}
                 className={classes.avatar}
-                alt={`${this.state.author.username}'s profile picture`}
+                alt={`${this.state.author.username}'s profile avatar`}
               />
             ) : (
               <Skeleton
@@ -153,7 +174,13 @@ class Post extends React.Component<Props> {
           </Grid>
           <Grid item xs={7} sm={9}>
             {this.state.author ? (
-              <Link className={classes.uname} to={url_for("views.user").replace(/:username$/, this.state.author.username)}>
+              <Link
+                className={classes.uname}
+                to={url_for("views.user").replace(
+                  /:username$/,
+                  this.state.author.username
+                )}
+              >
                 {this.state.author.username +
                   "  (" +
                   this.state.author.name +
@@ -184,8 +211,43 @@ class Post extends React.Component<Props> {
         )}
 
         <div className={classes.actions}>
-          <Tooltip title="Like">
-            <Button className={classes.actionButton}>
+          <Tooltip
+            title={this.state.liked_by_user ? "You've liked this post" : "Like"}
+          >
+            <Button
+              className={classes.actionButton}
+              onClick={() => {
+                this.state.stats &&
+                  fetch(
+                    url_for("api.posts.like") +
+                      "?uuid=" +
+                      this.props.match.params.postid
+                  ).then((res) => {
+                    if (res.ok) {
+                      let stats = this.state.stats;
+                      stats!.likes += 1;
+                      this.setState({
+                        stats,
+                        liked_by_user: true,
+                      });
+                    } else {
+                      switch (res.status) {
+                        case 400:
+                          alert("You've already liked this post");
+                          break;
+                        case 403:
+                          alert("Please login to like.");
+                          break;
+                        default:
+                          alert(
+                            `Failed to like because: ${res.status} ${res.statusText}`
+                          );
+                          break;
+                      }
+                    }
+                  });
+              }}
+            >
               <span className={classes.actionsWrapper}>
                 {this.state.liked_by_user ? <Favorite /> : <FavoriteBorder />}
                 <span>{this.state.stats ? this.state.stats.likes : "Loa"}</span>
@@ -202,12 +264,47 @@ class Post extends React.Component<Props> {
               </span>
             </Button>
           </Tooltip>
-          <Tooltip
-            title={
-              navigator.share ? "Share" : "Your device doesn't support sharing"
-            }
-          >
-            <Button className={classes.actionButton}>
+          <Tooltip title="Share">
+            <Button
+              className={classes.actionButton}
+              onClick={() => {
+                new Promise((res, rej) => {
+                  if (navigator.share)
+                    navigator
+                      .share({
+                        url: window.location.href,
+                        text: "Read this amazing post on blogit now!!",
+                        title: this.state.post ? this.state.post.title : "",
+                      })
+                      .then(() => res());
+                  else {
+                    navigator.clipboard
+                      .writeText(
+                        `${
+                          this.state.post ? this.state.post.title : ""
+                        }\nRead this amazing post on blogit now!!\n${
+                          window.location.href
+                        }`
+                      )
+                      .then(() => {
+                        alert(
+                          "Your device doesn't seem to support sharing.\nSo, we copied it to your clipboard!"
+                        );
+                        res();
+                      });
+                  }
+                }).then(() => {
+                  fetch(
+                    url_for("api.posts.share") +
+                      `?uuid=${this.props.match.params.postid}`
+                  ).then((res) => {
+                    let stats = this.state.stats;
+                    stats!.shares += 1;
+                    this.setState({ stats });
+                  });
+                });
+              }}
+            >
               <span className={classes.actionsWrapper}>
                 <Share />
                 <span>
