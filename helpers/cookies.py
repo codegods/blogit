@@ -1,7 +1,8 @@
 import flask
-from urllib.parse import quote
+import functools
 from .url_for import url_for
 from typing import Any, Union
+from urllib.parse import quote
 from itsdangerous.url_safe import URLSafeSerializer
 from itsdangerous.exc import BadData, BadSignature
 
@@ -48,6 +49,7 @@ def login_required(user_needed=False):
     """
 
     def wrapper(view):
+        @functools.wraps(view)
         def real_wrapper(*args, **kwargs):
             user_id = retrieve_cookie("l_id")
             is_authenticated = False
