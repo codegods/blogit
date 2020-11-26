@@ -1,12 +1,12 @@
 # Getting set up
 
-Once you have obtained a local copy of the source code, you will have to so some setup to get running. Although we have tried to keep setting up as simple as possible, but let's face it, it can sometimes be a little tricky for beginners to get running. So, here are the steps you should follow to run the app.
+Once you have obtained a local copy of the source code, you will have to do some setup to get running. Although we have tried to keep setting up as simple as possible, but let's face it, it can sometimes be a little tricky for beginners to get running. So, here are the steps you should follow to run the app.
 
 ## Step 1: Download NodeJS and Python
 
 If you haven't already then, you should first download a recent version of NodeJS ([Download](https://nodejs.org/en/download/)) and Python 3.6+ ([Download](https://www.python.org/downloads/)).
 Next, it is preferred to download the yarn package manager but npm will also do.
-Check you installations with the following commands:
+Check your installations with the following commands:
 
     $ node --version
     v12.18.3
@@ -76,7 +76,7 @@ Create a new file and enter the following details in it:
 }
 ```
 
-Set `MYSQL_PASSWORD` field to your mysql password and `FLASK_SECRET_KEY` should be a randomly generated cryptographically secure key with a minimum length of 16. To generate a good and random secret key use the following program:
+Set `MYSQL_PASSWORD` field to your mysql password and `FLASK_SECRET_KEY` should be a randomly generated, cryptographically secure key with a minimum length of 16. To generate a good and random secret key use the following program:
 
 ```python
 import secrets
@@ -104,7 +104,7 @@ The next step is to make the database ready for use. And there's a long list of 
 
     $ python -m scripts.init_db
 
-And, it will create the database all the tables with right structures for you.
+And, it will create the database along with all the tables with right structures for you.
 
 <ins>**Note**</ins> Before running the script, please make sure that your MySQL server doesn't has any database with the name `blogit`. Because if it does, then the above script will exit without doing anything.
 
@@ -141,7 +141,7 @@ This script will load the config and act accordingly. With the default config, y
     [15:56:38.917475] [WARNING] werkzeug:  * Debugger is active!
     [15:56:38.928997] [INFO] werkzeug:  * Debugger PIN: 943-047-095
 
-along with a new terminal window that will automatically start the `Webpack Dev Server` for you along with proper proxy settings in place. 
+...along with a new terminal window that will automatically start the `Webpack Dev Server` for you along with proper proxy settings in place. 
 Please note that this feature is not available in all operating systems. Windows works fine and Linux/Unix distros with `gnome-terminal` or `x-terminal-emulator` should work fine.
 
 Just make the changes and both the servers will reload automatically!
@@ -156,9 +156,9 @@ The recommended way to run blogit in production mode is to use `gunicorn` along 
 
 You can change the number of workers as per your needs ( and CPU cores ).
 
-#### The other way
+#### The not so good way
 
-The above way is the most effecient one to run the app. However, both `gunicorn` and `meinheld` are unix only. They won't work on Windows.
+The above way is the most efficient one to run the app. However, both `gunicorn` and `meinheld` are unix only. They won't work on Windows.
 `gevent` can help us there. `gevent` wasn't made for this specific purpose, so this should be seen as a workaround rather than a feature.
 You shouldn't be using this for serving in production in the real world.
 
