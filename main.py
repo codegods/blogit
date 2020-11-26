@@ -80,18 +80,35 @@ def run_development_server(config: object, mysql: object) -> NoReturn:
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
     app = create_app(config, mysql)
-    from meinheld import server
+    if sys.platform == "windows":
+        from gevent.pywsgi import WSGIServer
 
-    server.listen(
-        (config.HOST, int(config.PORT)),
-    )
-    try:
-        logger.info(
-            "Starting server on {}://{}:{}".format("http", config.HOST, config.PORT)
+        server = WSGIServer((config.HOST, int(config.PORT)), app)
+        try:
+            logger.info(
+                "Starting server on {}://{}:{}".format("http", config.HOST, config.PORT)
+            )
+            server.serve_forever()
+        except KeyboardInterrupt:
+            logger.info("Server shutting down...")
+    else:
+        from meinheld import server
+
+        logger.warning(
+            "This is not the recommended way to go with on non-windows systems. "
+            "Please use gunicorn instead"
         )
-        server.run(app)
-    except KeyboardInterrupt:
-        logger.info("Server shutting down...")
+
+        server.listen(
+            (config.HOST, int(config.PORT)),
+        )
+        try:
+            logger.info(
+                "Starting server on {}://{}:{}".format("http", config.HOST, config.PORT)
+            )
+            server.run(app)
+        except KeyboardInterrupt:
+            logger.info("Server shutting down...")
 
 
 def deserialize(encoded: str) -> object:
@@ -109,10 +126,11 @@ def main() -> NoReturn:
     global logger
     if "--log-file" in sys.argv:
         formatter.init(PROJECT_ROOT, sys.argv[sys.argv.index("--log-file") + 1])
-    logger = logging.getLogger("server")
 
     if "--flask-config" not in sys.argv or "--mysql-config" not in sys.argv:
         logger.error("Flask and mysql config are not specified in commandline.")
+
+    logger = logging.getLogger("server")
 
     flask_config = deserialize(sys.argv[sys.argv.index("--flask-config") + 1])
     mysql_config = deserialize(sys.argv[sys.argv.index("--mysql-config") + 1])
@@ -133,3 +151,6 @@ if __name__ == "__main__":
     init()
 
     main()
+
+# Code shouldn't reach here if it is being run as a script
+logger: logging.Logger = logging.getLogger("server")

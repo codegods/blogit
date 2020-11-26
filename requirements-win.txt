@@ -1,7 +1,6 @@
 flask
 bcrypt
+gevent
 pillow
 markdown
-meinheld
-gunicorn
 mysql-connector-python

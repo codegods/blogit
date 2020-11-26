@@ -3,7 +3,6 @@ import hashlib
 import datetime
 from dataclasses import dataclass
 from flask import current_app as app, has_request_context
-from mysql.connector import cursor
 
 
 @dataclass
@@ -46,7 +45,7 @@ class Model:
             (self.id,),
         )
         return csr.fetchone()
-    
+
     def get_author(self):
         csr = app.sql.cursor(dictionary=True)
         csr.execute(
