@@ -74,10 +74,7 @@ class FileUploader(View):
 
             # Frees the cache
             store.delete(body["uuid"])
-            return {
-                "success": True,
-                "url": uid
-            }, 200
+            return {"success": True, "url": uid}, 200
         except KeyError:
             return "400 - Bad Request", 400
 
