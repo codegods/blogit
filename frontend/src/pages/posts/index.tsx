@@ -6,10 +6,11 @@ import {
   Button,
   Tooltip,
 } from "@material-ui/core";
-import { Favorite, FavoriteBorder, Share, Chat } from "@material-ui/icons";
+import { Favorite, FavoriteBorder, Share } from "@material-ui/icons";
 import { Skeleton } from "@material-ui/lab";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { RootStyles as Styles } from "../../styles/post";
+import Comments from "./comment-box";
 import url_for from "../../utils/url_for";
 
 type Props = RouteComponentProps<{
@@ -214,6 +215,7 @@ class Post extends React.Component<Props> {
           <Tooltip
             title={this.state.liked_by_user ? "You've liked this post" : "Like"}
           >
+            <span>
             <Button
               className={classes.actionButton}
               onClick={() => {
@@ -253,18 +255,18 @@ class Post extends React.Component<Props> {
                 <span>{this.state.stats ? this.state.stats.likes : "Loa"}</span>
               </span>
             </Button>
+            </span>
           </Tooltip>
-          <Tooltip title="Comments">
-            <Button className={classes.actionButton}>
-              <span className={classes.actionsWrapper}>
-                <Chat />
-                <span>
-                  {this.state.stats ? this.state.stats.comments : "din"}
-                </span>
-              </span>
-            </Button>
-          </Tooltip>
+            <Comments
+              classes={{
+                actionWrapper: classes.actionsWrapper,
+                actionButton: classes.actionButton,
+              }}
+              comments={this.state.stats && this.state.stats.comments}
+              uuid={this.props.match.params.postid}
+            />
           <Tooltip title="Share">
+            <span>
             <Button
               className={classes.actionButton}
               onClick={() => {
@@ -312,6 +314,7 @@ class Post extends React.Component<Props> {
                 </span>
               </span>
             </Button>
+            </span>
           </Tooltip>
         </div>
       </div>

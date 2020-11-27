@@ -72,3 +72,29 @@ export let RootStyles = (theme: Theme) => {
         },
     });
 };
+
+export let CommentBox = (theme: Theme) =>
+    createStyles({
+        root: {
+            minWidth: "60vw",
+        },
+        title: {
+            borderBottom: "1px solid rgba(100, 100, 100, 0.5)"
+        },
+        actions: {
+            padding: `${theme.spacing(1)}px ${theme.spacing(
+                3
+            )}px ${theme.spacing(2)}px ${theme.spacing(3)}px`,
+            borderTop: "1px solid rgba(100, 100, 100, 0.5)"
+        },
+        no_user: {
+            "& a": {
+                color: theme.palette.primary.dark,
+                textDecoration: "none",
+            },
+            "& a:hover": {
+                textDecoration: "underline"
+            },
+            background: "rgba(100, 100, 100, 0.3)"
+        }
+    });
