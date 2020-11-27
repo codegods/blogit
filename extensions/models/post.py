@@ -20,14 +20,13 @@ class Model:
     # TODO Untested method
     def like(self, username: str):
         csr = app.sql.cursor()
-        csr.execute("select from likes where likee=%s and post=%s", (username, self.id))
-        try:
-            csr.fetchone()
+        csr.execute("select post from likes where likee=%s and post=%s", (username, self.id))
+        if csr.fetchone():
             raise ValueError("User has alreay liked the post")
-        except Exception:
-            return app.sql.autocommit(
-                "insert into likes values (%s, %s)", (username, self.id)
-            )
+        
+        return app.sql.autocommit(
+            "insert into likes values (%s, %s)", (username, self.id)
+        )
 
     def get_stats(self):
         csr = app.sql.cursor(dictionary=True)

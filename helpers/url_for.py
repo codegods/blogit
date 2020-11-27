@@ -18,6 +18,7 @@ _url_database = {
     "api.posts.share": "/api/posts/share-count",
     "api.posts.get_comments": "/api/posts/comments",
     "api.posts.comment": "/api/posts/comment",
+    "api.posts.get_comment_by_id": "/api/posts/get-comment-by-id",
     "api.uploader": "/api/uploader",
     "api.renderer": "/api/render",
     "api.user_info": "/api/user",

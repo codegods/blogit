@@ -75,9 +75,6 @@ export let RootStyles = (theme: Theme) => {
 
 export let CommentBox = (theme: Theme) =>
     createStyles({
-        root: {
-            minWidth: "60vw",
-        },
         title: {
             borderBottom: "1px solid rgba(100, 100, 100, 0.5)"
         },
@@ -96,5 +93,18 @@ export let CommentBox = (theme: Theme) =>
                 textDecoration: "underline"
             },
             background: "rgba(100, 100, 100, 0.3)"
+        },
+        action: {
+            width: "100%",
+            display: "flex"
+        },
+        textfield: {
+            flexGrow: 1
         }
     });
+
+export let Comment = (theme: Theme) => createStyles({
+    root: {
+        margin: `${theme.spacing(1)}px 0`
+    }
+})
