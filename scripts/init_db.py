@@ -47,7 +47,6 @@ class Execute:
                 "bio varchar(500)",
                 "avatarurl char(64)",
                 "PRIMARY KEY(id)",
-                "FOREIGN KEY(avatarurl) REFERENCES storage(id)",
                 "UNIQUE (Username)",
                 "UNIQUE (Email)",
             ],
