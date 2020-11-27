@@ -10,6 +10,7 @@ import {
   Button,
   Tooltip,
   IconButton,
+  Grid,
 } from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
 import { Send, Chat } from "@material-ui/icons";
@@ -40,7 +41,6 @@ interface CommentProps extends WithStyles<typeof Styles> {
 
 class _Comment extends React.Component<CommentProps> {
   state: {
-    loaded: boolean;
     author: {
       username: string;
       avatar: string;
@@ -50,14 +50,69 @@ class _Comment extends React.Component<CommentProps> {
   constructor(props: CommentProps) {
     super(props);
     this.state = {
-      loaded: false,
       author: null,
       content: null,
     };
   }
+  componentDidMount() {
+    fetch(
+      url_for("api.posts.get_comment_by_id") + "?uuid=" + this.props.uuid
+    ).then((res) => {
+      if (res.ok) {
+        res.json().then((cmt) => {
+          this.setState({
+            content: cmt.content,
+            author: {
+              username: cmt.username,
+              avatar: "",
+            },
+          });
+          let img = new Image();
+          let src =
+            url_for("api.storage.avatar") +
+            "?user=" +
+            cmt.username +
+            "&size=" +
+            128;
+          img.src = src;
+          img.onload = () => {
+            this.setState({
+              author: {
+                username: cmt.username,
+                avatar: src,
+              },
+            });
+          };
+        });
+      }
+    });
+  }
   render() {
-    if (this.state.loaded) return <div>Loaded</div>;
-    return <Skeleton variant="circle" />;
+    return (
+      <div>
+        <Grid container>
+          <Grid item xs={3}>
+            {this.state.author ? (
+              <img src={this.state.author.avatar} />
+            ) : (
+              <Skeleton variant="circle" width="3em" height="3em" />
+            )}
+          </Grid>
+          <Grid item xs={9}>
+            {this.state.author ? (
+              <span>{this.state.author.username}</span>
+            ) : (
+              <Skeleton width="50%" />
+            )}
+            {this.state.content ? (
+              <span>{this.state.content}</span>
+            ) : (
+              <Skeleton width="100%" />
+            )}
+          </Grid>
+        </Grid>
+      </div>
+    );
   }
 }
 
@@ -65,7 +120,6 @@ class _CommentBox extends React.Component<CommentBoxProps> {
   state: {
     comments: string[];
     loaded: boolean;
-    more_available: boolean;
     error: string;
   };
   constructor(props: CommentBoxProps) {
@@ -73,14 +127,12 @@ class _CommentBox extends React.Component<CommentBoxProps> {
     this.state = {
       comments: [],
       loaded: false,
-      more_available: false,
       error: "",
     };
   }
   componentDidMount() {
     fetch(
-      url_for("api.posts.get_comments") +
-        `?uuid=${this.props.uuid}&from=0&to=10`
+      url_for("api.posts.get_comments") + `?uuid=${this.props.uuid}&from=0`
     ).then((res) => {
       if (!res.ok) {
         res.text().then((txt) => {
@@ -89,8 +141,8 @@ class _CommentBox extends React.Component<CommentBoxProps> {
           });
         });
       } else {
-        return res.json().then((comments) => {
-          this.setState({ comments, loaded: true });
+        res.json().then((comments) => {
+          this.setState({ comments: comments.comments, loaded: true });
         });
       }
     });
@@ -98,11 +150,7 @@ class _CommentBox extends React.Component<CommentBoxProps> {
   render() {
     const { classes } = this.props;
     return (
-      <Dialog
-        className={classes.root}
-        open={this.props.show}
-        onClose={this.props.onClose}
-      >
+      <Dialog open={this.props.show} onClose={this.props.onClose}>
         <DialogTitle className={classes.title}>Comments</DialogTitle>
         <DialogContent>
           {this.state.loaded ? (
@@ -113,13 +161,25 @@ class _CommentBox extends React.Component<CommentBoxProps> {
             <Skeleton />
           )}
           {this.state.loaded &&
-            (this.state.more_available ? (
-              <Button size="small">Load More</Button>
+            (this.state.comments.length ? (
+              this.state.comments.length % 10 === 0 ? (
+                <Button size="small" variant="contained">
+                  Load More
+                </Button>
+              ) : (
+                <i>No more comments</i>
+              )
             ) : (
-              <i>No more comments</i>
+              <i>Be the first one to add a comment</i>
             ))}
         </DialogContent>
-        <DialogActions className={this.props.context.username !== "" ?classes.actions : classes.no_user}>
+        <DialogActions
+          className={
+            this.props.context.username !== ""
+              ? classes.actions
+              : classes.no_user
+          }
+        >
           {this.props.context.username === "" ? (
             <div>
               <Link
@@ -144,8 +204,11 @@ class _CommentBox extends React.Component<CommentBoxProps> {
               to post a comment
             </div>
           ) : (
-            <div>
-              <TextField label="Add a Comment..." />
+            <div className={classes.action}>
+              <TextField
+                className={classes.textfield}
+                label="Add a Comment..."
+              />
               <IconButton>
                 <Send />
               </IconButton>

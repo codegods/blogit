@@ -65,6 +65,7 @@ class Execute:
                 "author char(64) NOT NULL",
                 "post char(64) NOT NULL",
                 "content varchar(1024) NOT NULL",
+                "date_posted datetime",
                 "PRIMARY KEY (id)",
                 "FOREIGN KEY (author) REFERENCES users(id)",
                 "FOREIGN KEY (post) REFERENCES posts(id)",

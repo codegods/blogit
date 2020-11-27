@@ -161,5 +161,45 @@ def share():
     post = app.sql.posts.get(uuid=uuid)
     if not post:
         return "Post not found", 404
-    app.sql.autocommit("update posts set share_count = %s where id=%s", (post.share_count + 1, post.id))
+    app.sql.autocommit(
+        "update posts set share_count = %s where id=%s", (post.share_count + 1, post.id)
+    )
     return "shared"
+
+
+@blueprint.route(url_for("api.posts.get_comments"))
+def get_comments():
+    uuid = flask.request.args.get("uuid")
+    fro = flask.request.args.get("from")
+    if any([p is None for p in [uuid, fro]]):
+        return "Bad Request", 400
+    if not (fro.isdigit()):
+        return "Bad request", 400
+    csr = app.sql.cursor()
+    csr.execute(
+        "select id from comments where post=%s order by date_posted desc limit 10 offset %s", (uuid, int(fro))
+    )
+    return {"comments": csr.fetchall()}
+
+
+@blueprint.route(url_for("api.posts.get_comment_by_id"))
+def get_comment_by_id():
+    uuid = flask.request.args.get("uuid")
+    if uuid is None:
+        return "Bad Request", 400
+    csr = app.sql.cursor(dictionary=True)
+    csr.execute(
+        "select "
+        "users.username as 'username', "
+        "users.avatarurl as 'avatar', "
+        "comments.content as 'content' "
+        "from comments "
+        "inner join users "
+        "on comments.author = users.id "
+        "where comments.id=%s",
+        (uuid, )
+    )
+    res = csr.fetchone() 
+    if res:
+        return res
+    return "Comment not found", 404
