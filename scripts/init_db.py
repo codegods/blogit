@@ -105,7 +105,7 @@ class Execute:
             self._connection.commit()
 
         self._connection.cursor().execute(
-            "use {}".format(self._connection.converter.escape(self._db))
+            f"use {self._db}"
         )
 
         # Create all required tables
@@ -135,7 +135,7 @@ class Execute:
         cursor.execute("show databases;")
         result = cursor.fetchall()
         for dbs in result:
-            if db == dbs["Database"].decode("utf-8"):
+            if db == dbs["Database"]:
                 return True
         return False
 
@@ -146,7 +146,7 @@ class Execute:
         cursor.execute("show tables;")
         result = cursor.fetchall()
         for tables in result:
-            if table == tables["Tables_in_blogit"].decode("utf-8"):
+            if table == tables["Tables_in_blogit"]:
                 return True
         return False
 
