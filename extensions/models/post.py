@@ -32,8 +32,8 @@ class Model:
         csr = app.sql.cursor(dictionary=True)
         csr.execute(
             "SELECT "
-            "COUNT(likes.likee) AS 'likes', "
-            "COUNT(comments.id) AS 'comments', "
+            "COUNT( DISTINCT likes.likee) AS 'likes', "
+            "COUNT( DISTINCT comments.id) AS 'comments', "
             "posts.share_count AS 'shares' "
             "FROM ("
             "(posts LEFT JOIN likes ON posts.id=likes.post) "
