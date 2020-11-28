@@ -53,18 +53,18 @@ class Post extends React.Component<Props> {
   load_post() {
     fetch(url_for("api.posts.get") + "?uuid=" + this.props.match.params.postid)
       .then((res) => {
-        if (res.ok) return res.json();
+        if (res.ok)
+          res.json().then((json) => {
+            this.setState({ post: json });
+            document.title = `${json.title} - Blogit`;
+            this.load_stats();
+          });
         else
           throw Error(
             `Server gave an invalid response code: ${res.status}. Reponse String: ${res.statusText}`
           );
       })
-      .catch((err) => {})
-      .then((json) => {
-        this.setState({ post: json });
-        document.title = `${json.title} - Blogit`;
-        this.load_stats();
-      });
+      .catch((err) => {});
   }
   load_stats() {
     fetch(
@@ -216,104 +216,106 @@ class Post extends React.Component<Props> {
             title={this.state.liked_by_user ? "You've liked this post" : "Like"}
           >
             <span>
-            <Button
-              className={classes.actionButton}
-              onClick={() => {
-                this.state.stats &&
-                  fetch(
-                    url_for("api.posts.like") +
-                      "?uuid=" +
-                      this.props.match.params.postid
-                  ).then((res) => {
-                    if (res.ok) {
-                      let stats = this.state.stats;
-                      stats!.likes += 1;
-                      this.setState({
-                        stats,
-                        liked_by_user: true,
-                      });
-                    } else {
-                      switch (res.status) {
-                        case 400:
-                          alert("You've already liked this post");
-                          break;
-                        case 403:
-                          alert("Please login to like.");
-                          break;
-                        default:
-                          alert(
-                            `Failed to like because: ${res.status} ${res.statusText}`
-                          );
-                          break;
+              <Button
+                className={classes.actionButton}
+                onClick={() => {
+                  this.state.stats &&
+                    fetch(
+                      url_for("api.posts.like") +
+                        "?uuid=" +
+                        this.props.match.params.postid
+                    ).then((res) => {
+                      if (res.ok) {
+                        let stats = this.state.stats;
+                        stats!.likes += 1;
+                        this.setState({
+                          stats,
+                          liked_by_user: true,
+                        });
+                      } else {
+                        switch (res.status) {
+                          case 400:
+                            alert("You've already liked this post");
+                            break;
+                          case 403:
+                            alert("Please login to like.");
+                            break;
+                          default:
+                            alert(
+                              `Failed to like because: ${res.status} ${res.statusText}`
+                            );
+                            break;
+                        }
                       }
-                    }
-                  });
-              }}
-            >
-              <span className={classes.actionsWrapper}>
-                {this.state.liked_by_user ? <Favorite /> : <FavoriteBorder />}
-                <span>{this.state.stats ? this.state.stats.likes : "Loa"}</span>
-              </span>
-            </Button>
+                    });
+                }}
+              >
+                <span className={classes.actionsWrapper}>
+                  {this.state.liked_by_user ? <Favorite /> : <FavoriteBorder />}
+                  <span>
+                    {this.state.stats ? this.state.stats.likes : "Loa"}
+                  </span>
+                </span>
+              </Button>
             </span>
           </Tooltip>
-            <Comments
-              classes={{
-                actionWrapper: classes.actionsWrapper,
-                actionButton: classes.actionButton,
-              }}
-              comments={this.state.stats && this.state.stats.comments}
-              uuid={this.props.match.params.postid}
-            />
+          <Comments
+            classes={{
+              actionWrapper: classes.actionsWrapper,
+              actionButton: classes.actionButton,
+            }}
+            comments={this.state.stats && this.state.stats.comments}
+            uuid={this.props.match.params.postid}
+          />
           <Tooltip title="Share">
             <span>
-            <Button
-              className={classes.actionButton}
-              onClick={() => {
-                new Promise((res, rej) => {
-                  if (navigator.share)
-                    navigator
-                      .share({
-                        url: window.location.href,
-                        text: "Read this amazing post on blogit now!!",
-                        title: this.state.post ? this.state.post.title : "",
-                      })
-                      .then(() => res());
-                  else {
-                    navigator.clipboard
-                      .writeText(
-                        `${
-                          this.state.post ? this.state.post.title : ""
-                        }\nRead this amazing post on blogit now!!\n${
-                          window.location.href
-                        }`
-                      )
-                      .then(() => {
-                        alert(
-                          "Your device doesn't seem to support sharing.\nSo, we copied it to your clipboard!"
-                        );
-                        res();
-                      });
-                  }
-                }).then(() => {
-                  fetch(
-                    url_for("api.posts.share") +
-                      `?uuid=${this.props.match.params.postid}`
-                  ).then((res) => {
-                    let stats = this.state.stats;
-                    stats!.shares += 1;
-                    this.setState({ stats });
+              <Button
+                className={classes.actionButton}
+                onClick={() => {
+                  new Promise((res, rej) => {
+                    if (navigator.share)
+                      navigator
+                        .share({
+                          url: window.location.href,
+                          text: "Read this amazing post on blogit now!!",
+                          title: this.state.post ? this.state.post.title : "",
+                        })
+                        .then(() => res());
+                    else {
+                      navigator.clipboard
+                        .writeText(
+                          `${
+                            this.state.post ? this.state.post.title : ""
+                          }\nRead this amazing post on blogit now!!\n${
+                            window.location.href
+                          }`
+                        )
+                        .then(() => {
+                          alert(
+                            "Your device doesn't seem to support sharing.\nSo, we copied it to your clipboard!"
+                          );
+                          res();
+                        });
+                    }
+                  }).then(() => {
+                    fetch(
+                      url_for("api.posts.share") +
+                        `?uuid=${this.props.match.params.postid}`
+                    ).then((res) => {
+                      let stats = this.state.stats;
+                      stats!.shares += 1;
+                      this.setState({ stats });
+                    });
                   });
-                });
-              }}
-            >
-              <span className={classes.actionsWrapper}>
-                <Share />
-                <span>
-                  {this.state.stats ? this.state.stats.shares : "g..."}
+                }}
+              >
+                <span className={classes.actionsWrapper}>
+                  <Share />
+                  <span>
+                    {this.state.stats ? this.state.stats.shares : "g..."}
+                  </span>
                 </span>
-              </span>
-            </Button>
+              </Button>
             </span>
           </Tooltip>
         </div>
