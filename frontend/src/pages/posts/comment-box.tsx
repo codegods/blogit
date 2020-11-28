@@ -16,7 +16,7 @@ import { Skeleton } from "@material-ui/lab";
 import { Send, Chat } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import url_for from "../../utils/url_for";
-import { CommentBox as Styles } from "../../styles/post";
+import { CommentBox as Styles, Comment as CStyles } from "../../styles/post";
 import { UserContextType, withUserContext } from "../../utils/UserContext";
 
 type CommentBoxProps = WithStyles<typeof Styles> & {
@@ -35,7 +35,7 @@ type CommentButtonProps = {
   uuid: string;
 };
 
-interface CommentProps extends WithStyles<typeof Styles> {
+interface CommentProps extends WithStyles<typeof CStyles> {
   uuid: string;
 }
 
@@ -88,24 +88,25 @@ class _Comment extends React.Component<CommentProps> {
     });
   }
   render() {
+    const { classes } = this.props;
     return (
       <div>
-        <Grid container>
+        <Grid container className={classes.root}>
           <Grid item xs={3}>
             {this.state.author ? (
-              <img src={this.state.author.avatar} />
+              <img className={classes.img} src={this.state.author.avatar} alt={this.state.author.username + "'s avatar"} />
             ) : (
               <Skeleton variant="circle" width="3em" height="3em" />
             )}
           </Grid>
           <Grid item xs={9}>
             {this.state.author ? (
-              <span>{this.state.author.username}</span>
+              <Link className={classes.uname} to={url_for("views.user").replace(/:[a-z]+/, this.state.author.username)}>{this.state.author.username}</Link>
             ) : (
               <Skeleton width="50%" />
             )}
             {this.state.content ? (
-              <span>{this.state.content}</span>
+              <div>{this.state.content}</div>
             ) : (
               <Skeleton width="100%" />
             )}
@@ -129,6 +130,7 @@ class _CommentBox extends React.Component<CommentBoxProps> {
       loaded: false,
       error: "",
     };
+    this.postComment = this.postComment.bind(this);
   }
   componentDidMount() {
     fetch(
@@ -146,6 +148,27 @@ class _CommentBox extends React.Component<CommentBoxProps> {
         });
       }
     });
+  }
+  postComment(){
+    let comment =  (document.getElementById("comment-box-create") as HTMLInputElement).value;
+    if (comment)
+      fetch(url_for("api.posts.comment"), {
+        method: "POST",
+        body: JSON.stringify({
+          uuid: this.props.uuid,
+          comment
+        })
+      }).then(res => {
+        if (res.ok)
+          res.text().then(txt => {
+            this.setState({ comments: this.state.comments.concat(txt)});
+            (document.getElementById("comment-box-create") as HTMLInputElement).value = "";
+          })
+        else
+          alert(`Could not post comment. Error: ${res.status} ${res.statusText}`)
+      })
+    else
+      alert("Please enter something to post it!")
   }
   render() {
     const { classes } = this.props;
@@ -208,8 +231,9 @@ class _CommentBox extends React.Component<CommentBoxProps> {
               <TextField
                 className={classes.textfield}
                 label="Add a Comment..."
+                id="comment-box-create"
               />
-              <IconButton>
+              <IconButton onClick={() => this.postComment()}>
                 <Send />
               </IconButton>
             </div>
@@ -252,6 +276,6 @@ class CommentButton extends React.Component<CommentButtonProps> {
 }
 
 const CommentBox = withStyles(Styles)(withUserContext(_CommentBox));
-const Comment = withStyles(Styles)(_Comment);
+const Comment = withStyles(CStyles)(_Comment);
 
 export default CommentButton;

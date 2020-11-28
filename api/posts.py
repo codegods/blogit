@@ -203,3 +203,24 @@ def get_comment_by_id():
     if res:
         return res
     return "Comment not found", 404
+
+@blueprint.route(url_for("api.posts.comment"), methods=["POST"])
+@login_required(True)
+def post_a_comment():
+    try:
+        body: dict = json.loads(flask.request.get_data())
+    except json.JSONDecodeError:
+        return "Bad encoding", 400
+    
+    if any([prop not in body for prop in ["uuid", "comment"]]):
+        return "Req params not specified", 400
+    
+    if not app.sql.posts.get(uuid=body.get("uuid")):
+        return "Non-existent post", 400
+    
+    try:
+        uuid = app.sql.comments.create(body["comment"], flask.g.user.id, body["uuid"])
+        return uuid
+    except Exception:
+        app.logger.exception("Error while creating comment: "), 500
+

@@ -106,5 +106,18 @@ export let CommentBox = (theme: Theme) =>
 export let Comment = (theme: Theme) => createStyles({
     root: {
         margin: `${theme.spacing(1)}px 0`
+    },
+    img: {
+        width: "3em",
+        height: "3em",
+        borderRadius: "50%"
+    },
+    uname: {
+        textDecoration: "none",
+        fontWeight: 700,
+        color: "#222",
+        "&:hover": {
+            textDecoration: "underline"
+        }
     }
 })
