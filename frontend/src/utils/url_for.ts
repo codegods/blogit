@@ -7,6 +7,7 @@ let _url_database: {
     "views.user": "/u/:username",
     "views.tags": "/t/:tagname",
     "views.posts": "/p/:postid",
+    "views.explore": "/explore",
 
     "views.auth.login": "/auth/login",
     "views.auth.signup": "/auth/signup",
