@@ -148,6 +148,21 @@ Just make the changes and both the servers will reload automatically!
 
 ### Production mode
 
+When you are in production mode, the first thing you should do is to compile the frontend part.
+For this, first change your cwd to frontend:
+
+    $ cd frontend
+
+Now build the app, by running any of the following commands:
+
+    $ npm run build
+    $ # or
+    $ yarn build
+    $ # or
+    $ node scripts/build.js
+
+After the build succeeds, we have to run the actual python server. There are two ways to do this:
+
 #### The better way
 
 The recommended way to run blogit in production mode is to use `gunicorn` along with `meinheld`. Just enter this command in a terminal:
