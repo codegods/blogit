@@ -138,9 +138,7 @@ class _CommentBox extends React.Component<CommentBoxProps> {
     ).then((res) => {
       if (!res.ok) {
         res.text().then((txt) => {
-          this.setState({
-            error: `Failed to load comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`,
-          });
+          alert(`Failed to load comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`)
         });
       } else {
         res.json().then((comments) => {
@@ -186,7 +184,21 @@ class _CommentBox extends React.Component<CommentBoxProps> {
           {this.state.loaded &&
             (this.state.comments.length ? (
               this.state.comments.length % 10 === 0 ? (
-                <Button size="small" variant="contained">
+                <Button size="small" variant="contained" onClick={() => {
+                  fetch(
+                    url_for("api.posts.get_comments") + `?uuid=${this.props.uuid}&from=${this.state.comments.length}`
+                  ).then((res) => {
+                    if (!res.ok) {
+                      res.text().then((txt) => {
+                        alert(`Failed to load more comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`)
+                      });
+                    } else {
+                      res.json().then((comments) => {
+                        this.setState({ comments: this.state.comments.concat(comments.comments) });
+                      });
+                    }
+                  });
+                }}>
                   Load More
                 </Button>
               ) : (
