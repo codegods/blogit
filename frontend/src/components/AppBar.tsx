@@ -5,7 +5,6 @@ import {
   InputBase,
   Typography,
   WithStyles,
-  Badge,
   IconButton,
   Tooltip,
   Button,
@@ -13,14 +12,13 @@ import {
 } from "@material-ui/core";
 import {
   SearchOutlined as SearchIcon,
-  NotificationsOutlined,
   PersonOutline,
   ExploreOutlined,
 } from "@material-ui/icons";
 import { Link } from "react-router-dom";
-import { UserContextType, withUserContext } from "./utils/UserContext";
-import { AppBar as Styles } from "./styles/appbar";
-import url_for from "./utils/url_for";
+import { UserContextType, withUserContext } from "../utils/UserContext";
+import { AppBar as Styles } from "../styles/appbar";
+import url_for from "../utils/url_for";
 
 interface AppBarProps extends WithStyles<typeof Styles> {
   context: UserContextType;
@@ -53,22 +51,24 @@ class MainAppBar extends React.Component<AppBarProps> {
           </div>
           {this.props.context.username !== "" ? (
             <div>
-              <Tooltip title="Notifications" aria-label="notifications">
-                <IconButton className={classes.icon}>
-                  <Badge max={9} badgeContent={7} color="secondary">
-                    <NotificationsOutlined />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
               <Tooltip title="Explore" aria-label="explore">
-                <IconButton className={classes.icon}>
-                  <ExploreOutlined />
-                </IconButton>
+                <Link to={url_for("views.explore")}>
+                  <IconButton className={classes.icon}>
+                    <ExploreOutlined />
+                  </IconButton>
+                </Link>
               </Tooltip>
               <Tooltip title="My Account" aria-label="my account">
-                <IconButton className={classes.icon}>
-                  <PersonOutline />
-                </IconButton>
+                <Link
+                  to={url_for("views.user").replace(
+                    /:[a-z]+/,
+                    this.props.context.username
+                  )}
+                >
+                  <IconButton className={classes.icon}>
+                    <PersonOutline />
+                  </IconButton>
+                </Link>
               </Tooltip>
             </div>
           ) : (
