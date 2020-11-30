@@ -8,6 +8,7 @@ let _url_database: {
     "views.tags": "/t/:tagname",
     "views.posts": "/p/:postid",
     "views.explore": "/explore",
+    "views.meta.about": "/meta/about-us",
 
     "views.auth.login": "/auth/login",
     "views.auth.signup": "/auth/signup",
@@ -25,6 +26,8 @@ let _url_database: {
     "api.posts.get_comments": "/api/posts/comments",
     "api.posts.comment": "/api/posts/comment",
     "api.posts.get_comment_by_id": "/api/posts/get-comment-by-id",
+    "api.posts.explore": "/api/posts/explore/",
+    "api.posts.explore.info": "/api/posts/explore/post-info",
 
     "api.uploader": "/api/uploader",
 
