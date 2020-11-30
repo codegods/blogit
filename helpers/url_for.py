@@ -8,6 +8,7 @@ _url_database = {
     "views.explore": "/explore",
     "views.auth.login": "/auth/login",
     "views.auth.signup": "/auth/signup",
+    "views.meta.about": "/meta/about-us",
     "api.auth.signup.validate": "/api/auth/signup/validate/",
     "api.auth.login": "/api/auth/login",
     "api.posts.create": "/api/posts/create",
