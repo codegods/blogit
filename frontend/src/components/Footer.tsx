@@ -4,8 +4,6 @@ import {
   WithStyles,
   Grid,
   Typography,
-  List,
-  ListItem,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import url_for from "../utils/url_for";
@@ -39,12 +37,17 @@ class Footer extends React.Component<WithStyles<typeof Styles>> {
           <Grid item sm={6} xs={12} style={{ textAlign: "center" }}>
             <ul className={classes.list}>
               <li>
-                <a target="_blank" href="https://github.com/codegods/blogit">
+                <a
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href="https://github.com/codegods/blogit"
+                >
                   Source Code
                 </a>
               </li>
               <li>
                 <a
+                  rel="noopener noreferrer"
                   target="_blank"
                   href="https://github.com/codegods/blogit/issues/new?template=bug_report.md"
                 >
@@ -53,6 +56,7 @@ class Footer extends React.Component<WithStyles<typeof Styles>> {
               </li>
               <li>
                 <a
+                  rel="noopener noreferrer"
                   target="_blank"
                   href="https://github.com/codegods/blogit/issues/new?template=feature_request.md"
                 >
