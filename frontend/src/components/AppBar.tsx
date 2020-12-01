@@ -72,26 +72,26 @@ class MainAppBar extends React.Component<AppBarProps> {
               </Tooltip>
             </div>
           ) : (
-            <div>
-              <Button
-                component={Link}
-                to={url_for("views.auth.login")}
-                className={classes.loginButtons}
-                color="secondary"
-              >
-                Login
+              <div>
+                <Button
+                  component={Link}
+                  to={url_for("views.auth.login")}
+                  className={classes.loginButtons}
+                  color="secondary"
+                >
+                  Login
               </Button>
-              <Button
-                component={Link}
-                to={url_for("views.auth.signup")}
-                className={classes.loginButtons}
-                color="secondary"
-                variant="contained"
-              >
-                Signup
+                <Button
+                  component={Link}
+                  to={url_for("views.auth.signup")}
+                  className={classes.loginButtons}
+                  color="secondary"
+                  variant="contained"
+                >
+                  Signup
               </Button>
-            </div>
-          )}
+              </div>
+            )}
         </Toolbar>
       </AppBar>
     );
