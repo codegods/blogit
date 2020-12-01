@@ -15,15 +15,15 @@
 - Markdown render API                   ✓
 - Markdown editor                       ✓
 - Create new post API                   ✓
-- Posts view                            •
-- Post stats API                        •
-- Like API and view                     •
+- Posts view                            ✓
+- Post stats API                        ✓
+- Like API and view                     ✓
 - Profile view                          ⨯
 - Profile stats API                     ⨯
 - Following and followers API           ⨯
-- Comments view                         ⨯
-- Comments API                          ⨯
-- Logged in user's homepage             ⨯
+- Comments view                         ✓
+- Comments API                          ✓
+- Logged in user's homepage             •
 - [L] Service Worker                    ⨯
 - [L] Build script                      ⨯
 - [L] Pre-render script                 ⨯
