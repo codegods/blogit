@@ -23,6 +23,7 @@ del os, sys
 import json
 import flask
 from helpers.md import render
+from helpers.flatten import flatten
 from helpers.url_for import url_for
 from helpers.cookies import login_required
 from flask import Blueprint, current_app as app
@@ -177,7 +178,8 @@ def get_comments():
         return "Bad request", 400
     csr = app.sql.cursor()
     csr.execute(
-        "select id from comments where post=%s order by date_posted desc limit 10 offset %s", (uuid, int(fro))
+        "select id from comments where post=%s order by date_posted desc limit 10 offset %s",
+        (uuid, int(fro)),
     )
     return {"comments": csr.fetchall()}
 
@@ -197,12 +199,13 @@ def get_comment_by_id():
         "inner join users "
         "on comments.author = users.id "
         "where comments.id=%s",
-        (uuid, )
+        (uuid,),
     )
-    res = csr.fetchone() 
+    res = csr.fetchone()
     if res:
         return res
     return "Comment not found", 404
+
 
 @blueprint.route(url_for("api.posts.comment"), methods=["POST"])
 @login_required(True)
@@ -211,16 +214,84 @@ def post_a_comment():
         body: dict = json.loads(flask.request.get_data())
     except json.JSONDecodeError:
         return "Bad encoding", 400
-    
+
     if any([prop not in body for prop in ["uuid", "comment"]]):
         return "Req params not specified", 400
-    
+
     if not app.sql.posts.get(uuid=body.get("uuid")):
         return "Non-existent post", 400
-    
+
     try:
         uuid = app.sql.comments.create(body["comment"], flask.g.user.id, body["uuid"])
         return uuid
     except Exception:
         app.logger.exception("Error while creating comment: "), 500
 
+
+@blueprint.route(url_for("api.posts.explore"))
+@login_required(True)
+def explore():
+    csr = app.sql.cursor()
+    result = {}
+    csr.execute(
+        "select "
+        "posts.id "
+        "from posts "
+        "inner join followers "
+        "on followers.follower=%s "
+        "order by posts.date_posted desc "
+        "limit 15",
+        (flask.g.user.id,),
+    )
+    result["followers"] = flatten(csr.fetchall())
+    csr.execute(
+        "select "
+        "posts.id "
+        "from posts "
+        "left join likes "
+        "on likes.post=posts.id "
+        "group by posts.id "
+        "order by count(likes.likee) desc "
+        "limit 15"
+    )
+    result["liked"] = flatten(csr.fetchall())
+    csr.execute("select id from posts order by date_posted desc limit 15")
+    result["recents"] = flatten(csr.fetchall())
+    return result
+
+
+@blueprint.route(url_for("api.posts.explore.info"))
+@login_required()
+def explore_info():
+    uuid = flask.request.args.get("uuid")
+    if not uuid:
+        return "Bad request", 400
+
+    csr = app.sql.cursor(dictionary=True)
+    csr.execute(
+        "select "
+        "count( distinct likes.likee) as 'likes', "
+        "count( distinct comments.id) as 'comments', "
+        "posts.share_count as 'shares', "
+        "posts.title as 'title', "
+        "users.username as 'name', "
+        "users.avatarurl as 'avatar' "
+        "from ("
+        "("
+        "( posts left join likes on posts.id=likes.post) "
+        "left join comments on comments.post=posts.id) "
+        "left join users on users.username=posts.author) "
+        "where posts.id=%s "
+        "group by posts.id",
+        (uuid,),
+    )
+    res = csr.fetchone()
+    return {
+        "stats": {
+            "likes": res["likes"],
+            "comments": res["comments"],
+            "shares": res["shares"],
+        },
+        "title": res["title"],
+        "author": {"avatar": res["avatar"], "name": res["name"]},
+    }
