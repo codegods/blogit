@@ -10,6 +10,7 @@ import {
 import { Add } from "@material-ui/icons";
 import { Switch, Route, Link } from "react-router-dom";
 import AppBar from "./components/AppBar";
+import Footer from "./components/Footer";
 
 import Styles from "./styles/appbar";
 import url_for from "./utils/url_for";
@@ -65,6 +66,7 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
             <PrivateRoute path={url_for("views.explore")} component={Explore} />
           </Switch>
         </React.Suspense>
+        <Footer />
       </div>
     );
   }
