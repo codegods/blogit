@@ -1,4 +1,3 @@
-# TODO Create API endpoint for post content, stats and author.
 _url_database = {
     "new": "/create",
     "storage": "/storage/<uuid>",
