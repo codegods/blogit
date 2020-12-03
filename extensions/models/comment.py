@@ -44,7 +44,8 @@ def get(post_uuid: str, limits: Tuple[int, int] = (0, 10)):
 
     cursor = app.sql.cursor()
     cursor.execute(
-        "select id from comments where post=%s limit %d offset %d order by date_posted desc", (post_uuid, *limits)
+        "select id from comments where post=%s limit %d offset %d order by date_posted desc",
+        (post_uuid, *limits),
     )
     result = cursor.fetchall()
     return len(result) and result
@@ -63,6 +64,6 @@ def get_by_id(uuid: str):
         raise Exception("The app is not connected to a mysql server")
 
     cursor = app.sql.cursor(dictionary=True)
-    cursor.execute("select * from comments where id=%s", (uuid, ))
+    cursor.execute("select * from comments where id=%s", (uuid,))
     result = cursor.fetchone()
     return len(result) and from_dict(result)

@@ -142,7 +142,7 @@ class CacheInvalidator:
             # It may happen because of a size change during iteration.
             # Probably because of creation or deletion of a cache obj.
             pass
-        
+
         # Run every 15 minutes
         self._th = Timer(900, self.clearer)
         self._th.start()

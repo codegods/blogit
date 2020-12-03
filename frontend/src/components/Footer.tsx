@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  withStyles,
-  WithStyles,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import { withStyles, WithStyles, Grid, Typography } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import url_for from "../utils/url_for";
 import { RootStyles as Styles } from "../styles/footer";

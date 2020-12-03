@@ -123,7 +123,7 @@ class Post extends React.Component<PostProps> {
           }
         />
         {this.state.content ? (
-          <CardContent style={{fontSize: "large"}}>
+          <CardContent style={{ fontSize: "large" }}>
             <Link
               to={url_for("views.posts").replace(/:[a-z]+/, this.props.uuid)}
               className={classes.link}

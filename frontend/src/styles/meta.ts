@@ -4,11 +4,11 @@ export let AboutUsStyles = (theme: Theme) =>
     createStyles({
         root: {
             "& .MuiTypography-root": {
-                marginBottom: theme.spacing(1)
+                marginBottom: theme.spacing(1),
             },
             "& p": {
-                padding: theme.spacing(1)
-            }
+                padding: theme.spacing(1),
+            },
         },
         heading: {
             fontFamily: "'Comfortaa', cursive",
@@ -21,7 +21,7 @@ export let AboutUsStyles = (theme: Theme) =>
         details: {
             display: "flex",
             flexDirection: "column",
-            flexGrow: 1
+            flexGrow: 1,
         },
         content: {
             flex: "1 0 auto",
@@ -36,21 +36,21 @@ export let AboutUsStyles = (theme: Theme) =>
             paddingBottom: theme.spacing(1),
         },
         iconButton: {
-            position: "inherit"
+            position: "inherit",
         },
         link: {
             textDecoration: "none",
             color: theme.palette.secondary.main,
             "&:hover": {
-                textDecoration: "underline"
-            }
+                textDecoration: "underline",
+            },
         },
         social: {
             margin: theme.spacing(2),
             width: "100%",
             textAlign: "center",
             "& img": {
-                padding: theme.spacing(1)
-            }
-        }
+                padding: theme.spacing(1),
+            },
+        },
     });

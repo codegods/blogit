@@ -76,13 +76,13 @@ export let RootStyles = (theme: Theme) => {
 export let CommentBox = (theme: Theme) =>
     createStyles({
         title: {
-            borderBottom: "1px solid rgba(100, 100, 100, 0.5)"
+            borderBottom: "1px solid rgba(100, 100, 100, 0.5)",
         },
         actions: {
             padding: `${theme.spacing(1)}px ${theme.spacing(
                 3
             )}px ${theme.spacing(2)}px ${theme.spacing(3)}px`,
-            borderTop: "1px solid rgba(100, 100, 100, 0.5)"
+            borderTop: "1px solid rgba(100, 100, 100, 0.5)",
         },
         no_user: {
             "& a": {
@@ -90,34 +90,35 @@ export let CommentBox = (theme: Theme) =>
                 textDecoration: "none",
             },
             "& a:hover": {
-                textDecoration: "underline"
+                textDecoration: "underline",
             },
-            background: "rgba(100, 100, 100, 0.3)"
+            background: "rgba(100, 100, 100, 0.3)",
         },
         action: {
             width: "100%",
-            display: "flex"
+            display: "flex",
         },
         textfield: {
-            flexGrow: 1
-        }
+            flexGrow: 1,
+        },
     });
 
-export let Comment = (theme: Theme) => createStyles({
-    root: {
-        margin: `${theme.spacing(1)}px 0`
-    },
-    img: {
-        width: "3em",
-        height: "3em",
-        borderRadius: "50%"
-    },
-    uname: {
-        textDecoration: "none",
-        fontWeight: 700,
-        color: "#222",
-        "&:hover": {
-            textDecoration: "underline"
-        }
-    }
-})
+export let Comment = (theme: Theme) =>
+    createStyles({
+        root: {
+            margin: `${theme.spacing(1)}px 0`,
+        },
+        img: {
+            width: "3em",
+            height: "3em",
+            borderRadius: "50%",
+        },
+        uname: {
+            textDecoration: "none",
+            fontWeight: 700,
+            color: "#222",
+            "&:hover": {
+                textDecoration: "underline",
+            },
+        },
+    });
