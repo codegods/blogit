@@ -114,8 +114,8 @@ class AboutUs extends React.Component<WithStyles<typeof Styles>> {
           </Grid>
         </Grid>
         <p className={classes.social}>
-          <img src="https://img.shields.io/github/stars/codegods/blogit?style=social" />
-          <img src="https://img.shields.io/github/watchers/codegods/blogit?style=social" />
+          <img alt="Blogit's star count on GitHub" src="https://img.shields.io/github/stars/codegods/blogit?style=social" />
+          <img alt="Blogit's watch count on GitHub" src="https://img.shields.io/github/watchers/codegods/blogit?style=social" />
         </p>
       </Container>
     );
