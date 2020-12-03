@@ -8,7 +8,6 @@ import {
   Tooltip,
   Menu,
   MenuItem,
-  ListItemIcon,
 } from "@material-ui/core";
 import {
   DragIndicator,
@@ -19,7 +18,6 @@ import {
   FormatQuote,
   FormatSize,
   Image,
-  CloudUpload,
   InsertLink,
   Code,
   Highlight,
