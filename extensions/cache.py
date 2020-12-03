@@ -1,12 +1,35 @@
 """
 This module implements a in-memory cache system for the application.
 """
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(
+        ".."
+        if os.path.abspath(".").split("/")[-1]
+        in [
+            "lib",
+            "api",
+            "helpers",
+            "scripts",
+            "tests",
+            "extensions",
+            "docs",
+            "frontend",
+        ]
+        else "."
+    )
+)
+
+del os, sys
+
 import time
-import atexit
 import logging
 import datetime
-from threading import Thread
+from threading import Timer
 from typing import Any, Union, Dict
+from helpers.exception import register
 
 
 class Store:
@@ -56,7 +79,8 @@ class _Cache:
         self._logger = logging.getLogger("cache")
         self._stores: Dict[str, Store] = {}
         self._logger.info("Caching extension ready.")
-        CacheInvalidator(self).start()
+        self._invalidator = CacheInvalidator(self)
+        self._invalidator.start()
 
     def create_store(self, name: str) -> Store:
         """Creates and returns a new cache store of the name `name`"""
@@ -91,39 +115,38 @@ class CacheInvalidator:
         """
         self.cache = cache
         self.work = False
-        self._th = Thread(target=self.clearer)
+        self._th = Timer(900, self.clearer)
 
     def start(self) -> None:
         """Starts the clearing thread"""
+        self.cache._logger.info("Cache invalidator running...")
         self._th.start()
-        self.work = True
-        atexit.register(self.kill)
+        register(self.kill)
 
     def kill(self) -> None:
-        self.work = False
+        self.cache._logger.info("Killing cache thread.")
+        self._th.cancel()
 
     def clearer(self):
         """The actual function that clears the cache"""
-        print("Cache invalidator running...")
-        while self.work:
-            ctime = datetime.datetime.now()
-            print("Invalidating cache")
-            try:
-                
-                for store in self.cache._stores.values():
-                    cache = store._cache
-                    for k, v in cache.items():
-                        diff: datetime.timedelta = ctime - v["timestamp"]
-                        # Delete caches older than 10 minutes
-                        if diff.seconds > 600:
-                            cache.pop(k)
-            except RuntimeError:
-                # It may happen because of a size change during iteration.
-                # Probably because of creation or deletion of a cache obj.
-                pass
-            
-            # Run every 15 minutes
-            time.sleep(900)
+        ctime = datetime.datetime.now()
+        try:
+            print("working")
+            for store in self.cache._stores.values():
+                cache = store._cache
+                for k, v in cache.items():
+                    diff: datetime.timedelta = ctime - v["timestamp"]
+                    # Delete caches older than 10 minutes
+                    if diff.seconds > 600:
+                        cache.pop(k)
+        except RuntimeError:
+            # It may happen because of a size change during iteration.
+            # Probably because of creation or deletion of a cache obj.
+            pass
+        
+        # Run every 15 minutes
+        self._th = Timer(900, self.clearer)
+        self._th.start()
 
 
 def Cache(config: object, app) -> Union[None, _Cache]:
