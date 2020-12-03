@@ -14,6 +14,7 @@ _url_database = {
     "api.posts.author": "/api/posts/author",
     "api.posts.stats": "/api/posts/stats",
     "api.posts.get": "/api/posts",
+    "api.posts.get_by_author": "/api/posts/authored-by",
     "api.posts.like": "/api/posts/like",
     "api.posts.liked_by_user": "/api/posts/has-user-liked",
     "api.posts.share": "/api/posts/share-count",
@@ -25,6 +26,9 @@ _url_database = {
     "api.uploader": "/api/uploader",
     "api.renderer": "/api/render",
     "api.user_info": "/api/user",
+    "api.user.follow": "/api/user/follow",
+    "api.user.has_followed": "/api/user/follow/is-followed-by-me",
+    "api.user.info": "/api/user/info",
     "api.storage.avatar": "/api/storage/avatar",
     "api.storage.image": "/api/storage/image/<uuid>",
 }
