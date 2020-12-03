@@ -1,6 +1,29 @@
-import atexit
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(
+        ".."
+        if os.path.abspath(".").split("/")[-1]
+        in [
+            "lib",
+            "api",
+            "helpers",
+            "scripts",
+            "tests",
+            "extensions",
+            "docs",
+            "frontend",
+        ]
+        else "."
+    )
+)
+
+del os, sys
+
 import logging
 import mysql.connector
+from helpers.exception import register
 from .models import user, storage, post, comment
 
 
@@ -54,7 +77,7 @@ class DataBase:
         self.storage = storage
 
         # Make sure connection is committed and closed before exiting
-        atexit.register(self.tearDown)
+        register(self.tearDown)
 
     def cursor(self, *args, **kwargs) -> mysql.connector.connection.MySQLCursor:
         """Returns a MySQLCursor on the current connection."""

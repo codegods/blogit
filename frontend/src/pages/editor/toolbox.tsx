@@ -32,18 +32,14 @@ interface ToolBoxProps extends WithStyles<typeof Styles> {
 
 class Toolbox extends React.Component<ToolBoxProps> {
   state: {
-    anchorEl_img: null | HTMLElement;
     anchorEl_heading: null | HTMLElement;
   };
   constructor(props: ToolBoxProps) {
     super(props);
     this.state = {
-      anchorEl_img: null,
       anchorEl_heading: null,
     };
     this.md_handler = this.md_handler.bind(this);
-    this.menuOpen_img = this.menuOpen_img.bind(this);
-    this.menuClose_img = this.menuClose_img.bind(this);
     this.menuOpen_heading = this.menuOpen_heading.bind(this);
     this.menuClose_heading = this.menuClose_heading.bind(this);
   }
@@ -71,13 +67,6 @@ class Toolbox extends React.Component<ToolBoxProps> {
         textarea.selectionEnd = len + start_char.length;
       }
     };
-  }
-
-  menuOpen_img(ev: React.MouseEvent<HTMLElement>) {
-    this.setState({ anchorEl_img: ev.currentTarget });
-  }
-  menuClose_img() {
-    this.setState({ anchorEl_img: null });
   }
   menuOpen_heading(ev: React.MouseEvent<HTMLElement>) {
     this.setState({ anchorEl_heading: ev.currentTarget });
@@ -191,31 +180,15 @@ class Toolbox extends React.Component<ToolBoxProps> {
             <Button
               aria-haspopup="true"
               aria-controls="toolbox-image-menu"
-              onClick={this.menuOpen_img}
+              onClick={this.md_handler(
+                "![Image Caption]",
+                "(yourwebsite/path/to/image.png)"
+              )}
             >
               <Image />
             </Button>
           </Tooltip>
         </ButtonGroup>
-        <Menu
-          anchorEl={this.state.anchorEl_img}
-          onClose={this.menuClose_img}
-          open={this.state.anchorEl_img !== null}
-          id="toolbox-image-menu"
-        >
-          <MenuItem onClick={this.menuClose_img}>
-            <ListItemIcon>
-              <CloudUpload />
-            </ListItemIcon>
-            Upload
-          </MenuItem>
-          <MenuItem onClick={this.menuClose_img}>
-            <ListItemIcon>
-              <InsertLink />
-            </ListItemIcon>
-            From web URL
-          </MenuItem>
-        </Menu>
         <Menu
           anchorEl={this.state.anchorEl_heading}
           onClose={this.menuClose_heading}
@@ -230,38 +203,19 @@ class Toolbox extends React.Component<ToolBoxProps> {
           >
             Heading 1 (Largest)
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              this.md_handler("\n\n## Heading goes here", "\n")();
-              this.menuClose_heading();
-            }}
-          >
-            Heading 2
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              this.md_handler("\n\n### Heading goes here", "\n")();
-              this.menuClose_heading();
-            }}
-          >
-            Heading 3
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              this.md_handler("\n\n#### Heading goes here", "\n")();
-              this.menuClose_heading();
-            }}
-          >
-            Heading 4
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              this.md_handler("\n\n##### Heading goes here", "\n")();
-              this.menuClose_heading();
-            }}
-          >
-            Heading 5
-          </MenuItem>
+          {Array.from({ length: 4 }, (_obj, index) => (
+            <MenuItem
+              onClick={() => {
+                this.md_handler(
+                  `\n\n${"#".repeat(index + 2)} Heading goes here`,
+                  "\n"
+                )();
+                this.menuClose_heading();
+              }}
+            >
+              Heading {index + 2}
+            </MenuItem>
+          ))}
           <MenuItem
             onClick={() => {
               this.md_handler("\n\n###### Heading goes here", "\n")();
