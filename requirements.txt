@@ -1,7 +1,7 @@
-flask
-bcrypt
-pillow
-markdown
-meinheld
-gunicorn
-mysql-connector-python
+bcrypt==3.2.0
+Flask==1.1.2
+Markdown==3.3.3
+meinheld==1.0.2
+mysql-connector-python==8.0.22
+Pillow==8.0.1
+selenium==3.141.0
