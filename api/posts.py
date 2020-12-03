@@ -295,3 +295,13 @@ def explore_info():
         "title": res["title"],
         "author": {"avatar": res["avatar"], "name": res["name"]},
     }
+
+
+@blueprint.route(url_for("api.posts.get_by_author"))
+def get_by_author():
+    uname = flask.request.args.get("uname")
+    if not uname:
+        return "Bad request", 400
+    csr = app.sql.cursor()
+    csr.execute("select id from posts where author=%s", (uname,))
+    return {"posts": flatten(csr.fetchall())}

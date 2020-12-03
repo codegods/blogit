@@ -79,6 +79,8 @@ class Execute:
             "followers": [
                 "following char(64) NOT NULL",
                 "follower char(64) NOT NULL",
+                # This is to ensure unique combinations
+                "PRIMARY KEY (following, follower)",
                 "FOREIGN KEY (following) REFERENCES users(id)",
                 "FOREIGN KEY (follower) REFERENCES users(id)",
             ],
