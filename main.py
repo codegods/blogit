@@ -76,6 +76,9 @@ def run_development_server(config: object, mysql: object) -> NoReturn:
         )
     except KeyboardInterrupt:
         logger.info("Server shutting down...")
+    except SystemExit:
+        app.cache._invalidator.kill()
+        raise
 
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
@@ -145,10 +148,9 @@ if __name__ == "__main__":
 
     # If the functions were called as modules, then screen is already initialised
     # but if the code reaches here, it means that it is not initialised.
-
-    from helpers.init_console import init
-
-    init()
+    from helpers import init_console, exception
+    exception.init()
+    init_console.init()
 
     main()
 
