@@ -131,7 +131,6 @@ class CacheInvalidator:
         """The actual function that clears the cache"""
         ctime = datetime.datetime.now()
         try:
-            print("working")
             for store in self.cache._stores.values():
                 cache = store._cache
                 for k, v in cache.items():
