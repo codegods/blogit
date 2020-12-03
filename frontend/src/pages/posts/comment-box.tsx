@@ -94,14 +94,26 @@ class _Comment extends React.Component<CommentProps> {
         <Grid container className={classes.root}>
           <Grid item xs={3}>
             {this.state.author ? (
-              <img className={classes.img} src={this.state.author.avatar} alt={this.state.author.username + "'s avatar"} />
+              <img
+                className={classes.img}
+                src={this.state.author.avatar}
+                alt={this.state.author.username + "'s avatar"}
+              />
             ) : (
               <Skeleton variant="circle" width="3em" height="3em" />
             )}
           </Grid>
           <Grid item xs={9}>
             {this.state.author ? (
-              <Link className={classes.uname} to={url_for("views.user").replace(/:[a-z]+/, this.state.author.username)}>{this.state.author.username}</Link>
+              <Link
+                className={classes.uname}
+                to={url_for("views.user").replace(
+                  /:[a-z]+/,
+                  this.state.author.username
+                )}
+              >
+                {this.state.author.username}
+              </Link>
             ) : (
               <Skeleton width="50%" />
             )}
@@ -138,7 +150,9 @@ class _CommentBox extends React.Component<CommentBoxProps> {
     ).then((res) => {
       if (!res.ok) {
         res.text().then((txt) => {
-          alert(`Failed to load comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`)
+          alert(
+            `Failed to load comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`
+          );
         });
       } else {
         res.json().then((comments) => {
@@ -147,26 +161,31 @@ class _CommentBox extends React.Component<CommentBoxProps> {
       }
     });
   }
-  postComment(){
-    let comment =  (document.getElementById("comment-box-create") as HTMLInputElement).value;
+  postComment() {
+    let comment = (document.getElementById(
+      "comment-box-create"
+    ) as HTMLInputElement).value;
     if (comment)
       fetch(url_for("api.posts.comment"), {
         method: "POST",
         body: JSON.stringify({
           uuid: this.props.uuid,
-          comment
-        })
-      }).then(res => {
+          comment,
+        }),
+      }).then((res) => {
         if (res.ok)
-          res.text().then(txt => {
-            this.setState({ comments: this.state.comments.concat(txt)});
-            (document.getElementById("comment-box-create") as HTMLInputElement).value = "";
-          })
+          res.text().then((txt) => {
+            this.setState({ comments: this.state.comments.concat(txt) });
+            (document.getElementById(
+              "comment-box-create"
+            ) as HTMLInputElement).value = "";
+          });
         else
-          alert(`Could not post comment. Error: ${res.status} ${res.statusText}`)
-      })
-    else
-      alert("Please enter something to post it!")
+          alert(
+            `Could not post comment. Error: ${res.status} ${res.statusText}`
+          );
+      });
+    else alert("Please enter something to post it!");
   }
   render() {
     const { classes } = this.props;
@@ -184,21 +203,32 @@ class _CommentBox extends React.Component<CommentBoxProps> {
           {this.state.loaded &&
             (this.state.comments.length ? (
               this.state.comments.length % 10 === 0 ? (
-                <Button size="small" variant="contained" onClick={() => {
-                  fetch(
-                    url_for("api.posts.get_comments") + `?uuid=${this.props.uuid}&from=${this.state.comments.length}`
-                  ).then((res) => {
-                    if (!res.ok) {
-                      res.text().then((txt) => {
-                        alert(`Failed to load more comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`)
-                      });
-                    } else {
-                      res.json().then((comments) => {
-                        this.setState({ comments: this.state.comments.concat(comments.comments) });
-                      });
-                    }
-                  });
-                }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => {
+                    fetch(
+                      url_for("api.posts.get_comments") +
+                        `?uuid=${this.props.uuid}&from=${this.state.comments.length}`
+                    ).then((res) => {
+                      if (!res.ok) {
+                        res.text().then((txt) => {
+                          alert(
+                            `Failed to load more comments. The server responded with: "${txt}". ${res.status} ${res.statusText}`
+                          );
+                        });
+                      } else {
+                        res.json().then((comments) => {
+                          this.setState({
+                            comments: this.state.comments.concat(
+                              comments.comments
+                            ),
+                          });
+                        });
+                      }
+                    });
+                  }}
+                >
                   Load More
                 </Button>
               ) : (

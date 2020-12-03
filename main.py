@@ -149,6 +149,7 @@ if __name__ == "__main__":
     # If the functions were called as modules, then screen is already initialised
     # but if the code reaches here, it means that it is not initialised.
     from helpers import init_console, exception
+
     exception.init()
     init_console.init()
 

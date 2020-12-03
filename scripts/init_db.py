@@ -106,9 +106,7 @@ class Execute:
             )
             self._connection.commit()
 
-        self._connection.cursor().execute(
-            f"use {self._db}"
-        )
+        self._connection.cursor().execute(f"use {self._db}")
 
         # Create all required tables
         for table in self._structures:

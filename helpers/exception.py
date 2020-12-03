@@ -14,6 +14,7 @@ from typing import Any, Callable, Dict, Tuple, Type
 
 this = sys.modules[__name__]
 
+
 def init():
     # Checks if the `_exit_registry` has already been declared or not.
     # This is to prevent data-loss due to double-initialization.
@@ -23,7 +24,7 @@ def init():
     if not hasattr(this, "_builtin_excepthook"):
         this._builtin_excepthook = sys.excepthook
         sys.excepthook = excepthook
-    
+
     atexit.register(_call_all_funcs)
 
 
@@ -78,9 +79,7 @@ def excepthook(
     try:
         _call_all_funcs()
     except Exception:
-        logging.exception(
-            "Got exception while running one of the on_exit functions"
-        )
+        logging.exception("Got exception while running one of the on_exit functions")
     if isinstance(exc, KeyboardInterrupt):
         return this._builtin_excepthook(base_exc, exc, tb)
     logging.exception("Uncaught exception raised: ", exc_info=(base_exc, exc, tb))

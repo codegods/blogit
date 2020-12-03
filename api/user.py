@@ -201,16 +201,19 @@ def follow():
     user = csr.fetchone()
     if not user:
         return "User not found", 404
-    
+
     if user["id"] == flask.g.user.id:
         return "You can't follow yourself", 400
 
     try:
-        csr.execute("insert into followers values (%s, %s)", (user["id"], flask.g.user.id))
+        csr.execute(
+            "insert into followers values (%s, %s)", (user["id"], flask.g.user.id)
+        )
         app.sql.commit()
     except IntegrityError:
         return "User has already followed this person", 400
     return "Followed", 200
+
 
 @blueprint.route(url_for("api.user.has_followed"))
 @login_required(True)
@@ -219,10 +222,14 @@ def has_followed():
     if uuid is None:
         return "Bad Request", 400
     csr = app.sql.cursor(dictionary=True)
-    csr.execute("select follower from followers where follower=%s and following=%s", (flask.g.user.id,uuid))
+    csr.execute(
+        "select follower from followers where follower=%s and following=%s",
+        (flask.g.user.id, uuid),
+    )
     if csr.fetchone():
         return "true", 200
     return "false"
+
 
 blueprint.add_url_rule(
     url_for("api.auth.signup.validate"), view_func=UserSignup.as_view("users_signup")
