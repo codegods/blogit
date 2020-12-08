@@ -231,14 +231,24 @@ def post_a_comment():
 @blueprint.route(url_for("api.posts.explore"))
 @login_required(True)
 def explore():
-    csr = app.sql.cursor()
+    csr = app.sql.cursor(dictionary=True)
     result = {}
     csr.execute(
         "select "
-        "posts.id "
-        "from posts "
+        "count( distinct likes.likee) as 'likes', "
+        "count( distinct comments.id) as 'comments', "
+        "posts.share_count as 'shares', "
+        "posts.title as 'title', "
+        "users.username as 'name', "
+        "posts.id as 'id' "
+        "from ("
+        "("
+        "( posts left join likes on posts.id=likes.post) "
+        "left join comments on comments.post=posts.id) "
+        "left join users on users.username=posts.author) "
         "inner join followers "
         "on followers.follower=%s "
+        "group by posts.id "
         "order by posts.date_posted desc "
         "limit 15",
         (flask.g.user.id,),
@@ -246,16 +256,39 @@ def explore():
     result["followers"] = flatten(csr.fetchall())
     csr.execute(
         "select "
-        "posts.id "
-        "from posts "
-        "left join likes "
-        "on likes.post=posts.id "
+        "count( distinct likes.likee) as 'likes', "
+        "count( distinct comments.id) as 'comments', "
+        "posts.share_count as 'shares', "
+        "posts.title as 'title', "
+        "users.username as 'name', "
+        "posts.id as 'id' "
+        "from ("
+        "("
+        "( posts left join likes on posts.id=likes.post) "
+        "left join comments on comments.post=posts.id) "
+        "left join users on users.username=posts.author) "
         "group by posts.id "
         "order by count(likes.likee) desc "
         "limit 15"
     )
     result["liked"] = flatten(csr.fetchall())
-    csr.execute("select id from posts order by date_posted desc limit 15")
+    csr.execute(
+        "select "
+        "count( distinct likes.likee) as 'likes', "
+        "count( distinct comments.id) as 'comments', "
+        "posts.share_count as 'shares', "
+        "posts.title as 'title', "
+        "users.username as 'name', "
+        "posts.id as 'id' "
+        "from ("
+        "("
+        "( posts left join likes on posts.id=likes.post) "
+        "left join comments on comments.post=posts.id) "
+        "left join users on users.username=posts.author) "
+        "group by posts.id "
+        "order by posts.date_posted desc "
+        "limit 15"
+    )
     result["recents"] = flatten(csr.fetchall())
     return result
 
