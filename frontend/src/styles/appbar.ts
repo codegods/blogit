@@ -94,6 +94,7 @@ let App = (theme: Theme) =>
             position: "fixed",
             left: theme.spacing(4),
             bottom: theme.spacing(4),
+            zIndex: 99999
         },
     });
 

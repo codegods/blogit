@@ -1,6 +1,6 @@
 bcrypt
 flask
-python-markdown
+markdown
 meinheld
 mysql-connector-python
 pillow
