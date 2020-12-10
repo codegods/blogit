@@ -96,6 +96,9 @@ let App = (theme: Theme) =>
             bottom: theme.spacing(4),
             zIndex: 99999,
         },
+        minHeight: {
+            minHeight: `80vh`
+        }
     });
 
 export default { AppBar, Loader, App };

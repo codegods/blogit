@@ -8,7 +8,7 @@ class Footer extends React.Component<WithStyles<typeof Styles>> {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.root}>
+      <div className={classes.root} id="app-footer">
         <Grid container>
           <Grid item sm={6} xs={12}>
             <ul className={classes.list}>

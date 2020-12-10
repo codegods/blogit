@@ -28,4 +28,4 @@ render(
   document.getElementById("app-root")
 );
 
-serviceWorker.unregister();
+serviceWorker.register();

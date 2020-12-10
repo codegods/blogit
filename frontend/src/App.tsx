@@ -55,17 +55,22 @@ class App extends React.Component<WithStyles<typeof Styles.App>> {
           </Tooltip>
         </Link>
         <div className={classes.barProxy} />
-        <React.Suspense fallback={<Loader />}>
-          <Switch>
-            <Route path="/" exact component={HomePage} />
-            <Route path="/auth/:page" component={Auth} />
-            <Route path={url_for("views.posts")} component={Post} />
-            <Route path={url_for("views.user")} component={Profile} />
-            <Route path={url_for("views.meta.about")} component={AboutUs} />
-            <PrivateRoute path={url_for("new")} component={CreateNew} />
-            <PrivateRoute path={url_for("views.explore")} component={Explore} />
-          </Switch>
-        </React.Suspense>
+        <div className={classes.minHeight}>
+          <React.Suspense fallback={<Loader />}>
+            <Switch>
+              <Route path="/" exact component={HomePage} />
+              <Route path="/auth/:page" component={Auth} />
+              <Route path={url_for("views.posts")} component={Post} />
+              <Route path={url_for("views.user")} component={Profile} />
+              <Route path={url_for("views.meta.about")} component={AboutUs} />
+              <PrivateRoute path={url_for("new")} component={CreateNew} />
+              <PrivateRoute
+                path={url_for("views.explore")}
+                component={Explore}
+              />
+            </Switch>
+          </React.Suspense>
+        </div>
         <Footer />
       </div>
     );
