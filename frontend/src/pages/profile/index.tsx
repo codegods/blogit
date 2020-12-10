@@ -1,66 +1,205 @@
 import React from "react";
-import { withStyles, WithStyles, Typography } from "@material-ui/core";
+import {
+  withStyles,
+  WithStyles,
+  Typography,
+  Avatar,
+  Grid,
+  Button,
+  Container,
+  CircularProgress,
+} from "@material-ui/core";
+import Skeleton from "@material-ui/lab/Skeleton";
+import { RouteComponentProps } from "react-router-dom";
+import Post from "../../components/Post";
+import url_for from "../../utils/url_for";
 import { RootStyles as Styles } from "../../styles/profile";
-import Avatar from "@material-ui/core/Avatar";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 
-class Profile extends React.Component<WithStyles<typeof Styles>> {
+type ProfileProps = WithStyles<typeof Styles> &
+  RouteComponentProps<{
+    username: string;
+  }>;
+
+class Profile extends React.Component<ProfileProps> {
+  state: {
+    userInfo: {
+      name: string;
+      username: string;
+      followers: number;
+      following: number;
+      bio: string;
+    } | null;
+    has_user_followed: boolean;
+    error: boolean;
+    posts: Array<{
+      id: string;
+      likes: number;
+      shares: number;
+      comments: number;
+      title: string;
+      name: string;
+    }> | null;
+  };
+  constructor(props: ProfileProps) {
+    super(props);
+    this.state = {
+      userInfo: null,
+      has_user_followed: false,
+      error: false,
+      posts: null,
+    };
+    this.load_user = this.load_user.bind(this);
+    this.load_posts = this.load_posts.bind(this);
+  }
+  load_user() {
+    document.title = this.props.match.params.username + " on blogit";
+    fetch(
+      url_for("api.user.info") + "?uname=" + this.props.match.params.username
+    ).then((res) => {
+      if (res.ok) {
+        res.json().then((json) => {
+          this.setState({ userInfo: json });
+          this.load_posts();
+        });
+      } else {
+        this.setState({
+          userInfo: {
+            name: "Failed to load",
+            fullName: "",
+            followers: 0,
+            following: 0,
+            bio: `Server responded with status: ${res.status} (${res.statusText})`,
+          },
+          posts: [],
+          error: true,
+          has_user_followed: false,
+        });
+      }
+    });
+  }
+  load_posts() {
+    fetch(
+      url_for("api.posts.get_by_author") +
+        "?uname=" +
+        this.props.match.params.username
+    ).then((res) => {
+      if (res.ok) {
+        res.json().then((json) => {
+          this.setState({ posts: json.posts });
+        });
+      } else {
+        this.setState({
+          userInfo: {
+            name: "Failed to load",
+            fullName: "",
+            followers: 0,
+            following: 0,
+            bio: `Server responded with status: ${res.status} (${res.statusText})`,
+          },
+          posts: [],
+          has_user_followed: false,
+          error: true
+        });
+      }
+    });
+  }
+  componentDidMount() {
+    this.load_user();
+  }
   render() {
+    if (
+      !this.state.error &&
+      this.state.userInfo &&
+      this.state.userInfo.username !== this.props.match.params.username
+    ) {
+      // Sometimes when the url changes, the page doesn't reload.
+      // So, we fetch it asynchronously
+      new Promise(() => this.load_user());
+    }
     const { classes } = this.props;
     return (
-      <div>
-        <div className={classes.root}>
+      <Container>
+        <div className={classes.header}>
+          <Avatar
+            alt={this.props.match.params.username}
+            src={
+              url_for("api.storage.avatar") +
+              "?user=" +
+              this.props.match.params.username
+            }
+            className={classes.Avatar}
+          />
           <div>
-            <Avatar
-              alt="Remy Sharp"
-              src="/static/images/avatar/1.jpg"
-              className={classes.Avatar}
-            />
-          </div>
-          <div>
-            <Typography variant="h4" className={classes.heading}>
-              User
-            </Typography>
-            <Typography variant="h5"> Full Name </Typography>
-            <Button size="small" variant="outlined" color="primary">
-              Follow
-            </Button>
-            <Typography variant="subtitle1" color="textSecondary">
-              Bio
-            </Typography>
+            {this.state.userInfo ? (
+              <div className={classes.heading}>
+                <Typography component="div" variant="h4">
+                  {this.state.userInfo.username}
+                </Typography>
+                <Typography component="div" variant="h5">
+                  {this.state.userInfo.name}
+                </Typography>
+              </div>
+            ) : (
+              <div className={classes.heading}>
+                <Skeleton width="30vw" height="40px" />
+                <Skeleton width="20vw" height="30px" />
+              </div>
+            )}
+
+            {this.state.userInfo ? (
+              <Typography variant="subtitle1" color="textSecondary">
+                {this.state.userInfo.bio}
+              </Typography>
+            ) : (
+              <Skeleton width="40vw" height="30px" />
+            )}
+            <div className={classes.follow}>
+              {this.state.userInfo ? (
+                <div>
+                  <Typography component="b">
+                    {this.state.userInfo.followers} follower
+                    {this.state.userInfo.followers !== 1 && "s"}
+                  </Typography>
+                  <Typography component="b">
+                    {this.state.userInfo.following} following
+                  </Typography>
+                </div>
+              ) : (
+                <Skeleton />
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={this.state.has_user_followed}
+              >
+                {this.state.has_user_followed ? "Following" : "Follow"}
+              </Button>
+            </div>
           </div>
         </div>
-        <div className={classes.dis}>
-          <br />
+        <div>
           <hr />
           <div>
-            <Grid container spacing={3}>
-              <Grid item xs>
-                <Paper className={classes.paper}>xs</Paper>
-              </Grid>
-              <Grid item xs>
-                <Paper className={classes.paper}>xs</Paper>
-              </Grid>
-              <Grid item xs>
-                <Paper className={classes.paper}>xs</Paper>
-              </Grid>
-            </Grid>
-            <Grid container spacing={3}>
-              <Grid item xs>
-                <Paper className={classes.paper}>xs</Paper>
-              </Grid>
-              <Grid item xs={6}>
-                <Paper className={classes.paper}>xs=6</Paper>
-              </Grid>
-              <Grid item xs>
-                <Paper className={classes.paper}>xs</Paper>
-              </Grid>
+            <Grid className={classes.content} container spacing={3}>
+              {this.state.posts ? (
+                this.state.posts.length ? (
+                  this.state.posts.map((post) => (
+                    <Grid item xs={12} sm={6} md={4} key={post.id}>
+                      <Post content={post} />
+                    </Grid>
+                  ))
+                ) : (
+                  <i className={classes.info}>No posts yet</i>
+                )
+              ) : (
+                <Grid item xs={12} className={classes.info}>
+                  <CircularProgress />
+                </Grid>
+              )}
             </Grid>
           </div>
         </div>
-      </div>
+      </Container>
     );
   }
 }

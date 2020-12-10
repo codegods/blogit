@@ -335,6 +335,22 @@ def get_by_author():
     uname = flask.request.args.get("uname")
     if not uname:
         return "Bad request", 400
-    csr = app.sql.cursor()
-    csr.execute("select id from posts where author=%s", (uname,))
+    csr = app.sql.cursor(dictionary=True)
+    csr.execute("select "
+        "count( distinct likes.likee) as 'likes', "
+        "count( distinct comments.id) as 'comments', "
+        "posts.share_count as 'shares', "
+        "posts.title as 'title', "
+        "users.username as 'name', "
+        "posts.id as 'id' "
+        "from ("
+        "("
+        "( posts left join likes on posts.id=likes.post) "
+        "left join comments on comments.post=posts.id) "
+        "left join users on users.username=posts.author) "
+        "where posts.author=%s "
+        "group by posts.id "
+        "order by posts.date_posted desc "
+        "limit 15"
+    , (uname,))
     return {"posts": flatten(csr.fetchall())}

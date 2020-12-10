@@ -153,7 +153,7 @@ def user_info():
 
 
 @blueprint.route(url_for("api.user.info"))
-def get_by_author():
+def info():
     uuid = flask.request.args.get("uuid")
     uname = flask.request.args.get("uname")
     if uuid is None and uname is None:
@@ -163,10 +163,11 @@ def get_by_author():
     initials = "select {}".format(
         "count(distinct following.following) as 'following', "
         "count(distinct followers.follower) as 'followers', "
-        "concat(users.firstname, "
+        "concat(users.firstname, ' ', "
         "users.lastname) as 'name', "
         "users.username as 'username', "
-        "users.id as 'uuid' "
+        "users.id as 'uuid', "
+        "users.bio as 'bio' "
         "from ("
         "(users left join followers "
         "on users.id = followers.following) "
