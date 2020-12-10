@@ -37,7 +37,7 @@ class Explore extends React.Component<WithStyles<typeof Styles>> {
     };
   }
   componentDidMount() {
-    document.title = "Explore | Blogit"
+    document.title = "Explore | Blogit";
     fetch(url_for("api.posts.explore")).then((res) => {
       if (res.ok) {
         res.json().then((json) => {
@@ -68,7 +68,10 @@ class Explore extends React.Component<WithStyles<typeof Styles>> {
                   <CardContent>
                     {this.state.content.followers.length ? (
                       this.state.content.followers.map((content) => (
-                        <Post content={content} key={content.id + Math.random()} />
+                        <Post
+                          content={content}
+                          key={content.id + Math.random()}
+                        />
                       ))
                     ) : (
                       <i>No content to show :(</i>
@@ -89,7 +92,10 @@ class Explore extends React.Component<WithStyles<typeof Styles>> {
                   <CardContent>
                     {this.state.content.liked.length ? (
                       this.state.content.liked.map((content) => (
-                        <Post content={content} key={content.id + Math.random()} />
+                        <Post
+                          content={content}
+                          key={content.id + Math.random()}
+                        />
                       ))
                     ) : (
                       <span>No content to show</span>
@@ -108,14 +114,17 @@ class Explore extends React.Component<WithStyles<typeof Styles>> {
                 <CardHeader title="Recent additions" />
                 {this.state.content ? (
                   <CardContent>
-                  {this.state.content.recents.length ? (
-                    this.state.content.recents.map((content) => (
-                      <Post content={content} key={content.id + Math.random()} />
-                    ))
-                  ) : (
-                    <i>No content to show :(</i>
-                  )}
-                </CardContent>
+                    {this.state.content.recents.length ? (
+                      this.state.content.recents.map((content) => (
+                        <Post
+                          content={content}
+                          key={content.id + Math.random()}
+                        />
+                      ))
+                    ) : (
+                      <i>No content to show :(</i>
+                    )}
+                  </CardContent>
                 ) : (
                   <CardContent>
                     <Skeleton width="90%" />

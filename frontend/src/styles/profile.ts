@@ -39,18 +39,18 @@ export let RootStyles = (theme: Theme) => {
                 fontWeight: "bold",
                 textAlign: "center",
                 margin: "0 8px",
-                flexGrow: 1
+                flexGrow: 1,
             },
             "& .MuiButton-root": {
-                width: "100%"
-            }
+                width: "100%",
+            },
         },
         content: {
-            margin: "8px 0"
+            margin: "8px 0",
         },
         info: {
             textAlign: "center",
-            width: "100%"
-        }
+            width: "100%",
+        },
     });
 };
