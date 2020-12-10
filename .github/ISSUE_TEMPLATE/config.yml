@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Q&A / Ideas
+    url: https://github.com/codegods/blogit/discussions/new/
+    about: Instead of opening issues please asks your questions here and/or share your ideas
