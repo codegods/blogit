@@ -336,7 +336,8 @@ def get_by_author():
     if not uname:
         return "Bad request", 400
     csr = app.sql.cursor(dictionary=True)
-    csr.execute("select "
+    csr.execute(
+        "select "
         "count( distinct likes.likee) as 'likes', "
         "count( distinct comments.id) as 'comments', "
         "posts.share_count as 'shares', "
@@ -351,6 +352,10 @@ def get_by_author():
         "where posts.author=%s "
         "group by posts.id "
         "order by posts.date_posted desc "
-        "limit 15"
-    , (uname,))
-    return {"posts": flatten(csr.fetchall())}
+        "limit 15",
+        (uname,),
+    )
+    try:
+        return {"posts": flatten(csr.fetchall())}
+    except Exception:
+        return {"posts": []}

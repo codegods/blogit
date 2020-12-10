@@ -24,6 +24,7 @@ class Profile extends React.Component<ProfileProps> {
   state: {
     userInfo: {
       name: string;
+      uuid: string;
       username: string;
       followers: number;
       following: number;
@@ -50,6 +51,8 @@ class Profile extends React.Component<ProfileProps> {
     };
     this.load_user = this.load_user.bind(this);
     this.load_posts = this.load_posts.bind(this);
+    this.follow = this.follow.bind(this);
+    this.is_following = this.is_following.bind(this);
   }
   load_user() {
     document.title = this.props.match.params.username + " on blogit";
@@ -67,6 +70,7 @@ class Profile extends React.Component<ProfileProps> {
             name: "Failed to load",
             fullName: "",
             followers: 0,
+            id: "",
             following: 0,
             bio: `Server responded with status: ${res.status} (${res.statusText})`,
           },
@@ -87,21 +91,52 @@ class Profile extends React.Component<ProfileProps> {
         res.json().then((json) => {
           this.setState({ posts: json.posts });
         });
+        this.is_following();
       } else {
         this.setState({
           userInfo: {
             name: "Failed to load",
             fullName: "",
             followers: 0,
+            id: "",
             following: 0,
             bio: `Server responded with status: ${res.status} (${res.statusText})`,
           },
           posts: [],
           has_user_followed: false,
-          error: true
+          error: true,
         });
       }
     });
+  }
+  follow() {
+    this.state.userInfo &&
+      fetch(
+        url_for("api.user.follow") + "?to_follow=" + this.state.userInfo.uuid
+      ).then((res) => {
+        if (res.ok) {
+          let prev = this.state.userInfo!;
+          prev.followers += 1;
+          this.setState({ has_user_followed: true, userInfo: prev });
+        } else
+          alert(
+            `Failed to follow ${this.props.match.params.username}.\n\nServer responded with ${res.status} ${res.statusText}`
+          );
+      });
+  }
+  is_following() {
+    this.state.userInfo &&
+      fetch(
+        url_for("api.user.has_followed") + "?uuid=" + this.state.userInfo.uuid
+      ).then((res) => {
+        if (res.ok)
+          res
+            .text()
+            .then((txt) =>
+              this.setState({ has_user_followed: txt === "true" })
+            );
+        else this.setState({ has_user_followed: true });
+      });
   }
   componentDidMount() {
     this.load_user();
@@ -171,6 +206,7 @@ class Profile extends React.Component<ProfileProps> {
                 variant="contained"
                 color="primary"
                 disabled={this.state.has_user_followed}
+                onClick={this.follow}
               >
                 {this.state.has_user_followed ? "Following" : "Follow"}
               </Button>

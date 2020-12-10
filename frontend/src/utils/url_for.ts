@@ -1,8 +1,8 @@
 let _url_database: {
     [index: string]: string;
 } = {
-    "new": "/create",
-    "storage": "/storage/:uuid",
+    new: "/create",
+    storage: "/storage/:uuid",
     "views.user": "/u/:username",
     "views.tags": "/t/:tagname",
     "views.posts": "/p/:postid",

@@ -198,17 +198,18 @@ def follow():
     if to_follow is None:
         return "Bad Request", 400
     csr = app.sql.cursor(dictionary=True)
-    csr.execute("select id from users where username=%s", (to_follow,))
+    csr.execute("select id from users where id=%s", (to_follow,))
     user = csr.fetchone()
     if not user:
         return "User not found", 404
 
-    if user["id"] == flask.g.user.id:
+    del user
+    if to_follow == flask.g.user.id:
         return "You can't follow yourself", 400
 
     try:
         csr.execute(
-            "insert into followers values (%s, %s)", (user["id"], flask.g.user.id)
+            "insert into followers values (%s, %s)", (to_follow, flask.g.user.id)
         )
         app.sql.commit()
     except IntegrityError:
@@ -222,6 +223,8 @@ def has_followed():
     uuid = flask.request.args.get("uuid")
     if uuid is None:
         return "Bad Request", 400
+    if uuid == flask.g.user.id:
+        return "true"
     csr = app.sql.cursor(dictionary=True)
     csr.execute(
         "select follower from followers where follower=%s and following=%s",
