@@ -1,8 +1,8 @@
 ---
-name: 🕷 Bug report
+name: 🕷 General Bug report
 about: Create a report to help us improve
-title: '[BUG]'
-labels: 'bug'
+title: ''
+labels: 'issue-report: bug'
 assignees: ''
 
 ---
@@ -33,20 +33,12 @@ Add relevant screenshots here.
 Operating system: 
 
 <!-- 
-In case the problem is with the python part, you may remove the javascript related rows. And vice versa 
+Add versions of relevant technologies you are using. Eg. python, nodejs, etc
 -->
 
-| Software/Library | Version |
-| :--------------- | ------: |
-| Python           |         |
-| PIP              |         |
-| Flask            |         |
-| Selenium         |         |
-| NodeJS           |         |
-| Yarn             |         |
-| NPM              | N/A     |
-| React            |         |
-| Webpack          |         |
+| Technology | Version |
+| :--------- | ------: |
+|            |         |
 
 **Additional context**
 
