@@ -2,6 +2,8 @@
 
 Once you have obtained a local copy of the source code, you will have to do some setup to get running. Although we have tried to keep setting up as simple as possible, but let's face it, it can sometimes be a little tricky for beginners to get running. So, here are the steps you should follow to run the app.
 
+{:toc}
+
 ## Step 1: Download NodeJS and Python
 
 If you haven't already then, you should first download a recent version of NodeJS ([Download](https://nodejs.org/en/download/)) and Python 3.6+ ([Download](https://www.python.org/downloads/)).
