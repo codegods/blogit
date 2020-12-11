@@ -2,7 +2,7 @@
 name: 🕷 Backend Bug report
 about: Bug related to backend (the python part)
 title: ''
-labels: 'issue-report: bug', 'backend'
+labels: - 'issue-report: bug' - 'backend'
 assignees: ''
 
 ---
