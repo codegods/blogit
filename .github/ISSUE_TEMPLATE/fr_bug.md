@@ -2,7 +2,7 @@
 name: 🕷 Frontend Bug report
 about: Bugs related to the user facing part
 title: ''
-labels: - 'issue-report: bug' - 'frontend'
+labels: 'issue-report: bug, frontend'
 assignees: ''
 
 ---
