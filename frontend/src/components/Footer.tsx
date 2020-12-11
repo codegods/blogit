@@ -44,7 +44,7 @@ class Footer extends React.Component<WithStyles<typeof Styles>> {
                 <a
                   rel="noopener noreferrer"
                   target="_blank"
-                  href="https://github.com/codegods/blogit/issues/new?template=bug_report.md"
+                  href="https://github.com/codegods/blogit/issues/new/choose"
                 >
                   Report a bug
                 </a>
