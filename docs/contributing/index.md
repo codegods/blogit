@@ -8,3 +8,6 @@ We will soon start accepting pull requests, but that doesn't mean that you can't
 It only means that we won't be able to merge it as early as we want to.
 
 You can always help us improve by opening a [feature request](github.com/codegods/blogit/issues/new?template=feature_request.md) or creating a [bug report](https://github.com/codegods/blogit/issues/new/choose)
+
+You can still help us get better by contributing to the code. Here are some [topics ypu can work upon](tasklist).
+Be sure to follow the [how-to](how-to).
