@@ -1,4 +1,4 @@
-<img src="frontend/public/logo192.png" align="right" />
+<img src="logo192.png" align="right" />
 
 # Blogit
 
@@ -12,4 +12,5 @@ Blogit is a blogging website that haas been made obviously for the purpose of bl
 
 - [Setup](set-up)
 - [Contributing](contributing)
-- [Tasklist](contributing/tasklist)
+    - [How to](contributing/how-to)
+    - [Tasklist](contributing/tasklist)
