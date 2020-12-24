@@ -98,7 +98,8 @@ class DataBase:
 
     def tearDown(self) -> None:
         """Commits and closes the current connection"""
-        self._connection.commit()
-        self._connection.close()
-        self.is_connected = False
-        self._logger.warn("MySQL connection closed.")
+        if self.is_connected:
+            self._connection.commit()
+            self._connection.close()
+            self.is_connected = False
+            self._logger.warn("MySQL connection closed.")
