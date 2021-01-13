@@ -83,7 +83,7 @@ def run_development_server(config: object, mysql: object) -> NoReturn:
 
 def run_production_server(config: object, mysql: object) -> NoReturn:
     app = create_app(config, mysql)
-    if sys.platform == "windows":
+    if sys.platform == "win32":
         from gevent.pywsgi import WSGIServer
 
         server = WSGIServer((config.HOST, int(config.PORT)), app)
