@@ -75,7 +75,6 @@ def excepthook(
     """
     A custom exception hook for logging all uncaught exceptions.
     """
-    print("from hook")
     try:
         _call_all_funcs()
     except Exception:
