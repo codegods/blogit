@@ -46,17 +46,17 @@ def signup():
 
 
 @blueprint.route(url_for("views.posts"))
-def posts():
+def posts(*_args):
     return flask.send_file(INDEX_HTML)
 
 
 @blueprint.route(url_for("views.tags"))
-def tags():
+def tags(*_args):
     return flask.send_file(INDEX_HTML)
 
 
 @blueprint.route(url_for("views.user"))
-def user():
+def user(*_args):
     return flask.send_file(INDEX_HTML)
 
 
