@@ -34,8 +34,6 @@ logger: Union[logging.Logger, None] = None
 def create_app(config: object, mysql_config: object) -> flask.app:
     app = flask.Flask(
         __name__,
-        static_folder=os.path.join(PROJECT_ROOT, "build", "static"),
-        static_url_path="/static",
     )
 
     # The database extension
