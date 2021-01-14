@@ -12,10 +12,7 @@ let HomePage = withStyles(App)(
             <div className={classes.logoBackground} />
           </div>
           <main>
-            <Typography variant="h3">A better place to write</Typography>
-            <Typography variant="body1">
-              With blogit you can write whatever
-            </Typography>
+            {/* TODO: Create a homepage */}
           </main>
         </div>
       );
