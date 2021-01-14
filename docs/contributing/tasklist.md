@@ -48,4 +48,13 @@ because that instance won't identify the user.
 
 Thus, this issue needs to be resolved soon.
 
+### 4. Drop the file uploader
+
+Currently, we use a seperate ts class for uploading class, which splits the file into 100 chunks and then uploads them.
+Because of reasons similar to hose described above, we need to drop this and rely on browser's implementation.
+
+### 5. Docs
+
+As is said, a good software is one that comes with good documentation. So, we need to work on better documentation.
+
 _**Warning:** Draft page_
