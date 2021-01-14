@@ -21,13 +21,18 @@ INDEX_HTML = os.path.join(PROJECT_ROOT, "build", "index.html")
 
 sys.path.append(PROJECT_ROOT)
 
-del sys, os, PROJECT_ROOT
+del sys
 import flask
 from helpers.url_for import url_for
 from helpers.cookies import login_required
 from flask import Blueprint
 
-blueprint = Blueprint(__name__, "static_files")
+blueprint = Blueprint(
+    __name__,
+    "static_files",
+    static_folder=os.path.join(PROJECT_ROOT, "build"),
+    static_url_path="/app",
+)
 
 
 @blueprint.route("/")
@@ -46,17 +51,17 @@ def signup():
 
 
 @blueprint.route(url_for("views.posts"))
-def posts(*_args):
+def posts(*_args, **_kwargs):
     return flask.send_file(INDEX_HTML)
 
 
 @blueprint.route(url_for("views.tags"))
-def tags(*_args):
+def tags(*_args, **_kwargs):
     return flask.send_file(INDEX_HTML)
 
 
 @blueprint.route(url_for("views.user"))
-def user(*_args):
+def user(*_args, **_kwargs):
     return flask.send_file(INDEX_HTML)
 
 
