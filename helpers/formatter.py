@@ -63,7 +63,7 @@ class FileFormatter(logging.Formatter):
 
         # This will prevent any ANSI code from making their way to
         # the log files
-        msg = re.sub("\\033\[[0-9;m]+", "", record.getMessage())  # noqa: W605
+        msg = re.sub("\\033\[[0-9;]+m", "", record.getMessage())  # noqa: W605
         res = f"[{record.asctime}] [{record.levelname}] {record.name}: {msg}"
         if record.levelno >= logging.ERROR and record.exc_info is not None:
             res += "\n" + "\n".join(format_exception(*record.exc_info)) + "\n"
