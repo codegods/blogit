@@ -119,12 +119,32 @@ def webpack_build(cfg: object) -> Result:
     return Result("", "", 0)
 
 
-def docker_build():
-    pass
-
-
-def build_static_routes():
-    pass
+def docker_build() -> Result:
+    logger.info("Starting docker build...")
+    args = []
+    if "--" in sys.argv:
+        args = sys.argv[sys.argv.index("--") + 1 :]  # noqa: E203
+    proc = Terminal.execute(
+        commands=[
+            "docker",
+            "build",
+            ".",
+            "-f",
+            os.path.join(PROJECT_ROOT, "dockerfile"),
+            *args,
+        ],
+        cwd=PROJECT_ROOT,
+    )
+    logger.info("Docker build started. Waiting for compilation to complete...")
+    t1 = time.time()
+    proc.wait()
+    t2 = time.time()
+    if proc.returncode != 0:
+        return Result(
+            proc.stdout.read().decode(), proc.stderr.read().decode(), proc.returncode
+        )
+    logger.info(f"Docker build finished successfully in \x1b[32m{t2-t1}s\x1b[0m.")
+    return Result("", "", 0)
 
 
 def main():
@@ -151,15 +171,14 @@ def main():
             "Skipping webpack build because \x1b[36m--skip-wp-build\x1b[0m flag is supplied"
         )
 
-    if "--docker" not in sys.argv:
-        docker_build()
-
-    if "--skip-static" not in sys.argv:
-        build_static_routes(config.wds)
-    else:
-        logger.warning(
-            "Skipping webpack build because \x1b[36m--skip-static\x1b[0m flag is supplied"
-        )
+    if "--docker" in sys.argv:
+        result = docker_build()
+        if result.exit_code != 0:
+            failed_process(
+                "docker",
+                result,
+                "This indicates some error while building container.",
+            )
 
 
 Terminal = (_WinTerminal if sys.platform == "win32" else _Terminal)()
