@@ -11,6 +11,8 @@ Blogit is a blogging website that haas been made obviously for the purpose of bl
 ## Guide to docs
 
 - [Setup](set-up)
+    - [Dev mode](set-up/index)
+    - [Prod mode (Use this for demo purposes)](set-up/production)
 - [Contributing](contributing)
     - [How to](contributing/how-to)
     - [Tasklist](contributing/tasklist)

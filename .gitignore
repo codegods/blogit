@@ -24,7 +24,6 @@ yarn-error.log*
 
 # Driver
 chromedriver
-chromedriver_*.zip
 
 # Virtual environments
 venv/
@@ -40,3 +39,5 @@ secrets.json
 logs/
 
 **/tmp/*
+
+*.zip
