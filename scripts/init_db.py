@@ -73,7 +73,7 @@ class Execute:
             "storage": [
                 "id char(64) NOT NULL",
                 "name varchar(32) NOT NULL",
-                "contents text(5242880) NOT NULL",  # 5242880chars = 1024 chars/kb * 1024kb/mb * 5 = 5MB,
+                "contents text(5242880) NOT NULL",  # 5242880chars=1024chars/kb*1024kb/mb*5=5MB
                 "PRIMARY KEY (id)",
             ],
             "followers": [
@@ -100,9 +100,7 @@ class Execute:
             logger.info("Creating database \x1b[97m{}\x1b[m".format(self._db))
             cursor = self._connection.cursor()
             cursor.execute(
-                "create database {};".format(
-                    self._connection.converter.escape(self._db)
-                )
+                "create database {};".format(self._db)
             )
             self._connection.commit()
 
