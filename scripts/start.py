@@ -159,6 +159,10 @@ def start_flask(config: config_loader.ConfigTemplate) -> None:
 def gunicorn():
     """Utility function to run the app with gunicorn"""
     import main
+    from helpers import exception, init_console
+
+    exception.init()
+    init_console.init()
 
     config = config_loader.main()
     config.MODE = "production"

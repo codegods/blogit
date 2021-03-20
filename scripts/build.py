@@ -179,6 +179,7 @@ def main():
                 result,
                 "This indicates some error while building container.",
             )
+    logger.info("All builds completed, exiting...")
 
 
 Terminal = (_WinTerminal if sys.platform == "win32" else _Terminal)()
